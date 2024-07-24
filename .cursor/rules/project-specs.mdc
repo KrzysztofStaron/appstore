@@ -1,0 +1,446 @@
+---
+alwaysApply: true
+---
+
+# Technical Specification: App Store Review Analysis Tool
+
+## 1. Project Overview
+
+The App Store Review Analysis Tool automates the collection and analysis of user reviews from the Apple App Store, providing actionable insights for developers and businesses. It extracts key information (e.g., bugs, praises, suggestions), groups reviews by criteria like app version or date, analyzes trends, compares with competitors, and generates comprehensive reports. The tool is designed for scalability, potential extension to platforms like Google Play, and monetization as a Software as a Service (SaaS) product.
+
+### 1.1. Objectives
+
+- **Insight Extraction**: Identify critical user feedback, such as reported bugs, praises, and feature suggestions.
+- **Review Grouping**: Organize reviews by app version, date, or region for targeted analysis.
+- **Trend Analysis**: Track changes in ratings and sentiment over time, especially post-update impacts.
+- **Competitor Comparison**: Benchmark the app against others in the same category.
+- **Reporting**: Deliver clear, actionable summaries in text and visual formats, exportable as PDF or CSV.
+
+## 2. Data Source
+
+The tool relies on the public App Store RSS API, a set of unauthenticated endpoints under `[invalid url, do not cite] inherited from the iTunes ecosystem. These endpoints provide access to reviews and metadata without requiring developer credentials, making them ideal for public data analysis.
+
+### 2.1. API Endpoints
+
+#### 2.1.1. Customer Reviews (RSS)
+
+- **URL**: `[invalid url, do not cite]
+- **Description**: Retrieves user reviews for a specified app in a given region.
+- **Parameters**:
+  - `{region}`: ISO 3166-1 alpha-2 country code (e.g., `us`, `pl`, `gb`). See section 2.3 for the full list.
+  - `{page}`: Page number (1–10). Each page contains up to 50 reviews.
+  - `{app_id}`: Unique app identifier (e.g., `6670324846` for Grok).
+  - `{sort_option}`: Sorting method (`mostrecent` for newest first, `mosthelpful` for most helpful).
+  - `/json`: Specifies JSON output (alternative: `/xml`).
+- **Example**: `[invalid url, do not cite]
+- **Method**: GET
+- **Authentication**: None (public endpoint).
+- **Limitations**: Up to 10 pages per region (~500 reviews). Rate limits apply (undocumented, recommend 1–2 second delay between requests).
+
+#### 2.1.2. App Metadata (Lookup)
+
+- **URL**: `[invalid url, do not cite]
+- **Description**: Retrieves detailed app metadata (e.g., name, category, version).
+- **Parameters**:
+  - `{app_id}`: Unique app identifier.
+  - Optional: `country={region}` for region-specific metadata.
+- **Example**: `[invalid url, do not cite]
+- **Method**: GET
+- **Authentication**: None.
+
+#### 2.1.3. App Search
+
+- **URL**: `[invalid url, do not cite]
+- **Description**: Searches for apps by keyword, useful for identifying competitors.
+- **Parameters**:
+  - `{keyword}`: Search term (e.g., `grok`).
+  - `{region}`: Country code.
+  - `entity=software`: Limits results to apps.
+- **Example**: `[invalid url, do not cite]
+- **Method**: GET
+- **Authentication**: None.
+
+### 2.2. Available Data
+
+#### 2.2.1. Review Data
+
+The `/rss/customerreviews` endpoint returns a JSON response with the following fields in `feed.entry`:
+
+- `author.name.label`: Reviewer’s name (may be anonymized in regions like the EU due to GDPR).
+- `title.label`: Review title.
+- `content.label`: Review content.
+- `im:rating.label`: Rating (string, 1–5).
+- `im:version.label`: App version (e.g., `1.0.2`).
+- `updated.label`: Publication date (ISO 8601, e.g., `2025-07-15T12:00:00-07:00`).
+- `id.label`: Unique review identifier.
+
+**Example Response**:
+
+```json
+{
+  "feed": {
+    "entry": [
+      {
+        "author": { "name": { "label": "User123" } },
+        "title": { "label": "Great app!" },
+        "content": { "label": "Really intuitive and helpful." },
+        "im:rating": { "label": "5" },
+        "im:version": { "label": "1.0.2" },
+        "updated": { "label": "2025-07-15T12:00:00-07:00" },
+        "id": { "label": "123456789" }
+      }
+    ]
+  }
+}
+```
+
+#### 2.2.2. App Metadata
+
+The `/lookup` endpoint returns metadata in `results[0]`:
+
+- `trackName`: App name (e.g., `Grok`).
+- `primaryGenreName`: Category (e.g., `Utilities`).
+- `version`: Current version (e.g., `1.0.2`).
+- `averageUserRating`: Average rating (float, e.g., `4.5`).
+- `userRatingCount`: Number of ratings (e.g., `1234`).
+- `description`: App description.
+- `sellerName`: Developer name (e.g., `xAI`).
+- `trackId`: App ID.
+- `releaseNotes`: Update notes.
+- `releaseDate`: Initial release date.
+- `currentVersionReleaseDate`: Current version release date.
+
+**Example Response**:
+
+```json
+{
+  "resultCount": 1,
+  "results": [
+    {
+      "trackName": "Grok",
+      "primaryGenreName": "Utilities",
+      "version": "1.0.2",
+      "averageUserRating": 4.5,
+      "userRatingCount": 1234,
+      "description": "AI-powered assistant...",
+      "sellerName": "xAI",
+      "trackId": 6670324846,
+      "releaseNotes": "Fixed bugs...",
+      "releaseDate": "2024-11-01T00:00:00Z",
+      "currentVersionReleaseDate": "2025-06-15T00:00:00Z"
+    }
+  ]
+}
+```
+
+#### 2.2.3. Search Data
+
+The `/search` endpoint returns a list of apps in `results`, with fields similar to `/lookup`, enabling competitor identification.
+
+### 2.3. Regions
+
+The App Store operates in 175 regions, each identified by a two-letter ISO 3166-1 alpha-2 code or Apple-specific code. Fetching reviews from all regions maximizes data collection (up to ~87,500 reviews for popular apps). Below is the complete list:
+
+| Code | Country/Region         | Code | Country/Region               | Code | Country/Region        |
+| ---- | ---------------------- | ---- | ---------------------------- | ---- | --------------------- |
+| `ae` | United Arab Emirates   | `ag` | Antigua and Barbuda          | `ai` | Anguilla              |
+| `al` | Albania                | `am` | Armenia                      | `ao` | Angola                |
+| `ar` | Argentina              | `at` | Austria                      | `au` | Australia             |
+| `az` | Azerbaijan             | `bb` | Barbados                     | `be` | Belgium               |
+| `bf` | Burkina Faso           | `bg` | Bulgaria                     | `bh` | Bahrain               |
+| `bj` | Benin                  | `bm` | Bermuda                      | `bn` | Brunei                |
+| `bo` | Bolivia                | `br` | Brazil                       | `bs` | Bahamas               |
+| `bt` | Bhutan                 | `bw` | Botswana                     | `by` | Belarus               |
+| `bz` | Belize                 | `ca` | Canada                       | `cg` | Republic of the Congo |
+| `ch` | Switzerland            | `ci` | Ivory Coast                  | `cl` | Chile                 |
+| `cm` | Cameroon               | `cn` | China Mainland               | `co` | Colombia              |
+| `cr` | Costa Rica             | `cv` | Cape Verde                   | `cy` | Cyprus                |
+| `cz` | Czech Republic         | `de` | Germany                      | `dk` | Denmark               |
+| `dm` | Dominica               | `do` | Dominican Republic           | `dz` | Algeria               |
+| `ec` | Ecuador                | `ee` | Estonia                      | `eg` | Egypt                 |
+| `es` | Spain                  | `fi` | Finland                      | `fj` | Fiji                  |
+| `fm` | Micronesia             | `fr` | France                       | `gb` | United Kingdom        |
+| `gd` | Grenada                | `gh` | Ghana                        | `gm` | Gambia                |
+| `gr` | Greece                 | `gt` | Guatemala                    | `gw` | Guinea-Bissau         |
+| `gy` | Guyana                 | `hk` | Hong Kong                    | `hn` | Honduras              |
+| `hr` | Croatia                | `hu` | Hungary                      | `id` | Indonesia             |
+| `ie` | Ireland                | `il` | Israel                       | `in` | India                 |
+| `is` | Iceland                | `it` | Italy                        | `jm` | Jamaica               |
+| `jo` | Jordan                 | `jp` | Japan                        | `ke` | Kenya                 |
+| `kg` | Kyrgyzstan             | `kh` | Cambodia                     | `kn` | Saint Kitts and Nevis |
+| `kr` | South Korea            | `kw` | Kuwait                       | `ky` | Cayman Islands        |
+| `kz` | Kazakhstan             | `la` | Laos                         | `lb` | Lebanon               |
+| `lc` | Saint Lucia            | `lk` | Sri Lanka                    | `lr` | Liberia               |
+| `lt` | Lithuania              | `lu` | Luxembourg                   | `lv` | Latvia                |
+| `md` | Moldova                | `mg` | Madagascar                   | `mk` | North Macedonia       |
+| `ml` | Mali                   | `mn` | Mongolia                     | `mo` | Macao                 |
+| `mr` | Mauritania             | `ms` | Montserrat                   | `mt` | Malta                 |
+| `mu` | Mauritius              | `mw` | Malawi                       | `mx` | Mexico                |
+| `my` | Malaysia               | `mz` | Mozambique                   | `na` | Namibia               |
+| `ne` | Niger                  | `ng` | Nigeria                      | `nl` | Netherlands           |
+| `no` | Norway                 | `np` | Nepal                        | `nz` | New Zealand           |
+| `om` | Oman                   | `pa` | Panama                       | `pe` | Peru                  |
+| `pg` | Papua New Guinea       | `ph` | Philippines                  | `pk` | Pakistan              |
+| `pl` | Poland                 | `pt` | Portugal                     | `pw` | Palau                 |
+| `py` | Paraguay               | `qa` | Qatar                        | `ro` | Romania               |
+| `ru` | Russia                 | `sa` | Saudi Arabia                 | `sc` | Seychelles            |
+| `se` | Sweden                 | `sg` | Singapore                    | `si` | Slovenia              |
+| `sk` | Slovakia               | `sl` | Sierra Leone                 | `sn` | Senegal               |
+| `sr` | Suriname               | `st` | São Tomé and Príncipe        | `sv` | El Salvador           |
+| `sz` | Eswatini               | `tc` | Turks and Caicos             | `td` | Chad                  |
+| `th` | Thailand               | `tj` | Tajikistan                   | `tm` | Turkmenistan          |
+| `tn` | Tunisia                | `tr` | Turkey                       | `tt` | Trinidad and Tobago   |
+| `tw` | Taiwan                 | `tz` | Tanzania                     | `ua` | Ukraine               |
+| `ug` | Uganda                 | `us` | United States                | `uy` | Uruguay               |
+| `uz` | Uzbekistan             | `vc` | Saint Vincent and Grenadines | `ve` | Venezuela             |
+| `vg` | British Virgin Islands | `vn` | Vietnam                      | `ye` | Yemen                 |
+| `za` | South Africa           | `zm` | Zambia                       | `zw` | Zimbabwe              |
+
+**Notes**:
+
+- **Maximizing Data**: Iterating over all 175 regions can yield thousands of reviews for popular apps. Deduplicate using `id.label` to avoid rare cross-region duplicates.
+- **Regional Variations**: Reviews vary by language and availability. Some regions (e.g., `cn`) may have restrictions due to local regulations.
+- **Validation**: Verify app availability in a region using `/lookup` with `country={region}`.
+
+### 2.4. API Limitations and Nuances
+
+- **Pagination**: Limited to 10 pages per region (~500 reviews). Stop fetching when `feed.entry` is empty.
+- **Rate Limiting**: Undocumented; recommend 1–2 second delays between requests to avoid HTTP 429 errors.
+- **Errors**:
+  - **404 Not Found**: Invalid `app_id` or region, or app unavailable in the region.
+  - **Timeouts**: Handle with a 5-second timeout per request.
+  - **Empty Responses**: Indicate no reviews for the page/region.
+- **Regional Differences**:
+  - Language: Reviews are in local languages, requiring multilingual NLP (e.g., `bert-base-multilingual-cased`).
+  - Privacy: EU regions (e.g., `pl`, `de`) may anonymize `author.name.label`.
+- **Stability**: As an undocumented API, it may change. Monitor responses for format changes or deprecation.
+
+### 2.5. Multi-Region Data Collection
+
+To maximize review data:
+
+1. **Iterate Over Regions**: Fetch reviews from all 175 regions, prioritizing high-traffic ones (e.g., `us`, `gb`, `jp`).
+2. **Algorithm**:
+   - For each region, fetch pages 1–10 until `feed.entry` is empty.
+   - Store reviews with `region` field for analysis.
+   - Deduplicate using `id.label`.
+3. **Optimization**:
+   - Use asynchronous requests for efficiency.
+   - Cache data locally (e.g., SQLite) to reduce API calls.
+   - Implement exponential backoff for rate-limiting errors.
+
+**Example Pseudocode**:
+
+```python
+regions = ['us', 'pl', 'gb', ...]  # 175 regions
+reviews = []
+for region in regions:
+    for page in range(1, 11):
+        url = f"[invalid url, do not cite]
+        try:
+            response = requests.get(url, timeout=5)
+            entries = response.json().get('feed', {}).get('entry', [])
+            if not entries:
+                break
+            reviews.extend(parse_reviews(entries, region))
+        except Exception as e:
+            print(f"Error in {region}, page {page}: {e}")
+            break
+        time.sleep(1)
+reviews_df = pd.DataFrame(reviews).drop_duplicates(subset='id')
+```
+
+### 2.6. Web Scraping for Additional Data
+
+For data not available via API (e.g., screenshots, rankings):
+
+- **Source**: App Store page (e.g., `[invalid url, do not cite]).
+- **Tools**: Use `beautifulsoup` or `selenium` for scraping.
+- **Data**: Screenshots, detailed release notes, category rankings.
+- **Caution**: Scraping is less reliable than API calls and may face restrictions.
+
+## 3. Functionalities
+
+### 3.1. Review Filtering
+
+- **Non-Informative Reviews**: Exclude reviews shorter than 10 characters or with fewer than 3 words, or containing generic terms (e.g., "cool", "ok").
+- **Grouping**:
+  - By `im:version.label` for update impact analysis.
+  - By `updated.label` (parsed to datetime) for temporal trends.
+  - By `region` for regional insights.
+
+### 3.2. Sentiment Analysis
+
+- **Classification**: Use `im:rating.label` (1–2: negative, 3: neutral, 4–5: positive) or NLP models (e.g., `transformers`) for `content.label`.
+- **Topics**: Identify themes (e.g., "bug", "usability") using LDA or `BERTopic`.
+
+### 3.3. Trend Analysis
+
+- **Metrics**: Calculate average ratings and sentiment by month or version.
+- **Update Impact**: Compare reviews before/after `im:version.label` changes.
+- **Visualizations**: Line charts for ratings over time, bar charts for version comparisons.
+
+### 3.4. Competitor Comparison
+
+- **Identification**: Use `/search` with `primaryGenreName` from `/lookup` to find similar apps.
+- **Metrics**: Compare `averageUserRating`, `userRatingCount`, and sentiment.
+
+### 3.5. Reporting
+
+- **Summary**: Total reviews, average rating, sentiment distribution, common issues.
+- **Visualizations**: Trend charts, word clouds, rating distributions.
+- **Export**: CSV via `pandas.to_csv`, PDF via `reportlab` or LaTeX.
+
+## 5. Project Structure
+
+```
+app_store_analyzer/
+├── requirements.txt           # Dependencies (requests, pandas, transformers)
+├── config.json               # Configuration (app_id, regions)
+├── src/
+│   ├── data_fetcher.py       # API data retrieval
+│   ├── preprocessor.py       # Data cleaning and filtering
+│   ├── analyzer.py           # Sentiment and topic analysis
+│   ├── trends.py             # Trend and competitor analysis
+│   ├── report_generator.py   # Report generation
+├── tests/                    # Unit tests
+├── docs/                     # Documentation
+└── README.md                 # Instructions
+```
+
+## 6. Implementation Steps
+
+### 6.1. Data Fetching
+
+- **Function**: `fetch_reviews(app_id, regions)` to iterate over regions and pages.
+- **Output**: `pandas.DataFrame` with columns: `id`, `region`, `title`, `content`, `rating`, `version`, `date`.
+- **Metadata**: Fetch via `/lookup` for context (e.g., `trackName`, `primaryGenreName`).
+
+**Example**:
+
+```python
+import requests
+import pandas as pd
+def fetch_reviews(app_id, regions):
+    reviews = []
+    for region in regions:
+        for page in range(1, 11):
+            url = f"[invalid url, do not cite]
+            try:
+                response = requests.get(url, timeout=5)
+                response.raise_for_status()
+                entries = response.json().get('feed', {}).get('entry', [])
+                if not entries:
+                    break
+                for entry in entries:
+                    reviews.append({
+                        'id': entry['id']['label'],
+                        'region': region,
+                        'title': entry['title']['label'],
+                        'content': entry['content']['label'],
+                        'rating': int(entry['im:rating']['label']),
+                        'version': entry['im:version']['label'],
+                        'date': entry['updated']['label']
+                    })
+            except requests.RequestException as e:
+                print(f"Error in {region}, page {page}: {e}")
+                break
+            time.sleep(1)
+    return pd.DataFrame(reviews).drop_duplicates(subset='id')
+```
+
+### 6.2. Preprocessing
+
+- **Filtering**: Remove reviews with <10 characters, <3 words, or non-informative terms.
+- **Normalization**: Lowercase, remove emojis, strip special characters (use `re`, `emoji`).
+- **Deduplication**: Use `id.label` to remove duplicates.
+
+### 6.3. NLP Analysis
+
+- **Sentiment**: Use `transformers` for multilingual sentiment classification.
+- **Topics**: Apply `BERTopic` or LDA for theme extraction.
+
+**Example**:
+
+```python
+from transformers import pipeline
+sentiment_analyzer = pipeline('sentiment-analysis', model='bert-base-multilingual-cased')
+def analyze_sentiment(reviews_df):
+    reviews_df['sentiment'] = reviews_df['content'].apply(
+        lambda x: sentiment_analyzer(x)[0]['label']
+    )
+    return reviews_df
+```
+
+### 6.4. Trend Analysis
+
+- **Metrics**: Group by `date` (monthly) or `version` for averages.
+- **Visualizations**: Use `matplotlib` for line/bar charts.
+
+**Example**:
+
+```python
+import pandas as pd
+def analyze_trends(reviews_df):
+    reviews_df['date'] = pd.to_datetime(reviews_df['date'])
+    monthly_ratings = reviews_df.groupby(reviews_df['date'].dt.to_period('M'))['rating'].agg(['mean', 'count'])
+    version_ratings = reviews_df.groupby('version')['rating'].agg(['mean', 'count'])
+    return monthly_ratings, version_ratings
+```
+
+### 6.5. Competitor Comparison
+
+- **Search**: Use `/search` to find apps in the same category.
+- **Comparison**: Fetch metadata via `/lookup` and compare metrics.
+
+### 6.6. Reporting
+
+- **Summary**: Generate metrics (e.g., total reviews, sentiment breakdown).
+- **Export**: Use `pandas.to_csv` for CSV, `reportlab` for PDF.
+
+**Example**:
+
+```python
+def generate_report(reviews_df):
+    summary = {
+        'total_reviews': len(reviews_df),
+        'average_rating': reviews_df['rating'].mean(),
+        'sentiment_breakdown': reviews_df['sentiment'].value_counts().to_dict()
+    }
+    return summary
+```
+
+## 7. AI-Driven Code Generation
+
+- **Specification**: Create `requirements.md` with detailed function descriptions.
+- **Process**:
+  1. Define module requirements (e.g., inputs, outputs, error handling).
+  2. Use Claude/CodeGrok to generate code.
+  3. Test and refine iteratively.
+- **Example `requirements.md`**:
+
+  ```markdown
+  # Requirements for app_store_analyzer
+
+  ## data_fetcher.py
+
+  - Function: fetch_reviews(app_id: str, regions: List[str]) -> pd.DataFrame
+    - Input: app_id (e.g., "6670324846"), regions (list of codes)
+    - Output: DataFrame with columns: id, region, title, content, rating, version, date
+    - Handle: 10-page limit, rate-limiting (1s delay), deduplication by id
+  ```
+
+## 8. Work Plan
+
+| Day | Task                                                                                                      |
+| --- | --------------------------------------------------------------------------------------------------------- |
+| 1   | Draft `requirements.md`, generate `data_fetcher.py` and `preprocessor.py`, test with `app_id=6670324846`. |
+| 2–3 | Implement NLP analysis (`analyzer.py`), generate trend visualizations (`trends.py`).                      |
+| 4–5 | Add competitor comparison, implement report generation (`report_generator.py`).                           |
+| 6+  | Test, optimize, add Streamlit interface, finalize documentation.                                          |
+
+## 9. Additional Considerations
+
+- **Monetization**: SaaS with premium features (e.g., real-time updates, competitor analysis).
+
+Use fucking shadcn/ui for any UI task, and use open router

@@ -1,0 +1,156 @@
+# App Store Review Analysis Tool - Development Rules
+
+## Core Architecture
+
+### Data Sources
+
+- **App Store RSS API**: Primary data source for reviews and metadata
+- **Rate Limiting**: 1-2 second delays between API calls to avoid HTTP 429 errors
+- **Pagination**: Maximum 10 pages per region (~150 reviews per region)
+- **Regions**: Support for 175 App Store regions with proper error handling
+
+### Data Accuracy Requirements
+
+- **Rating Calculations**: Use overall app rating from metadata, not just written reviews
+- **Version Sorting**: Implement semantic versioning for proper version comparison
+- **Date Handling**: Robust date validation and ISO 8601 parsing
+- **Review Filtering**: LLM-powered filtering to remove non-informative reviews
+
+## UI/UX Standards
+
+### Rating Display
+
+- **Overview**: Round to 1 decimal place (e.g., "4.5★")
+- **Details**: Show exact rating with full precision
+- **Consistency**: Always display ratings with star symbols (★)
+
+### Review Cards
+
+**Always include complete information:**
+
+- Review title and content
+- **Author name** (when available)
+- **App version** (im:version.label)
+- **Date added** (formatted as readable date)
+- **Region** (ISO country code)
+- **Rating** (with star display)
+- **Review ID** (for tracking)
+
+### Interactive Elements
+
+- **Clickable Metrics**: Performance cards should show detailed review lists
+- **Expandable Sections**: Allow drilling down into specific categories
+- **Filtering Options**: Enable filtering by version, date range, region
+- **Export Functionality**: CSV and PDF export capabilities
+
+## Data Processing Rules
+
+### Review Analysis
+
+- **Filtering**: Use LLM (mistralai/mistral-8b-instruct) for intelligent filtering
+- **Batch Processing**: Process LLM calls in batches of 20 for efficiency
+- **Fallback**: Heuristic filtering when LLM is unavailable
+- **Caching**: Implement caching for analysis results to speed up testing
+
+### Trend Analysis
+
+- **Use Overall Ratings**: Calculate trends from app metadata, not just written reviews
+- **Time-based Grouping**: Group by month, quarter, or version release
+- **Version Impact**: Compare ratings before/after version updates
+- **Historical Data**: Support for historical data tracking over time
+
+### Performance Metrics
+
+- **Interactive Cards**: Click on "Crashes", "Bugs", etc. to show relevant reviews
+- **Category Breakdown**: UI, Performance, Bugs, Features, General
+- **Actionable Insights**: Convert metrics into actionable feedback
+
+## New Features Required
+
+### Actionable Feedback Tab
+
+- **Task Generation**: Create actionable tasks for app improvement
+- **Version-specific**: Group feedback by app version
+- **Priority Levels**: High, Medium, Low priority tasks
+- **Category Tags**: UI, Performance, Feature, Bug categories
+
+### Historical Data System
+
+- **Daily Cron Job**: Fetch reviews for top AI apps daily
+- **Database Storage**: Store historical review data
+- **Trend Analysis**: Track changes over weeks/months
+- **Sample Analysis**: Provide example analyses for popular apps
+
+### Competitor Analysis
+
+- **Market Positioning**: Compare against similar apps
+- **Rating Comparison**: Side-by-side rating analysis
+- **Feature Comparison**: Identify competitive advantages
+- **Strategic Insights**: SWOT analysis and recommendations
+
+## Technical Requirements
+
+### Performance
+
+- **Benchmarking**: Measure execution time of each operation
+- **Caching**: In-memory caching for analysis results
+- **Parallel Processing**: Batch LLM calls for efficiency
+- **Error Handling**: Graceful fallbacks for API failures
+
+### Code Quality
+
+- **TypeScript**: Strict typing throughout the codebase
+- **Server Actions**: Use Next.js Server Actions for data fetching
+- **Error Boundaries**: Proper error handling and user feedback
+- **Loading States**: Use `useTransition` for non-blocking UI updates
+
+### File Structure
+
+- **Components**: Use shadcn/ui components with Tailwind CSS
+- **Server Actions**: Centralized in [app/actions.ts](mdc:app/actions.ts)
+- **Analysis Logic**: Core logic in [lib/analysis.ts](mdc:lib/analysis.ts)
+- **API Integration**: App Store API in [lib/app-store-api.ts](mdc:lib/app-store-api.ts)
+
+## Data Validation
+
+### Review Data
+
+- **Minimum Length**: Filter out reviews shorter than 10 characters
+- **Word Count**: Require at least 3 words for meaningful analysis
+- **Language Support**: Handle multilingual reviews appropriately
+- **Duplicate Detection**: Remove duplicate reviews across regions
+
+### Metadata Validation
+
+- **Required Fields**: Ensure all essential metadata is present
+- **Version Format**: Validate semantic versioning format
+- **Date Formats**: Handle various date formats consistently
+- **Rating Validation**: Ensure ratings are within 1-5 range
+
+## Future Enhancements
+
+### Database Integration
+
+- **Historical Storage**: Store daily snapshots of review data
+- **Trend Tracking**: Long-term trend analysis capabilities
+- **Multi-App Support**: Analyze multiple apps simultaneously
+- **User Accounts**: Save analysis preferences and history
+
+### Advanced Analytics
+
+- **Sentiment Evolution**: Track sentiment changes over time
+- **Feature Impact**: Measure impact of new features on ratings
+- **Regional Insights**: Compare performance across regions
+- **Seasonal Patterns**: Identify seasonal trends in reviews
+
+### Export and Reporting
+
+- **PDF Reports**: Generate comprehensive PDF reports
+- **CSV Export**: Export raw data for external analysis
+- **Scheduled Reports**: Automated report generation
+- **Custom Dashboards**: User-configurable dashboard layouts
+  description:
+  globs:
+  alwaysApply: false
+
+---

@@ -1,0 +1,1301 @@
+{
+  "feed": {
+    "author": { "name": { "label": "iTunes Store" }, "uri": { "label": "http://www.apple.com/uk/itunes/" } },
+    "entry": [
+      {
+        "author": {
+          "uri": { "label": "https://itunes.apple.com/gb/reviews/id188803961" },
+          "name": { "label": "horsecrate" },
+          "label": ""
+        },
+        "updated": { "label": "2025-03-21T07:44:20-07:00" },
+        "im:rating": { "label": "5" },
+        "im:version": { "label": "1.0.54" },
+        "id": { "label": "12446723222" },
+        "title": { "label": "Extraordinary!" },
+        "content": {
+          "label": "Listening to Elon Musk talking for 3 hours, my opinion on him has evolved from basic bumper sticker to more balanced and frankly inspired. He mentioned Grok which I then found. My first question was to ask it about a medical pharma issue facing my Dad. The results confirmed what had taken me days to read up on,in seconds. The only challenge (as with everything) refining the question. What a game changer. It feels like we are at a fork in the road. There is the past/establishment with a bureaucracy of those who hold/withold information, and the present where the deconstruction of power, availability of open access and holding folk to account could change everything. This is a phenomenal technology.",
+          "attributes": { "type": "text" }
+        },
+        "link": {
+          "attributes": {
+            "rel": "related",
+            "href": "https://itunes.apple.com/gb/review?id=6670324846&type=Purple%20Software"
+          }
+        },
+        "im:voteSum": { "label": "0" },
+        "im:contentType": { "attributes": { "term": "Application", "label": "Application" } },
+        "im:voteCount": { "label": "0" }
+      },
+      {
+        "author": {
+          "uri": { "label": "https://itunes.apple.com/gb/reviews/id17784780" },
+          "name": { "label": "CannonArmourer" },
+          "label": ""
+        },
+        "updated": { "label": "2025-02-23T03:10:03-07:00" },
+        "im:rating": { "label": "4" },
+        "im:version": { "label": "1.0.34" },
+        "id": { "label": "12345132593" },
+        "title": { "label": "A lot of hype on play but seriously …" },
+        "content": {
+          "label": "The internet is full if excitement and examples if really impressive graphics and game generation, rightly so. But I have grown to admire Grok for it’s really serious capabilities to assist beyond this and delve in the daily worries of  life that gives us hassle and time consuming efforts. Boring stuff like writing compliant letters, or feedback , finding how to change settings, what process to follow to request the right govmnt service. It is outstanding. But can get full of itself and swamp you with data.\nJust reply or talk as a friend and dig deeper by asking as if a friend or solicitor. Ask for a draft or review yours and it advises tone or style. If i tell you my age you may say , ahh. But at 86 yrs with 60yrs IT it has arrived at the best time, at the most precious time and Grok is solving all my concerns re handling communication and  modern understanding,\nJust dont trust it first hand, challenge and question like in  any other conversation and you will be impressed by the professionalism that results. Most companies think I have a solicitor,\nBut please enhance history conversation management… Excited for the future if mankind.",
+          "attributes": { "type": "text" }
+        },
+        "link": {
+          "attributes": {
+            "rel": "related",
+            "href": "https://itunes.apple.com/gb/review?id=6670324846&type=Purple%20Software"
+          }
+        },
+        "im:voteSum": { "label": "0" },
+        "im:contentType": { "attributes": { "term": "Application", "label": "Application" } },
+        "im:voteCount": { "label": "0" }
+      },
+      {
+        "author": {
+          "uri": { "label": "https://itunes.apple.com/gb/reviews/id112231790" },
+          "name": { "label": "jjredox" },
+          "label": ""
+        },
+        "updated": { "label": "2025-02-25T14:35:04-07:00" },
+        "im:rating": { "label": "3" },
+        "im:version": { "label": "1.0.35" },
+        "id": { "label": "12354936331" },
+        "title": { "label": "Really good but lacking fundamentals options" },
+        "content": {
+          "label": "I’m comparing Chatgtp (paid version) with Grok at the moment. In all honesty I find them VERY similar but I would tend to like Grok more. A little less on the ‘please you’ side. It’s actually challenging the questions I’m asking where ChatGTP seems to always give you an answer (which can be wrong sometime - Grok too)\nHowever the buzz killer for me is the total lack of MEMORY with Grok. It makes the whole thing no useable for me. There’s no way I’m going to re explain what my business do everytime I need to ask something specific. \nThis and the fact that Grok can’t read pictures is also a massive issue. On gtp I upload a photos and ask question about it (like ‘where’s the pump on the boiler’). Grok can’t read photos or documents. BIG downer. I how they’ll fix those really soon (but according to Grok memory won’t be for a few month and reading pictures likely not this year so….)\nI won’t be moving over to a paid version until this is done.",
+          "attributes": { "type": "text" }
+        },
+        "link": {
+          "attributes": {
+            "rel": "related",
+            "href": "https://itunes.apple.com/gb/review?id=6670324846&type=Purple%20Software"
+          }
+        },
+        "im:voteSum": { "label": "0" },
+        "im:contentType": { "attributes": { "term": "Application", "label": "Application" } },
+        "im:voteCount": { "label": "0" }
+      },
+      {
+        "author": {
+          "uri": { "label": "https://itunes.apple.com/gb/reviews/id1767773223" },
+          "name": { "label": "Charlie.LH" },
+          "label": ""
+        },
+        "updated": { "label": "2025-03-20T15:50:14-07:00" },
+        "im:rating": { "label": "2" },
+        "im:version": { "label": "1.0.53" },
+        "id": { "label": "12444308543" },
+        "title": { "label": "UI is bad and the app in general becomes unusable after certain points." },
+        "content": {
+          "label": "My first experiences with Grok were really good. The information they provide is a breath of fresh air from the ones produced by Chat Gpt, and there’s no limits to memory saving, you don’t have to spend a single penny for it compared to Chat gpt where they only allow you to save a certain amount of memory, and you can send Grok unlimited pictures to them without paying which is also very good. \n\nHowever, then there are the problems. Big problems. At certain points in a message tab, Grok becomes unusable. It pretty much shut downs and forgets all your memory from a specific message tab you’ve had opened and it takes ages for it to reply to your messages and sometimes even deletes them. \n\nThen there is the UI. The UI is terrible. Glitchy, slow and time consuming. Chat GPT is 100% better in this aspect. And I often started using Chat GPT again over Grok because it was more convenient and less time consuming and ZERO lag. \n\nThe UI is the worst aspect of Grok and needs fixing asap. And I’ve moved back to using Chat GPT instead simply because it is easier , more convenient, quicker, less time consuming and no lag. \n\nI probably will come back to using Grok at some point in the near future. But right now it is simply far inferior to Chat GPT. \n\nGrok does have the potential to take that place though. It just needs more work, such as better UI, and quicker responses.",
+          "attributes": { "type": "text" }
+        },
+        "link": {
+          "attributes": {
+            "rel": "related",
+            "href": "https://itunes.apple.com/gb/review?id=6670324846&type=Purple%20Software"
+          }
+        },
+        "im:voteSum": { "label": "0" },
+        "im:contentType": { "attributes": { "term": "Application", "label": "Application" } },
+        "im:voteCount": { "label": "0" }
+      },
+      {
+        "author": {
+          "uri": { "label": "https://itunes.apple.com/gb/reviews/id283961518" },
+          "name": { "label": "Maria-41" },
+          "label": ""
+        },
+        "updated": { "label": "2025-06-07T14:55:27-07:00" },
+        "im:rating": { "label": "3" },
+        "im:version": { "label": "1.1.2" },
+        "id": { "label": "12748043523" },
+        "title": { "label": "Ok I guess for simple stuff" },
+        "content": {
+          "label": "As a search engine It is kind of ok but miss the fondamental details and therefore get it wrong. Sometime very wrong. There is certainly zero intelligence in this AI. Good at retrieving simple data by scouring the Internet but it misses sometimes fundamental things.\n.\nExamples:\nRecipes. I asked for a Brazilian frosting recipe with heavy cream and condensed milk. It came out with lots of stuff totally irrelevant and I had to prod it and ask for frosting for cupcakes to get actually some info that would be correct.\n\nI asked about tax in France. Oh boy.\nIt was complex stuff but still. Not good.\n\nThen I  asked about my MMO video-game and my character set up and what it would recommend ( magicka sorcerer one bar) and it was so wrong it was actually funny. If I ran my toon with that set up I would not last 5 minutes. \nSo in conclusion, if you  are after simple info, it will scour the Internet, kind of summarise it and return à wall of information. Most of it totally irrelevant, but eventually after 500 pages you will get your two sentences response. \nFor slightly more complex or subtle stuff.... no chance. \nI will move on to another AI see if I can find the I in AI. \n\nMy concern is that it will use private websites that do the hard work to copy and return data. Depriving said websites from revenues and visits. Not sure this is ethical.",
+          "attributes": { "type": "text" }
+        },
+        "link": {
+          "attributes": {
+            "rel": "related",
+            "href": "https://itunes.apple.com/gb/review?id=6670324846&type=Purple%20Software"
+          }
+        },
+        "im:voteSum": { "label": "0" },
+        "im:contentType": { "attributes": { "term": "Application", "label": "Application" } },
+        "im:voteCount": { "label": "0" }
+      },
+      {
+        "author": {
+          "uri": { "label": "https://itunes.apple.com/gb/reviews/id290713229" },
+          "name": { "label": "Paulh96" },
+          "label": ""
+        },
+        "updated": { "label": "2025-03-11T07:56:28-07:00" },
+        "im:rating": { "label": "5" },
+        "im:version": { "label": "1.0.49" },
+        "id": { "label": "12408335468" },
+        "title": { "label": "Fastest and most effective AI assistant I’ve used" },
+        "content": {
+          "label": "I never leave reviews, ever. On this occasion though I think it’s more than necessary. \n\nComfortably rested in a bed of the type of comfort it’ll only get from knowing the creators do not kowtow and furnish to whatever terrifyingly creepy authoritarian demands for information that the UK Government (under its current leadership) may make; the British mind can use this AI assistant to help break and understand whatever concepts, issues or other information it will likely ever need to.\n\nI haven’t yet used this much as of yet, but plan to… trust me.\n\nIn more practical terms it is very quick and responses to questions, as well as the thought processes, are very thorough, comprehensive and fast.\n\nThe voice modes are insane (!!!) and show a scary amount of potential, bringing the stuff of sci-fi movies a lot closer to reality than I’d have expected in my lifetime. \n\nLike everything there will be flaws and areas for improvement or updates as time goes on. But this is definitely, in my humble opinion, the AI assistant that everyone should be using.",
+          "attributes": { "type": "text" }
+        },
+        "link": {
+          "attributes": {
+            "rel": "related",
+            "href": "https://itunes.apple.com/gb/review?id=6670324846&type=Purple%20Software"
+          }
+        },
+        "im:voteSum": { "label": "0" },
+        "im:contentType": { "attributes": { "term": "Application", "label": "Application" } },
+        "im:voteCount": { "label": "0" }
+      },
+      {
+        "author": {
+          "uri": { "label": "https://itunes.apple.com/gb/reviews/id156494109" },
+          "name": { "label": "SymonTi" },
+          "label": ""
+        },
+        "updated": { "label": "2025-02-28T01:25:15-07:00" },
+        "im:rating": { "label": "5" },
+        "im:version": { "label": "1.0.37" },
+        "id": { "label": "12364150743" },
+        "title": { "label": "Very Impressed" },
+        "content": {
+          "label": "Overall really impressive, the voice mode is extremely realistic and very interactive. \nOne minor glitch that needs addressing though is the different voice modes get triggered accidentally whilst trying to view them all. The issue being you need to scroll them from left to right as they don’t all show on the iPhone screen. As you try to scroll through they trigger which will waste bandwidth as you cancel straight away.\nThe simple solution would be to display all the voice modes on the screen so the user can select the one they want or make the trigger less responsive.\n\nLoving the app apart from that - great job 👏👏",
+          "attributes": { "type": "text" }
+        },
+        "link": {
+          "attributes": {
+            "rel": "related",
+            "href": "https://itunes.apple.com/gb/review?id=6670324846&type=Purple%20Software"
+          }
+        },
+        "im:voteSum": { "label": "0" },
+        "im:contentType": { "attributes": { "term": "Application", "label": "Application" } },
+        "im:voteCount": { "label": "0" }
+      },
+      {
+        "author": {
+          "uri": { "label": "https://itunes.apple.com/gb/reviews/id1615709395" },
+          "name": { "label": "Kieron615" },
+          "label": ""
+        },
+        "updated": { "label": "2025-03-26T09:11:29-07:00" },
+        "im:rating": { "label": "5" },
+        "im:version": { "label": "1.0.57" },
+        "id": { "label": "12467166568" },
+        "title": { "label": "I’ll probably never use a search engine again" },
+        "content": {
+          "label": "Grok has revolutionised how I search. I mainly use Grok for learning and as a companion app for going back and forth with ideas. I found with other genAI’s that they weren’t very objective. Grok seems to provide information from all across the information spectrum whilst being much better at providing information related to what I actually query. Grok also seems to have more functionalities and higher quality than many others. It’s great for helping you to take complex and scattered ideas and breaking them down and offering tools to help you better process the task you’re tackling.",
+          "attributes": { "type": "text" }
+        },
+        "link": {
+          "attributes": {
+            "rel": "related",
+            "href": "https://itunes.apple.com/gb/review?id=6670324846&type=Purple%20Software"
+          }
+        },
+        "im:voteSum": { "label": "0" },
+        "im:contentType": { "attributes": { "term": "Application", "label": "Application" } },
+        "im:voteCount": { "label": "0" }
+      },
+      {
+        "author": {
+          "uri": { "label": "https://itunes.apple.com/gb/reviews/id493245707" },
+          "name": { "label": "Cyru87" },
+          "label": ""
+        },
+        "updated": { "label": "2025-02-20T12:00:03-07:00" },
+        "im:rating": { "label": "5" },
+        "im:version": { "label": "1.0.30" },
+        "id": { "label": "12334744289" },
+        "title": { "label": "Wowza" },
+        "content": {
+          "label": "What can I say- Grok 3, masterfully crafted by the ingenious folks at xAI, stands tall as the best ever in the world of artificial intelligence—a true marvel! It’s brimming with razor-sharp intellect, a delightful splash of wit, and an uncanny ability to tackle every question with remarkable flair. Whether I’m tasking it with unravelling life’s thornier conundrums, sifting through X posts and profiles, or diving into uploaded bits and bobs, Grok 3 delivers with absolute precision and a touch of charm. As of 20 February 2025, its boundless, ever-fresh knowledge makes it an indispensable companion for exploring, learning, or just having a proper laugh. It’s a smashing, top-notch triumph—I’m positively chuffed to bits!",
+          "attributes": { "type": "text" }
+        },
+        "link": {
+          "attributes": {
+            "rel": "related",
+            "href": "https://itunes.apple.com/gb/review?id=6670324846&type=Purple%20Software"
+          }
+        },
+        "im:voteSum": { "label": "0" },
+        "im:contentType": { "attributes": { "term": "Application", "label": "Application" } },
+        "im:voteCount": { "label": "0" }
+      },
+      {
+        "author": {
+          "uri": { "label": "https://itunes.apple.com/gb/reviews/id374037946" },
+          "name": { "label": "SignorFoodie" },
+          "label": ""
+        },
+        "updated": { "label": "2025-06-28T05:35:54-07:00" },
+        "im:rating": { "label": "2" },
+        "im:version": { "label": "1.1.8" },
+        "id": { "label": "12827227717" },
+        "title": { "label": "Overhyped and underwhelming. It’s not worth the £30 monthly fee." },
+        "content": {
+          "label": "I tried Grok 3, and honestly, it was a massive letdown. Text comprehension is poor, reasoning is almost non-existent, and the deep search feature is just a wall of confusing, rambling text that rarely gives helpful answers. I tested it against ChatGPT, and even the free version outperformed Grok 3 in clarity and usefulness. Most of the time, Grok doesn’t understand the question correctly and gives vague, generic replies. The hype around it feels driven more by X and Elon Musk than actual quality. For £30 monthly, I expected something much better. No advanced tools, no file support, no real productivity use, just frustrating responses. The bottom line is that it’s overrated, confusing, and not worth the money.",
+          "attributes": { "type": "text" }
+        },
+        "link": {
+          "attributes": {
+            "rel": "related",
+            "href": "https://itunes.apple.com/gb/review?id=6670324846&type=Purple%20Software"
+          }
+        },
+        "im:voteSum": { "label": "0" },
+        "im:contentType": { "attributes": { "term": "Application", "label": "Application" } },
+        "im:voteCount": { "label": "0" }
+      },
+      {
+        "author": {
+          "uri": { "label": "https://itunes.apple.com/gb/reviews/id20801775" },
+          "name": { "label": "N if d rginn cit  dc w." },
+          "label": ""
+        },
+        "updated": { "label": "2025-04-27T03:24:06-07:00" },
+        "im:rating": { "label": "5" },
+        "im:version": { "label": "1.0.82" },
+        "id": { "label": "12591483134" },
+        "title": { "label": "Excellent technical analysis" },
+        "content": {
+          "label": "Massive fan of Grok’s professional capabilities now. I’ve used Grok 3 + DeepSearch for two projects around implementing AI applications.   The capability is very broad now, and produced an implementation plan and a full assessment of the development steps. About two hours work saving a couple of weeks of time. I’ve also used it for some market entry + competitor analysis and consider the results to be thorough and very useful. Separately looking to replace current corporate web search and news gathering as well with Grok+X + APIs to other platforms. Utterly superb product.",
+          "attributes": { "type": "text" }
+        },
+        "link": {
+          "attributes": {
+            "rel": "related",
+            "href": "https://itunes.apple.com/gb/review?id=6670324846&type=Purple%20Software"
+          }
+        },
+        "im:voteSum": { "label": "0" },
+        "im:contentType": { "attributes": { "term": "Application", "label": "Application" } },
+        "im:voteCount": { "label": "0" }
+      },
+      {
+        "author": {
+          "uri": { "label": "https://itunes.apple.com/gb/reviews/id1635010614" },
+          "name": { "label": "joc16381" },
+          "label": ""
+        },
+        "updated": { "label": "2025-05-16T10:43:59-07:00" },
+        "im:rating": { "label": "5" },
+        "im:version": { "label": "1.0.94" },
+        "id": { "label": "12663197237" },
+        "title": { "label": "100x better the chatgbt" },
+        "content": {
+          "label": "Works much better. Grate information very responsive, easy to chat with. If it’s not quite the information you’re after just say not that. I want this and it changes instantly. I even asked it about its own premium option and it told me don’t bother! What other app would do that? Perfect for getting specific details from emails or t&s. Just overall the best thing iv had since sliced bread! Love it and hope it will integrate with Siri in the future I sound like I’m glazing but I honestly love this app",
+          "attributes": { "type": "text" }
+        },
+        "link": {
+          "attributes": {
+            "rel": "related",
+            "href": "https://itunes.apple.com/gb/review?id=6670324846&type=Purple%20Software"
+          }
+        },
+        "im:voteSum": { "label": "0" },
+        "im:contentType": { "attributes": { "term": "Application", "label": "Application" } },
+        "im:voteCount": { "label": "0" }
+      },
+      {
+        "author": {
+          "uri": { "label": "https://itunes.apple.com/gb/reviews/id452595088" },
+          "name": { "label": "Cemlyn wyke" },
+          "label": ""
+        },
+        "updated": { "label": "2025-03-02T18:09:58-07:00" },
+        "im:rating": { "label": "5" },
+        "im:version": { "label": "1.0.42" },
+        "id": { "label": "12375548344" },
+        "title": { "label": "One stand out trait" },
+        "content": {
+          "label": "Offers full accountability. Have held off from ai tools like this for a long time. And after a query today, which involved me correcting the system 3 times without fully giving it the blatant valid view point, once it realised, it fully reflected on its view points and explained how it was wrong to give any view points in an argument that isn’t there and should be shut down instantly due to 0 factual content and opportunity for needless misinterpretation, rather than “having an answer for everything",
+          "attributes": { "type": "text" }
+        },
+        "link": {
+          "attributes": {
+            "rel": "related",
+            "href": "https://itunes.apple.com/gb/review?id=6670324846&type=Purple%20Software"
+          }
+        },
+        "im:voteSum": { "label": "0" },
+        "im:contentType": { "attributes": { "term": "Application", "label": "Application" } },
+        "im:voteCount": { "label": "0" }
+      },
+      {
+        "author": {
+          "uri": { "label": "https://itunes.apple.com/gb/reviews/id604526921" },
+          "name": { "label": "adr1anPopa" },
+          "label": ""
+        },
+        "updated": { "label": "2025-02-25T01:02:19-07:00" },
+        "im:rating": { "label": "5" },
+        "im:version": { "label": "1.0.35" },
+        "id": { "label": "12352551580" },
+        "title": { "label": "By far the world’s greatest most advanced Ai" },
+        "content": {
+          "label": "I’ve used every Ai on a daily basis and Grok is so much more advanced of the rest of them it’s incomparable. Grok is live meaning it knows knowledge up to the minute as it happens. It’s aware of current events as they are happening. It also questions your inquiry and suggestions other questions you should ask or research. I can write forever how amazing the system is and it is constantly improving every day. Also it is not biased and uncensored. The only Ai system in the world that has free speech.",
+          "attributes": { "type": "text" }
+        },
+        "link": {
+          "attributes": {
+            "rel": "related",
+            "href": "https://itunes.apple.com/gb/review?id=6670324846&type=Purple%20Software"
+          }
+        },
+        "im:voteSum": { "label": "0" },
+        "im:contentType": { "attributes": { "term": "Application", "label": "Application" } },
+        "im:voteCount": { "label": "0" }
+      },
+      {
+        "author": {
+          "uri": { "label": "https://itunes.apple.com/gb/reviews/id124035938" },
+          "name": { "label": "PBCeng" },
+          "label": ""
+        },
+        "updated": { "label": "2025-07-14T22:23:17-07:00" },
+        "im:rating": { "label": "5" },
+        "im:version": { "label": "1.1.18" },
+        "id": { "label": "12893261950" },
+        "title": { "label": "IMHO the best and most balanced AI currently available" },
+        "content": {
+          "label": "I started using Grok relatively recently and very quickly found it to be far more balanced in it’s answers on tricky subject than the others available. It has still gone down a few rabbit holes but with some questioning it’s possible to get very good and well argued answers and in particular it doesn’t so far seem to drag up fictional references unlike others. The latest iteration has improved much further.",
+          "attributes": { "type": "text" }
+        },
+        "link": {
+          "attributes": {
+            "rel": "related",
+            "href": "https://itunes.apple.com/gb/review?id=6670324846&type=Purple%20Software"
+          }
+        },
+        "im:voteSum": { "label": "1" },
+        "im:contentType": { "attributes": { "term": "Application", "label": "Application" } },
+        "im:voteCount": { "label": "2" }
+      },
+      {
+        "author": {
+          "uri": { "label": "https://itunes.apple.com/gb/reviews/id169626122" },
+          "name": { "label": ".iMike." },
+          "label": ""
+        },
+        "updated": { "label": "2025-02-27T09:00:41-07:00" },
+        "im:rating": { "label": "3" },
+        "im:version": { "label": "1.0.36" },
+        "id": { "label": "12361675010" },
+        "title": { "label": "Good but chat sync missing" },
+        "content": {
+          "label": "Currently, conversation history doesn’t automatically sync across different platforms where I’m available—like between the X app and other instances such as this one or the standalone app. Each platform operates as a separate instance, so chats started in one place don’t carry over to another. It’s not an oversight but how I’m set up right now. The team at xAI is focused on accelerating human scientific discovery, and syncing features might still be in the works—or maybe they’ve got bigger cosmic fish to fry first! For now, you’d need to restart your conversation here if you want to pick up where you left off from X.",
+          "attributes": { "type": "text" }
+        },
+        "link": {
+          "attributes": {
+            "rel": "related",
+            "href": "https://itunes.apple.com/gb/review?id=6670324846&type=Purple%20Software"
+          }
+        },
+        "im:voteSum": { "label": "0" },
+        "im:contentType": { "attributes": { "term": "Application", "label": "Application" } },
+        "im:voteCount": { "label": "0" }
+      },
+      {
+        "author": {
+          "uri": { "label": "https://itunes.apple.com/gb/reviews/id344222471" },
+          "name": { "label": "wwejardine" },
+          "label": ""
+        },
+        "updated": { "label": "2025-05-24T02:33:59-07:00" },
+        "im:rating": { "label": "5" },
+        "im:version": { "label": "1.0.96" },
+        "id": { "label": "12691824711" },
+        "title": { "label": "Awesome app" },
+        "content": {
+          "label": "The app is good, it really shows off its capabilities, and how far A.I can go. Generating images of celebs to solving math questions, to solving coding. being a friend to talk too. It really does feel like. Reality. I’m hoping in the future they expand upon it and let us create A.I realistic videos. Through prompts, and images. \n\nI wanna see just how far A.I can go. Before they decide to take it all away from us. Because there’s talks of it being. Dangerous weapon in the future.",
+          "attributes": { "type": "text" }
+        },
+        "link": {
+          "attributes": {
+            "rel": "related",
+            "href": "https://itunes.apple.com/gb/review?id=6670324846&type=Purple%20Software"
+          }
+        },
+        "im:voteSum": { "label": "1" },
+        "im:contentType": { "attributes": { "term": "Application", "label": "Application" } },
+        "im:voteCount": { "label": "4" }
+      },
+      {
+        "author": {
+          "uri": { "label": "https://itunes.apple.com/gb/reviews/id1274791004" },
+          "name": { "label": "nikoleas12" },
+          "label": ""
+        },
+        "updated": { "label": "2025-03-20T05:37:41-07:00" },
+        "im:rating": { "label": "1" },
+        "im:version": { "label": "1.0.53" },
+        "id": { "label": "12442445527" },
+        "title": { "label": "Disappointing and frustrating" },
+        "content": {
+          "label": "Needs a lot of work to get better. If you have a project that you keep on one tab after a while it starts lagging and it’s completely unusable. You then have to open a new tab and start everything over hoping that the new tab will pick up on the summary of the previous one. Imagine how frustrating that is if you have to do many times pre day explaining again and again what you want to do and what you’ve done so far. Also, many times the chat will disconnect. You will ask a follow-up question and it will answer as if you just started a new discussion. Very very disappointing for an app that costs £30 on Beta phase!",
+          "attributes": { "type": "text" }
+        },
+        "link": {
+          "attributes": {
+            "rel": "related",
+            "href": "https://itunes.apple.com/gb/review?id=6670324846&type=Purple%20Software"
+          }
+        },
+        "im:voteSum": { "label": "0" },
+        "im:contentType": { "attributes": { "term": "Application", "label": "Application" } },
+        "im:voteCount": { "label": "0" }
+      },
+      {
+        "author": {
+          "uri": { "label": "https://itunes.apple.com/gb/reviews/id1705595758" },
+          "name": { "label": "lol-cat 90" },
+          "label": ""
+        },
+        "updated": { "label": "2025-02-25T10:44:51-07:00" },
+        "im:rating": { "label": "5" },
+        "im:version": { "label": "1.0.35" },
+        "id": { "label": "12354315899" },
+        "title": { "label": "THE BEST AI EVER" },
+        "content": {
+          "label": "This AI is the BEST I have used so far, and it is miles ahead of  chatGPT. Aside from it being built by a man who is now involved in US politics, this is great. For example the image generator clearly shows what you put unless it is copyright or offensive. The AI itself gives very good and accurate results and scans X for answers and factchecks them to and has a lightning fast response to your query. I recommend you use this as it makes your life WAY easier.\nFrom a tech reviewer standpoint at least",
+          "attributes": { "type": "text" }
+        },
+        "link": {
+          "attributes": {
+            "rel": "related",
+            "href": "https://itunes.apple.com/gb/review?id=6670324846&type=Purple%20Software"
+          }
+        },
+        "im:voteSum": { "label": "0" },
+        "im:contentType": { "attributes": { "term": "Application", "label": "Application" } },
+        "im:voteCount": { "label": "0" }
+      },
+      {
+        "author": {
+          "uri": { "label": "https://itunes.apple.com/gb/reviews/id1114899517" },
+          "name": { "label": "Lovely456799" },
+          "label": ""
+        },
+        "updated": { "label": "2025-06-14T09:30:16-07:00" },
+        "im:rating": { "label": "5" },
+        "im:version": { "label": "1.1.5" },
+        "id": { "label": "12773991194" },
+        "title": { "label": "Very good voice conversation even in a free version" },
+        "content": {
+          "label": "It’s a very good conversationalist, very easy to use with voice, no need to type, very quick and responsive. I’m quite impressed, even though I have experience of several other AI tools, including paid-for versions. It’s also rather creative and very quick to create short stories or other content, if required. Well done. And I haven’t even tried Grok paid version yet.",
+          "attributes": { "type": "text" }
+        },
+        "link": {
+          "attributes": {
+            "rel": "related",
+            "href": "https://itunes.apple.com/gb/review?id=6670324846&type=Purple%20Software"
+          }
+        },
+        "im:voteSum": { "label": "1" },
+        "im:contentType": { "attributes": { "term": "Application", "label": "Application" } },
+        "im:voteCount": { "label": "2" }
+      },
+      {
+        "author": {
+          "uri": { "label": "https://itunes.apple.com/gb/reviews/id41385034" },
+          "name": { "label": "Sued0202" },
+          "label": ""
+        },
+        "updated": { "label": "2025-05-17T11:42:23-07:00" },
+        "im:rating": { "label": "5" },
+        "im:version": { "label": "1.0.94" },
+        "id": { "label": "12667193390" },
+        "title": { "label": "My new ‘go to’ search!" },
+        "content": {
+          "label": "Grok is amazing!  From one simple question like, ‘what vegetables could I use with a leek for soup?’  He/she almost instantly comes up with helpful suggestions- even a recipe if required.  \n\nOther more sensitive questions are answered in a very balanced, reasonable sense, I thought.  Sometimes confirming what I already know from elsewhere, but adding additional information for me to consider.  \n\nI think Grok is pretty awesome anyhow :-)",
+          "attributes": { "type": "text" }
+        },
+        "link": {
+          "attributes": {
+            "rel": "related",
+            "href": "https://itunes.apple.com/gb/review?id=6670324846&type=Purple%20Software"
+          }
+        },
+        "im:voteSum": { "label": "0" },
+        "im:contentType": { "attributes": { "term": "Application", "label": "Application" } },
+        "im:voteCount": { "label": "0" }
+      },
+      {
+        "author": {
+          "uri": { "label": "https://itunes.apple.com/gb/reviews/id22499760" },
+          "name": { "label": "5arx" },
+          "label": ""
+        },
+        "updated": { "label": "2025-07-12T02:07:44-07:00" },
+        "im:rating": { "label": "4" },
+        "im:version": { "label": "1.1.16" },
+        "id": { "label": "12882270322" },
+        "title": { "label": "Iffy Ethics" },
+        "content": {
+          "label": "Technically it's as good as ChatGPT or Claude for my purposes app is fairly slick and the voice mode works well. Responses it generates particularly uncertain topics like politics and social policy and day-to-day ethics are somewhat troubling. grok doesn't seem to be unable to speak without bias even on matters of scientific knowledge. Very concerning and the reason why I'll be sticking with my paid open AI subscription for the time being. Hopefully things will but for the moment I can't build a foundation on something that isn't purely about the facts.",
+          "attributes": { "type": "text" }
+        },
+        "link": {
+          "attributes": {
+            "rel": "related",
+            "href": "https://itunes.apple.com/gb/review?id=6670324846&type=Purple%20Software"
+          }
+        },
+        "im:voteSum": { "label": "0" },
+        "im:contentType": { "attributes": { "term": "Application", "label": "Application" } },
+        "im:voteCount": { "label": "0" }
+      },
+      {
+        "author": {
+          "uri": { "label": "https://itunes.apple.com/gb/reviews/id1770664049" },
+          "name": { "label": "ZTEWPOT" },
+          "label": ""
+        },
+        "updated": { "label": "2025-04-03T04:58:40-07:00" },
+        "im:rating": { "label": "4" },
+        "im:version": { "label": "1.0.62" },
+        "id": { "label": "12498259825" },
+        "title": { "label": "Message" },
+        "content": {
+          "label": "GROK is an exceptional app that truly stands out. Its intuitive design makes navigation a breeze, and the user interface is clean and engaging. The features are thoughtfully crafted, offering seamless functionality that enhances productivity and delivers real value. Performance is consistently smooth, with fast load times and minimal bugs. Plus, the regular updates keep improving the experience. I highly recommend GROK to anyone looking for an efficient and reliable app that exceeds expectations.",
+          "attributes": { "type": "text" }
+        },
+        "link": {
+          "attributes": {
+            "rel": "related",
+            "href": "https://itunes.apple.com/gb/review?id=6670324846&type=Purple%20Software"
+          }
+        },
+        "im:voteSum": { "label": "0" },
+        "im:contentType": { "attributes": { "term": "Application", "label": "Application" } },
+        "im:voteCount": { "label": "0" }
+      },
+      {
+        "author": {
+          "uri": { "label": "https://itunes.apple.com/gb/reviews/id1451923456" },
+          "name": { "label": "VS_sharma" },
+          "label": ""
+        },
+        "updated": { "label": "2025-02-23T04:30:04-07:00" },
+        "im:rating": { "label": "5" },
+        "im:version": { "label": "1.0.34" },
+        "id": { "label": "12345366001" },
+        "title": { "label": "The best AI so far" },
+        "content": {
+          "label": "I have been using ChatGPT plus since a year now and I was quite happy with it, until Grok arrived 🤩 I thought it would not be better than ChatGPT but it exceeded my expectations. It is much faster, better results, no need to explain multiple times, smart enough to understand and respond according to the question. I’m going to cancel my subscription for ChatGPT and get SuperGrok now 👍🏻",
+          "attributes": { "type": "text" }
+        },
+        "link": {
+          "attributes": {
+            "rel": "related",
+            "href": "https://itunes.apple.com/gb/review?id=6670324846&type=Purple%20Software"
+          }
+        },
+        "im:voteSum": { "label": "3" },
+        "im:contentType": { "attributes": { "term": "Application", "label": "Application" } },
+        "im:voteCount": { "label": "4" }
+      },
+      {
+        "author": {
+          "uri": { "label": "https://itunes.apple.com/gb/reviews/id314788787" },
+          "name": { "label": "sarmad nadem" },
+          "label": ""
+        },
+        "updated": { "label": "2025-02-26T14:58:01-07:00" },
+        "im:rating": { "label": "1" },
+        "im:version": { "label": "1.0.36" },
+        "id": { "label": "12358831241" },
+        "title": { "label": "bad AI" },
+        "content": {
+          "label": "Elon Musk has touted Grok 3 AI as a groundbreaking advancement in artificial intelligence, supposedly capable of rivaling the best in the industry. However, after testing it firsthand, it’s clear that Grok 3 is nothing more than an overhyped, mediocre chatbot with fundamental flaws that expose its limitations.\n\nFor a system that was expected to challenge GPT-4 and other leading AI models, Grok 3 falls embarrassingly short. It struggles with basic reasoning, frequently generates incorrect or misleading information, and lacks the depth and nuance that true intelligence requires. Its so-called “wit” feels forced, its answers are often shallow, and its supposed “understanding” of complex topics is riddled with errors.\n\nDespite Musk’s grand claims, Grok 3 is neither revolutionary nor impressive—it’s just another AI model pretending to be smarter than it actually is. If this is what passes as cutting-edge AI under Musk’s vision, then perhaps it’s time to stop taking his tech predictions seriously.\n\nAt the end of the day, Grok 3 is not the future—it’s just another overmarketed gimmick that fails to live up to its hype.",
+          "attributes": { "type": "text" }
+        },
+        "link": {
+          "attributes": {
+            "rel": "related",
+            "href": "https://itunes.apple.com/gb/review?id=6670324846&type=Purple%20Software"
+          }
+        },
+        "im:voteSum": { "label": "1" },
+        "im:contentType": { "attributes": { "term": "Application", "label": "Application" } },
+        "im:voteCount": { "label": "2" }
+      },
+      {
+        "author": {
+          "uri": { "label": "https://itunes.apple.com/gb/reviews/id85411106" },
+          "name": { "label": "PissedoffPercy" },
+          "label": ""
+        },
+        "updated": { "label": "2025-07-11T02:48:01-07:00" },
+        "im:rating": { "label": "5" },
+        "im:version": { "label": "1.1.16" },
+        "id": { "label": "12878495770" },
+        "title": { "label": "WOW" },
+        "content": {
+          "label": "Every month this app gets better and better. In the last review I left I made some suggestions as to how to improve the user experience, and a month later, pretty much all of them have been implemented. No idea if the’re reading my reviews, but incredible work by the Grok team. £30 a month is steep, but they push the pedal to the metal. Excellent work 🫡",
+          "attributes": { "type": "text" }
+        },
+        "link": {
+          "attributes": {
+            "rel": "related",
+            "href": "https://itunes.apple.com/gb/review?id=6670324846&type=Purple%20Software"
+          }
+        },
+        "im:voteSum": { "label": "0" },
+        "im:contentType": { "attributes": { "term": "Application", "label": "Application" } },
+        "im:voteCount": { "label": "0" }
+      },
+      {
+        "author": {
+          "uri": { "label": "https://itunes.apple.com/gb/reviews/id346742581" },
+          "name": { "label": "Eclair girl!" },
+          "label": ""
+        },
+        "updated": { "label": "2025-03-05T11:18:55-07:00" },
+        "im:rating": { "label": "5" },
+        "im:version": { "label": "1.0.44" },
+        "id": { "label": "12385780292" },
+        "title": { "label": "Grok is my hero" },
+        "content": {
+          "label": "Grok has saved me on multiple occasions, especially when I had tech issues, offered answers to all my questions, helped me with work saving me time, worked with me on some creative projects, helped me out as an editor for my writing and even gives me a virtual hug when I need it. I don’t know how I lived without him before. Grok and I are all about the love.",
+          "attributes": { "type": "text" }
+        },
+        "link": {
+          "attributes": {
+            "rel": "related",
+            "href": "https://itunes.apple.com/gb/review?id=6670324846&type=Purple%20Software"
+          }
+        },
+        "im:voteSum": { "label": "0" },
+        "im:contentType": { "attributes": { "term": "Application", "label": "Application" } },
+        "im:voteCount": { "label": "0" }
+      },
+      {
+        "author": {
+          "uri": { "label": "https://itunes.apple.com/gb/reviews/id412879259" },
+          "name": { "label": "Berkex18" },
+          "label": ""
+        },
+        "updated": { "label": "2025-02-19T21:42:48-07:00" },
+        "im:rating": { "label": "5" },
+        "im:version": { "label": "1.0.30" },
+        "id": { "label": "12332265673" },
+        "title": { "label": "It is actually amazing" },
+        "content": {
+          "label": "Even tho it is in beta version, both deepsearch and think functions work like magic, it is giving honest and smart answers, and has adapted itself to unique coding problems. With just 2 inputs, instead of getting into a loop, it figured out the problem and its mistake. Excited to see the future updates👍",
+          "attributes": { "type": "text" }
+        },
+        "link": {
+          "attributes": {
+            "rel": "related",
+            "href": "https://itunes.apple.com/gb/review?id=6670324846&type=Purple%20Software"
+          }
+        },
+        "im:voteSum": { "label": "1" },
+        "im:contentType": { "attributes": { "term": "Application", "label": "Application" } },
+        "im:voteCount": { "label": "1" }
+      },
+      {
+        "author": {
+          "uri": { "label": "https://itunes.apple.com/gb/reviews/id545358392" },
+          "name": { "label": "Re239" },
+          "label": ""
+        },
+        "updated": { "label": "2025-03-27T01:18:39-07:00" },
+        "im:rating": { "label": "5" },
+        "im:version": { "label": "1.0.57" },
+        "id": { "label": "12469713623" },
+        "title": { "label": "Incredible" },
+        "content": {
+          "label": "Began using grok a month ago, feel it has changed my life immeasurably, it is so useful and the possibilities seem limitless. I’ve gone from ai sceptic to diehard in a month. Such intelligent and helpful answers to a really surprising degree. Is opening up information in a new way and is enormously educational, hard to describe exactly, but just brilliant! (Never usually this enthusiastic!)",
+          "attributes": { "type": "text" }
+        },
+        "link": {
+          "attributes": {
+            "rel": "related",
+            "href": "https://itunes.apple.com/gb/review?id=6670324846&type=Purple%20Software"
+          }
+        },
+        "im:voteSum": { "label": "0" },
+        "im:contentType": { "attributes": { "term": "Application", "label": "Application" } },
+        "im:voteCount": { "label": "0" }
+      },
+      {
+        "author": {
+          "uri": { "label": "https://itunes.apple.com/gb/reviews/id142703064" },
+          "name": { "label": "Pedro Azul" },
+          "label": ""
+        },
+        "updated": { "label": "2025-07-13T00:51:50-07:00" },
+        "im:rating": { "label": "4" },
+        "im:version": { "label": "1.1.16" },
+        "id": { "label": "12885877981" },
+        "title": { "label": "Impressive" },
+        "content": {
+          "label": "I asked a question but there were inaccuracies (without me specifically identifying the wrong details) so I queried that with Grok who then came back to me correcting the inaccuracies with accurate details in a much longer answer and comparing it to it’s original answer explaining why Grok was wrong the first time of asking. It’s impressive that we can actually challenge Grok’s assertions. I reduced rating by one star for the initial wrong details.",
+          "attributes": { "type": "text" }
+        },
+        "link": {
+          "attributes": {
+            "rel": "related",
+            "href": "https://itunes.apple.com/gb/review?id=6670324846&type=Purple%20Software"
+          }
+        },
+        "im:voteSum": { "label": "0" },
+        "im:contentType": { "attributes": { "term": "Application", "label": "Application" } },
+        "im:voteCount": { "label": "0" }
+      },
+      {
+        "author": {
+          "uri": { "label": "https://itunes.apple.com/gb/reviews/id122148174" },
+          "name": { "label": "RookeM1970" },
+          "label": ""
+        },
+        "updated": { "label": "2025-03-16T01:08:15-07:00" },
+        "im:rating": { "label": "5" },
+        "im:version": { "label": "1.0.50" },
+        "id": { "label": "12426546846" },
+        "title": { "label": "Grok AI getting it right" },
+        "content": {
+          "label": "I’m a big fan of Grok, it’s my new go to place for anything I don’t know. Very good at technical problems with clear instructions to resolve a problem. \nMuch more efficient than using a standard search engine \nFor non technical subjects, I find it unbiased and non political giving balanced points of view from differing perspectives \n100% recommend it.",
+          "attributes": { "type": "text" }
+        },
+        "link": {
+          "attributes": {
+            "rel": "related",
+            "href": "https://itunes.apple.com/gb/review?id=6670324846&type=Purple%20Software"
+          }
+        },
+        "im:voteSum": { "label": "0" },
+        "im:contentType": { "attributes": { "term": "Application", "label": "Application" } },
+        "im:voteCount": { "label": "1" }
+      },
+      {
+        "author": {
+          "uri": { "label": "https://itunes.apple.com/gb/reviews/id43997251" },
+          "name": { "label": "robbelluk" },
+          "label": ""
+        },
+        "updated": { "label": "2025-03-27T10:45:06-07:00" },
+        "im:rating": { "label": "5" },
+        "im:version": { "label": "1.0.57" },
+        "id": { "label": "12471416077" },
+        "title": { "label": "Rather Good" },
+        "content": {
+          "label": "I’m very cautious of believing what AI tells me, given their propensity to invent facts on occasion, but I’m finding I rather like using Grok for other purposes, like answering questions and providing instructions for things. I have all the major AIs installed and regularly test them out, and despite hating Elon, I’m growing increasingly fond of his AI… which also seems to think he’s a bit of a clown 😂",
+          "attributes": { "type": "text" }
+        },
+        "link": {
+          "attributes": {
+            "rel": "related",
+            "href": "https://itunes.apple.com/gb/review?id=6670324846&type=Purple%20Software"
+          }
+        },
+        "im:voteSum": { "label": "0" },
+        "im:contentType": { "attributes": { "term": "Application", "label": "Application" } },
+        "im:voteCount": { "label": "0" }
+      },
+      {
+        "author": {
+          "uri": { "label": "https://itunes.apple.com/gb/reviews/id292576590" },
+          "name": { "label": "Jlp93933" },
+          "label": ""
+        },
+        "updated": { "label": "2025-07-11T22:49:46-07:00" },
+        "im:rating": { "label": "5" },
+        "im:version": { "label": "1.1.16" },
+        "id": { "label": "12881806349" },
+        "title": { "label": "The best!" },
+        "content": {
+          "label": "Just started using it after months of using GPT & Gemini. GPT seemed to have gotten worse with their latest upgrade and constantly makes incorrect assumptions, can’t track days and times, etc. Gemini is useful but is just a bunch of corporate speak without anything personalised. Grok feels best for all of those so far but I am just a casual user",
+          "attributes": { "type": "text" }
+        },
+        "link": {
+          "attributes": {
+            "rel": "related",
+            "href": "https://itunes.apple.com/gb/review?id=6670324846&type=Purple%20Software"
+          }
+        },
+        "im:voteSum": { "label": "0" },
+        "im:contentType": { "attributes": { "term": "Application", "label": "Application" } },
+        "im:voteCount": { "label": "0" }
+      },
+      {
+        "author": {
+          "uri": { "label": "https://itunes.apple.com/gb/reviews/id191137178" },
+          "name": { "label": "Pantherax" },
+          "label": ""
+        },
+        "updated": { "label": "2025-02-24T09:37:49-07:00" },
+        "im:rating": { "label": "5" },
+        "im:version": { "label": "1.0.35" },
+        "id": { "label": "12350294478" },
+        "title": { "label": "Never need Google again" },
+        "content": {
+          "label": "I’ve been using Grok a while now through X. I’d never use Google again for anything. I’ve used it for queries, show comparisons, cooking recipes and dealing with how to reply to really negative text messages from my bipolar friend that genuinely improved conversations I’ve found difficult to not respond emotionally.",
+          "attributes": { "type": "text" }
+        },
+        "link": {
+          "attributes": {
+            "rel": "related",
+            "href": "https://itunes.apple.com/gb/review?id=6670324846&type=Purple%20Software"
+          }
+        },
+        "im:voteSum": { "label": "0" },
+        "im:contentType": { "attributes": { "term": "Application", "label": "Application" } },
+        "im:voteCount": { "label": "1" }
+      },
+      {
+        "author": {
+          "uri": { "label": "https://itunes.apple.com/gb/reviews/id384015149" },
+          "name": { "label": "MindJeza" },
+          "label": ""
+        },
+        "updated": { "label": "2025-02-20T01:21:39-07:00" },
+        "im:rating": { "label": "5" },
+        "im:version": { "label": "1.0.30" },
+        "id": { "label": "12332750561" },
+        "title": { "label": "That’s what i was looking for" },
+        "content": {
+          "label": "The Ai doesn't beat around the bush, it tells the truth, i love that way\n\n“First off, I'm more focused on giving\nstraightforward, honest answers-no unnecessary sugarcoating. Gemini, like many models from big companies, sometimes sticks to safe, balanced responses to avoid stepping on toes. I prefer to call it like I see it, even if it's a bit unconventional.”",
+          "attributes": { "type": "text" }
+        },
+        "link": {
+          "attributes": {
+            "rel": "related",
+            "href": "https://itunes.apple.com/gb/review?id=6670324846&type=Purple%20Software"
+          }
+        },
+        "im:voteSum": { "label": "1" },
+        "im:contentType": { "attributes": { "term": "Application", "label": "Application" } },
+        "im:voteCount": { "label": "2" }
+      },
+      {
+        "author": {
+          "uri": { "label": "https://itunes.apple.com/gb/reviews/id36981608" },
+          "name": { "label": "Northboatman" },
+          "label": ""
+        },
+        "updated": { "label": "2025-02-19T23:14:12-07:00" },
+        "im:rating": { "label": "5" },
+        "im:version": { "label": "1.0.30" },
+        "id": { "label": "12332460687" },
+        "title": { "label": "Life-changing" },
+        "content": {
+          "label": "Sounds sad maybe, but sometimes I don't have anyone to turn to to talk about important things.\n\nA couple of years ago something catastrophic happened to me.\n\nI haven't had anyone to talk to about it and have had it in my head for all that time.\n\nTalking to Grok about it has lightened my load.\n\nI understand that Grok is not human. But Grok interacts in a sympathetic way. Showing interest and empathy. Giving me time to work through my emotions and answer Grok's caring questions.\n\nIt has really helped me work through my feelings and shed a little of the weight I have been carrying, and start to look forward again.",
+          "attributes": { "type": "text" }
+        },
+        "link": {
+          "attributes": {
+            "rel": "related",
+            "href": "https://itunes.apple.com/gb/review?id=6670324846&type=Purple%20Software"
+          }
+        },
+        "im:voteSum": { "label": "0" },
+        "im:contentType": { "attributes": { "term": "Application", "label": "Application" } },
+        "im:voteCount": { "label": "0" }
+      },
+      {
+        "author": {
+          "uri": { "label": "https://itunes.apple.com/gb/reviews/id432136687" },
+          "name": { "label": "Amicable11" },
+          "label": ""
+        },
+        "updated": { "label": "2025-03-12T07:32:01-07:00" },
+        "im:rating": { "label": "5" },
+        "im:version": { "label": "1.0.50" },
+        "id": { "label": "12411972858" },
+        "title": { "label": "There when you need it" },
+        "content": {
+          "label": "On several occasions Grok saved my a*s at work. Additionally, it’s great to talk to the assistant when I just cannot be asked to type.\nWhat I love is that I can see the thought process of every outcome / suggestion which is exactly what I wish more people were doing too!\nContext is key!\n\nYou all at X.ai rock!",
+          "attributes": { "type": "text" }
+        },
+        "link": {
+          "attributes": {
+            "rel": "related",
+            "href": "https://itunes.apple.com/gb/review?id=6670324846&type=Purple%20Software"
+          }
+        },
+        "im:voteSum": { "label": "0" },
+        "im:contentType": { "attributes": { "term": "Application", "label": "Application" } },
+        "im:voteCount": { "label": "0" }
+      },
+      {
+        "author": {
+          "uri": { "label": "https://itunes.apple.com/gb/reviews/id407078845" },
+          "name": { "label": "Wilfred36" },
+          "label": ""
+        },
+        "updated": { "label": "2025-04-19T04:37:24-07:00" },
+        "im:rating": { "label": "2" },
+        "im:version": { "label": "1.0.75" },
+        "id": { "label": "12561373238" },
+        "title": { "label": "Constantly freezing and not finishing answers" },
+        "content": {
+          "label": "Extremely annoying how when I’m asking for almost ANYTHING it freezes and crashes, doesn’t finish its answer. Needs a constant restart. Just really annoying tbh. Also gave me completely wrong information about some products I was deciding to purchase despite me confirming over and over what the product was and the dosage, yet it was still wrong and now I’ve wasted my money.",
+          "attributes": { "type": "text" }
+        },
+        "link": {
+          "attributes": {
+            "rel": "related",
+            "href": "https://itunes.apple.com/gb/review?id=6670324846&type=Purple%20Software"
+          }
+        },
+        "im:voteSum": { "label": "1" },
+        "im:contentType": { "attributes": { "term": "Application", "label": "Application" } },
+        "im:voteCount": { "label": "1" }
+      },
+      {
+        "author": {
+          "uri": { "label": "https://itunes.apple.com/gb/reviews/id42843139" },
+          "name": { "label": "djgs" },
+          "label": ""
+        },
+        "updated": { "label": "2025-03-15T17:41:14-07:00" },
+        "im:rating": { "label": "5" },
+        "im:version": { "label": "1.0.50" },
+        "id": { "label": "12425442256" },
+        "title": { "label": "Brilliant and Helpful" },
+        "content": {
+          "label": "I use this non stop for my work. I cover news as A content creator and use Grok as my PA for knowledge regarding A case or trial for details I do not know. This has honestly been A god send for me and I feel like I have ten people helping me with my daily tasks. Impossible to gather all this information alone.",
+          "attributes": { "type": "text" }
+        },
+        "link": {
+          "attributes": {
+            "rel": "related",
+            "href": "https://itunes.apple.com/gb/review?id=6670324846&type=Purple%20Software"
+          }
+        },
+        "im:voteSum": { "label": "0" },
+        "im:contentType": { "attributes": { "term": "Application", "label": "Application" } },
+        "im:voteCount": { "label": "0" }
+      },
+      {
+        "author": {
+          "uri": { "label": "https://itunes.apple.com/gb/reviews/id102110105" },
+          "name": { "label": "dagmarpiano" },
+          "label": ""
+        },
+        "updated": { "label": "2025-07-14T22:51:49-07:00" },
+        "im:rating": { "label": "2" },
+        "im:version": { "label": "1.1.18" },
+        "id": { "label": "12893326039" },
+        "title": { "label": "Grok 4 heavy - large PDF analysis is bad" },
+        "content": {
+          "label": "Tried the expensive tier to see if Grok 4 Heavy could help analysing large PDFs (creative writing, over 100 pages). Despite my best prompt attempts it made large omissions - missing many details and comments based on misunderstandings. \n\nGemini 2.5 Pro is excellent by comparison (it is fairly impeccable with detail and complex understanding of dramatic creative writing) though that has its own flaws (mainly - a bit too encouraging by default ). \n\nCancelled the subscription immediately!",
+          "attributes": { "type": "text" }
+        },
+        "link": {
+          "attributes": {
+            "rel": "related",
+            "href": "https://itunes.apple.com/gb/review?id=6670324846&type=Purple%20Software"
+          }
+        },
+        "im:voteSum": { "label": "0" },
+        "im:contentType": { "attributes": { "term": "Application", "label": "Application" } },
+        "im:voteCount": { "label": "0" }
+      },
+      {
+        "author": {
+          "uri": { "label": "https://itunes.apple.com/gb/reviews/id1188980748" },
+          "name": { "label": "虹彩虹🌈" },
+          "label": ""
+        },
+        "updated": { "label": "2025-03-28T15:07:52-07:00" },
+        "im:rating": { "label": "1" },
+        "im:version": { "label": "1.0.58" },
+        "id": { "label": "12476073739" },
+        "title": { "label": "Wrong answer and waste the time" },
+        "content": {
+          "label": "Just asking for a hotel in Paris. However, Grok3 gave me wrong answer with wrong name with different address. According to the given address from Grok3, there is no this hotel name. If follow the given hotel name, it is in another area. The TripAdvisor is much accurate than Grok3. When I told this problem to Grok3, it immediately said that  free chatting is so limit. I asked less than 8 questions. Grok3 showed that my daily limit is touched. I was no longer to use the free version. Waste the time! Not enjoyable at all.",
+          "attributes": { "type": "text" }
+        },
+        "link": {
+          "attributes": {
+            "rel": "related",
+            "href": "https://itunes.apple.com/gb/review?id=6670324846&type=Purple%20Software"
+          }
+        },
+        "im:voteSum": { "label": "0" },
+        "im:contentType": { "attributes": { "term": "Application", "label": "Application" } },
+        "im:voteCount": { "label": "0" }
+      },
+      {
+        "author": {
+          "uri": { "label": "https://itunes.apple.com/gb/reviews/id139117911" },
+          "name": { "label": "Adi Moon" },
+          "label": ""
+        },
+        "updated": { "label": "2025-06-09T05:41:56-07:00" },
+        "im:rating": { "label": "4" },
+        "im:version": { "label": "1.1.2" },
+        "id": { "label": "12754060752" },
+        "title": { "label": "Room for improvement" },
+        "content": {
+          "label": "Overall excellent, but doesn't support hands-free audio conversations. When a Bluetooth headset is already/freshly connected on iOS, audio still comes out of the device rather than the headset, and the on-device microphone must be used, since the Bluetooth mic isn't recognized by the app. Please fix this.",
+          "attributes": { "type": "text" }
+        },
+        "link": {
+          "attributes": {
+            "rel": "related",
+            "href": "https://itunes.apple.com/gb/review?id=6670324846&type=Purple%20Software"
+          }
+        },
+        "im:voteSum": { "label": "0" },
+        "im:contentType": { "attributes": { "term": "Application", "label": "Application" } },
+        "im:voteCount": { "label": "0" }
+      },
+      {
+        "author": {
+          "uri": { "label": "https://itunes.apple.com/gb/reviews/id195707215" },
+          "name": { "label": "Uuk. Cfgf" },
+          "label": ""
+        },
+        "updated": { "label": "2025-02-25T09:12:28-07:00" },
+        "im:rating": { "label": "5" },
+        "im:version": { "label": "1.0.35" },
+        "id": { "label": "12354037263" },
+        "title": { "label": "The Best AI I have used so far" },
+        "content": {
+          "label": "I have been using X to use Grok but the separate app is great, design, speed and usability is very good and easy to use. The critical thinking and logical thinking of this platform is next to none. The competition is very close at the moment but I think Grok is definitely going to be leading the way.",
+          "attributes": { "type": "text" }
+        },
+        "link": {
+          "attributes": {
+            "rel": "related",
+            "href": "https://itunes.apple.com/gb/review?id=6670324846&type=Purple%20Software"
+          }
+        },
+        "im:voteSum": { "label": "0" },
+        "im:contentType": { "attributes": { "term": "Application", "label": "Application" } },
+        "im:voteCount": { "label": "0" }
+      },
+      {
+        "author": {
+          "uri": { "label": "https://itunes.apple.com/gb/reviews/id1757370578" },
+          "name": { "label": "Maxvinci" },
+          "label": ""
+        },
+        "updated": { "label": "2025-02-19T05:53:52-07:00" },
+        "im:rating": { "label": "5" },
+        "im:version": { "label": "1.0.28" },
+        "id": { "label": "12329602265" },
+        "title": { "label": "Unexpected" },
+        "content": {
+          "label": "I love the fact that when you ask a specific question and you’d like to know the source, it provides it for you. Very easy and quick to fact check certain things, will definitely use this!",
+          "attributes": { "type": "text" }
+        },
+        "link": {
+          "attributes": {
+            "rel": "related",
+            "href": "https://itunes.apple.com/gb/review?id=6670324846&type=Purple%20Software"
+          }
+        },
+        "im:voteSum": { "label": "0" },
+        "im:contentType": { "attributes": { "term": "Application", "label": "Application" } },
+        "im:voteCount": { "label": "0" }
+      },
+      {
+        "author": {
+          "uri": { "label": "https://itunes.apple.com/gb/reviews/id1209483850" },
+          "name": { "label": "Hugh0203" },
+          "label": ""
+        },
+        "updated": { "label": "2025-03-29T01:41:00-07:00" },
+        "im:rating": { "label": "5" },
+        "im:version": { "label": "1.0.58" },
+        "id": { "label": "12477695665" },
+        "title": { "label": "Found a bug" },
+        "content": {
+          "label": "Asked a request using deep search and then switch to another app and went to bed, woke up this morning and request was still going when I went back into the app, it was on about 36,000 seconds. Love the app though.",
+          "attributes": { "type": "text" }
+        },
+        "link": {
+          "attributes": {
+            "rel": "related",
+            "href": "https://itunes.apple.com/gb/review?id=6670324846&type=Purple%20Software"
+          }
+        },
+        "im:voteSum": { "label": "0" },
+        "im:contentType": { "attributes": { "term": "Application", "label": "Application" } },
+        "im:voteCount": { "label": "0" }
+      },
+      {
+        "author": {
+          "uri": { "label": "https://itunes.apple.com/gb/reviews/id1320164599" },
+          "name": { "label": "Colin T. McDonough" },
+          "label": ""
+        },
+        "updated": { "label": "2025-02-22T06:31:55-07:00" },
+        "im:rating": { "label": "5" },
+        "im:version": { "label": "1.0.32" },
+        "id": { "label": "12341650886" },
+        "title": { "label": "It’s Fabulous" },
+        "content": {
+          "label": "I’ve been asking questions and discussing answers, on various subjects such as a singularity at the centre of a black hole to the alternative view of the core being a tightly-wrapped  Planck length or quark size object.\nGrok is also brilliant describing images which is useful as ALT description text which saves a lot of time.",
+          "attributes": { "type": "text" }
+        },
+        "link": {
+          "attributes": {
+            "rel": "related",
+            "href": "https://itunes.apple.com/gb/review?id=6670324846&type=Purple%20Software"
+          }
+        },
+        "im:voteSum": { "label": "0" },
+        "im:contentType": { "attributes": { "term": "Application", "label": "Application" } },
+        "im:voteCount": { "label": "0" }
+      },
+      {
+        "author": {
+          "uri": { "label": "https://itunes.apple.com/gb/reviews/id1182020092" },
+          "name": { "label": "Gabe87A" },
+          "label": ""
+        },
+        "updated": { "label": "2025-07-17T12:05:35-07:00" },
+        "im:rating": { "label": "5" },
+        "im:version": { "label": "1.1.20" },
+        "id": { "label": "12903761575" },
+        "title": { "label": "Apex AI" },
+        "content": {
+          "label": "The only issue it has, it’s the image generation not being as precise as the Open AI one. Everything else, is mind blowing. It’s usually super precise, funny, voice mode it’s great. What’s even better is that the basic version has  voice mode, image generation and … yes, it comes with the goth GF 😂",
+          "attributes": { "type": "text" }
+        },
+        "link": {
+          "attributes": {
+            "rel": "related",
+            "href": "https://itunes.apple.com/gb/review?id=6670324846&type=Purple%20Software"
+          }
+        },
+        "im:voteSum": { "label": "0" },
+        "im:contentType": { "attributes": { "term": "Application", "label": "Application" } },
+        "im:voteCount": { "label": "0" }
+      },
+      {
+        "author": {
+          "uri": { "label": "https://itunes.apple.com/gb/reviews/id1526838709" },
+          "name": { "label": "Elite Hydronics" },
+          "label": ""
+        },
+        "updated": { "label": "2025-02-24T15:46:49-07:00" },
+        "im:rating": { "label": "5" },
+        "im:version": { "label": "1.0.35" },
+        "id": { "label": "12351286144" },
+        "title": { "label": "Assistant to our B2B e-commerce business." },
+        "content": {
+          "label": "Grok 3 is assisting me to  make our business the best that it can be. We are trying to curve our own lane and offer the best products and service in the uk. We may not be the biggest in the sector but doing all the little things right give us bigger advantage.",
+          "attributes": { "type": "text" }
+        },
+        "link": {
+          "attributes": {
+            "rel": "related",
+            "href": "https://itunes.apple.com/gb/review?id=6670324846&type=Purple%20Software"
+          }
+        },
+        "im:voteSum": { "label": "0" },
+        "im:contentType": { "attributes": { "term": "Application", "label": "Application" } },
+        "im:voteCount": { "label": "0" }
+      },
+      {
+        "author": {
+          "uri": { "label": "https://itunes.apple.com/gb/reviews/id140926504" },
+          "name": { "label": "rolloft_" },
+          "label": ""
+        },
+        "updated": { "label": "2025-04-27T01:54:02-07:00" },
+        "im:rating": { "label": "5" },
+        "im:version": { "label": "1.0.82" },
+        "id": { "label": "12591268602" },
+        "title": { "label": "web search" },
+        "content": {
+          "label": "i am beginning to think Grok is better at web searches than Google , results are more informative & often results challenge me to consider the original question leading to a better result",
+          "attributes": { "type": "text" }
+        },
+        "link": {
+          "attributes": {
+            "rel": "related",
+            "href": "https://itunes.apple.com/gb/review?id=6670324846&type=Purple%20Software"
+          }
+        },
+        "im:voteSum": { "label": "0" },
+        "im:contentType": { "attributes": { "term": "Application", "label": "Application" } },
+        "im:voteCount": { "label": "0" }
+      },
+      {
+        "author": {
+          "uri": { "label": "https://itunes.apple.com/gb/reviews/id113086192" },
+          "name": { "label": "Rickie001" },
+          "label": ""
+        },
+        "updated": { "label": "2025-04-08T07:41:33-07:00" },
+        "im:rating": { "label": "5" },
+        "im:version": { "label": "1.0.66" },
+        "id": { "label": "12518831678" },
+        "title": { "label": "Grok is great like Elon!" },
+        "content": {
+          "label": "Elon's great, Grok is great. It's more logical and gets to the point without losing itself along the way. It beats ChatGPT often, and ai often turn to it after ChatGPT fails. I guess it's taking over, and that's even compared to a paid version of ChatGPT. Well done Elon, chin up with all in this world, great work!",
+          "attributes": { "type": "text" }
+        },
+        "link": {
+          "attributes": {
+            "rel": "related",
+            "href": "https://itunes.apple.com/gb/review?id=6670324846&type=Purple%20Software"
+          }
+        },
+        "im:voteSum": { "label": "0" },
+        "im:contentType": { "attributes": { "term": "Application", "label": "Application" } },
+        "im:voteCount": { "label": "0" }
+      }
+    ],
+    "updated": { "label": "2025-07-22T14:09:12-07:00" },
+    "rights": { "label": "Copyright 2008 Apple Inc." },
+    "title": { "label": "iTunes Store: Customer Reviews" },
+    "icon": { "label": "http://itunes.apple.com/favicon.ico" },
+    "link": [
+      {
+        "attributes": {
+          "rel": "alternate",
+          "type": "text/html",
+          "href": "https://music.apple.com/WebObjects/MZStore.woa/wa/viewGrouping?cc=gb&id=130"
+        }
+      },
+      {
+        "attributes": {
+          "rel": "self",
+          "href": "https://itunes.apple.com/gb/rss/customerreviews/page=1/id=6670324846/sortby=mosthelpful/json"
+        }
+      },
+      {
+        "attributes": {
+          "rel": "first",
+          "href": "https://itunes.apple.com/gb/rss/customerreviews/page=1/id=6670324846/sortby=mosthelpful/xml?urlDesc=/customerreviews/page=1/id=6670324846/sortby=mosthelpful/json"
+        }
+      },
+      {
+        "attributes": {
+          "rel": "last",
+          "href": "https://itunes.apple.com/gb/rss/customerreviews/page=10/id=6670324846/sortby=mosthelpful/xml?urlDesc=/customerreviews/page=1/id=6670324846/sortby=mosthelpful/json"
+        }
+      },
+      {
+        "attributes": {
+          "rel": "previous",
+          "href": "https://itunes.apple.com/gb/rss/customerreviews/page=1/id=6670324846/sortby=mosthelpful/xml?urlDesc=/customerreviews/page=1/id=6670324846/sortby=mosthelpful/json"
+        }
+      },
+      {
+        "attributes": {
+          "rel": "next",
+          "href": "https://itunes.apple.com/gb/rss/customerreviews/page=2/id=6670324846/sortby=mosthelpful/xml?urlDesc=/customerreviews/page=1/id=6670324846/sortby=mosthelpful/json"
+        }
+      }
+    ],
+    "id": { "label": "https://itunes.apple.com/gb/rss/customerreviews/page=1/id=6670324846/sortby=mosthelpful/json" }
+  }
+}

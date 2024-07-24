@@ -1,0 +1,453 @@
+# Data Processing Rules for App Store Review Analysis Tool
+
+## API Integration Standards
+
+### App Store RSS API
+
+**Base URL and Endpoints:**
+
+```typescript
+// Customer Reviews (RSS)
+const REVIEWS_URL = `https://itunes.apple.com/{region}/rss/customerreviews/id={app_id}/sortby={sort_option}/json`;
+
+// App Metadata (Lookup)
+const METADATA_URL = `https://itunes.apple.com/lookup?id={app_id}&country={region}`;
+
+// App Search
+const SEARCH_URL = `https://itunes.apple.com/search?term={keyword}&country={region}&entity=software`;
+```
+
+### Rate Limiting
+
+```typescript
+// Always implement rate limiting
+const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+
+// Use 1-2 second delays between API calls
+await delay(1000 + Math.random() * 1000);
+```
+
+### Error Handling
+
+```typescript
+try {
+  const response = await fetch(url, { timeout: 5000 });
+  if (!response.ok) {
+    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+  }
+  return await response.json();
+} catch (error) {
+  console.error(`API Error for ${url}:`, error);
+  return null;
+}
+```
+
+## Data Validation
+
+### Review Data Validation
+
+```typescript
+interface AppStoreReview {
+  id: string;
+  region: string;
+  title: string;
+  content: string;
+  rating: number;
+  version: string;
+  date: string;
+  author: string;
+}
+
+const validateReview = (review: any): AppStoreReview | null => {
+  // Required fields
+  if (!review.id?.label || !review.title?.label || !review.content?.label) {
+    return null;
+  }
+
+  // Rating validation (1-5)
+  const rating = parseInt(review["im:rating"]?.label);
+  if (isNaN(rating) || rating < 1 || rating > 5) {
+    return null;
+  }
+
+  // Date validation
+  const date = new Date(review.updated?.label);
+  if (isNaN(date.getTime())) {
+    return null;
+  }
+
+  return {
+    id: review.id.label,
+    region: review.region || "unknown",
+    title: review.title.label,
+    content: review.content.label,
+    rating,
+    version: review["im:version"]?.label || "unknown",
+    date: review.updated.label,
+    author: review.author?.name?.label || "Anonymous",
+  };
+};
+```
+
+### Metadata Validation
+
+```typescript
+interface AppMetadata {
+  trackId: number;
+  trackName: string;
+  sellerName: string;
+  primaryGenreName: string;
+  averageUserRating: number;
+  userRatingCount: number;
+  version: string;
+  releaseDate: string;
+  currentVersionReleaseDate: string;
+}
+
+const validateMetadata = (data: any): AppMetadata | null => {
+  if (!data.results || data.results.length === 0) {
+    return null;
+  }
+
+  const result = data.results[0];
+
+  // Required fields
+  if (!result.trackId || !result.trackName || !result.averageUserRating) {
+    return null;
+  }
+
+  return {
+    trackId: result.trackId,
+    trackName: result.trackName,
+    sellerName: result.sellerName || "Unknown",
+    primaryGenreName: result.primaryGenreName || "Unknown",
+    averageUserRating: parseFloat(result.averageUserRating) || 0,
+    userRatingCount: parseInt(result.userRatingCount) || 0,
+    version: result.version || "Unknown",
+    releaseDate: result.releaseDate || "",
+    currentVersionReleaseDate: result.currentVersionReleaseDate || "",
+  };
+};
+```
+
+## Review Filtering
+
+### LLM-Powered Filtering
+
+```typescript
+class ReviewFilter {
+  private openai: OpenAI;
+
+  constructor() {
+    this.openai = new OpenAI({
+      apiKey: process.env.OPENROUTER_API_KEY,
+      baseURL: "https://openrouter.ai/api/v1",
+    });
+  }
+
+  async filterReviews(reviews: AppStoreReview[]): Promise<FilteredAnalysis> {
+    const batchSize = 20;
+    const batches = this.chunkArray(reviews, batchSize);
+
+    const results = await Promise.all(batches.map(batch => this.processBatch(batch)));
+
+    return this.mergeResults(results);
+  }
+
+  private async processBatch(reviews: AppStoreReview[]): Promise<FilteredAnalysis> {
+    const prompt = this.buildPrompt(reviews);
+
+    try {
+      const response = await this.openai.chat.completions.create({
+        model: "mistralai/mistral-8b-instruct",
+        messages: [{ role: "user", content: prompt }],
+        temperature: 0.1,
+      });
+
+      return this.parseResponse(response.choices[0].message.content);
+    } catch (error) {
+      console.error("LLM filtering failed, using heuristic fallback");
+      return this.heuristicFilter(reviews);
+    }
+  }
+}
+```
+
+### Heuristic Fallback
+
+```typescript
+private heuristicFilter(reviews: AppStoreReview[]): FilteredAnalysis {
+  const informative = reviews.filter(review => {
+    const content = review.content.toLowerCase();
+    const title = review.title.toLowerCase();
+
+    // Filter out non-informative patterns
+    const nonInformativePatterns = [
+      'love it', 'hate it', 'great', 'bad', 'good', 'ok', 'cool',
+      'awesome', 'terrible', 'amazing', 'awful', 'nice', 'fine'
+    ];
+
+    const hasNonInformativeContent = nonInformativePatterns.some(pattern =>
+      content.includes(pattern) || title.includes(pattern)
+    );
+
+    // Require minimum content length
+    const hasMinimumLength = content.length >= 20 && title.length >= 5;
+
+    // Require minimum word count
+    const wordCount = content.split(' ').length;
+    const hasMinimumWords = wordCount >= 5;
+
+    return !hasNonInformativeContent && hasMinimumLength && hasMinimumWords;
+  });
+
+  return {
+    informativeReviews: informative.length,
+    nonInformativeReviews: reviews.length - informative.length,
+    totalReviews: reviews.length,
+    informativePercentage: Math.round((informative.length / reviews.length) * 100),
+    categoryBreakdown: this.categorizeReviews(informative)
+  };
+}
+```
+
+## Analysis Processing
+
+### Rating Calculations
+
+```typescript
+// Use overall app rating from metadata, not just written reviews
+const calculateOverallRating = (metadata: AppMetadata): number => {
+  return parseFloat(metadata.averageUserRating.toFixed(1));
+};
+
+// Calculate rating distribution from all reviews
+const calculateRatingDistribution = (reviews: AppStoreReview[]): Record<string, number> => {
+  const distribution: Record<string, number> = { "1": 0, "2": 0, "3": 0, "4": 0, "5": 0 };
+
+  reviews.forEach(review => {
+    const rating = review.rating.toString();
+    distribution[rating] = (distribution[rating] || 0) + 1;
+  });
+
+  return distribution;
+};
+```
+
+### Trend Analysis
+
+```typescript
+const analyzeTrends = (reviews: AppStoreReview[], metadata: AppMetadata) => {
+  // Group by month
+  const monthlyData = groupByMonth(reviews);
+
+  // Calculate trends using overall app rating
+  const overallRating = metadata.averageUserRating;
+
+  // Version impact analysis
+  const versionData = groupByVersion(reviews);
+
+  return {
+    monthlyTrends: monthlyData,
+    versionImpact: versionData,
+    overallRating,
+    trendDirection: calculateTrendDirection(monthlyData),
+  };
+};
+```
+
+### Keyword Extraction
+
+```typescript
+const extractKeywords = (reviews: AppStoreReview[]): KeywordAnalysis[] => {
+  const keywordMap = new Map<string, { count: number; ratings: number[]; sentiment: string }>();
+
+  reviews.forEach(review => {
+    const words = extractWords(review.content + " " + review.title);
+
+    words.forEach(word => {
+      if (isSignificantKeyword(word)) {
+        const existing = keywordMap.get(word) || { count: 0, ratings: [], sentiment: "neutral" };
+        existing.count++;
+        existing.ratings.push(review.rating);
+        existing.sentiment = calculateSentiment(review.rating);
+        keywordMap.set(word, existing);
+      }
+    });
+  });
+
+  return Array.from(keywordMap.entries())
+    .map(([keyword, data]) => ({
+      keyword,
+      count: data.count,
+      averageRating: data.ratings.reduce((a, b) => a + b, 0) / data.ratings.length,
+      sentiment: data.sentiment,
+    }))
+    .sort((a, b) => b.count - a.count)
+    .slice(0, 25); // Top 25 keywords
+};
+```
+
+## Caching Strategy
+
+### In-Memory Caching
+
+```typescript
+class Cache {
+  private cache = new Map<string, CacheEntry>();
+  private maxSize = 100;
+
+  set(key: string, value: any, ttl: number = 3600000): void {
+    if (this.cache.size >= this.maxSize) {
+      this.evictOldest();
+    }
+
+    this.cache.set(key, {
+      value,
+      timestamp: Date.now(),
+      ttl,
+    });
+  }
+
+  get(key: string): any | null {
+    const entry = this.cache.get(key);
+    if (!entry) return null;
+
+    if (Date.now() - entry.timestamp > entry.ttl) {
+      this.cache.delete(key);
+      return null;
+    }
+
+    return entry.value;
+  }
+
+  private evictOldest(): void {
+    let oldestKey: string | null = null;
+    let oldestTime = Date.now();
+
+    for (const [key, entry] of this.cache.entries()) {
+      if (entry.timestamp < oldestTime) {
+        oldestTime = entry.timestamp;
+        oldestKey = key;
+      }
+    }
+
+    if (oldestKey) {
+      this.cache.delete(oldestKey);
+    }
+  }
+}
+```
+
+### Cache Keys
+
+```typescript
+const generateCacheKey = (appId: string, regions: string[], type: string): string => {
+  const regionHash = regions.sort().join(",");
+  return `${type}:${appId}:${regionHash}`;
+};
+
+// Usage
+const reviewsKey = generateCacheKey(appId, regions, "reviews");
+const analysisKey = generateCacheKey(appId, regions, "analysis");
+```
+
+## Performance Optimization
+
+### Benchmarking
+
+```typescript
+class Benchmark {
+  private timers = new Map<string, number>();
+  private results: BenchmarkResult[] = [];
+
+  start(label: string): void {
+    this.timers.set(label, Date.now());
+  }
+
+  end(label: string, metadata?: any): void {
+    const startTime = this.timers.get(label);
+    if (!startTime) return;
+
+    const duration = Date.now() - startTime;
+    this.results.push({ label, duration, metadata, timestamp: Date.now() });
+    this.timers.delete(label);
+  }
+
+  measure<T>(label: string, fn: () => T | Promise<T>, metadata?: any): T | Promise<T> {
+    this.start(label);
+    const result = fn();
+
+    if (result instanceof Promise) {
+      return result.finally(() => this.end(label, metadata));
+    } else {
+      this.end(label, metadata);
+      return result;
+    }
+  }
+}
+```
+
+### Parallel Processing
+
+```typescript
+// Process regions in parallel with rate limiting
+const fetchAllRegions = async (appId: string, regions: string[]): Promise<AppStoreReview[]> => {
+  const allReviews: AppStoreReview[] = [];
+
+  // Process in batches to avoid overwhelming the API
+  const batchSize = 5;
+  for (let i = 0; i < regions.length; i += batchSize) {
+    const batch = regions.slice(i, i + batchSize);
+
+    const batchResults = await Promise.all(
+      batch.map(async region => {
+        await delay(1000); // Rate limiting
+        return fetchReviewsForRegion(appId, region);
+      })
+    );
+
+    allReviews.push(...batchResults.flat());
+  }
+
+  return allReviews;
+};
+```
+
+## Data Export
+
+### CSV Export
+
+```typescript
+const exportToCSV = (reviews: AppStoreReview[]): string => {
+  const headers = ["ID", "Region", "Title", "Content", "Rating", "Version", "Date", "Author"];
+  const rows = reviews.map(review => [
+    review.id,
+    review.region,
+    `"${review.title.replace(/"/g, '""')}"`,
+    `"${review.content.replace(/"/g, '""')}"`,
+    review.rating,
+    review.version,
+    review.date,
+    `"${review.author.replace(/"/g, '""')}"`,
+  ]);
+
+  return [headers.join(","), ...rows.map(row => row.join(","))].join("\n");
+};
+```
+
+### PDF Report Generation
+
+```typescript
+const generatePDFReport = async (analysis: AnalysisResult, metadata: AppMetadata): Promise<Buffer> => {
+  // Implementation for PDF generation
+  // Use libraries like puppeteer or jsPDF
+  // Include charts, tables, and insights
+};
+```
+
+description:
+globs:
+alwaysApply: false
+
+---
