@@ -73,7 +73,8 @@ export async function fetchAppStoreData(appId: string, regions: string[]): Promi
         // Fetch reviews from all selected regions
         const allReviews: AppStoreReview[] = [];
 
-        for (const region of regions) {
+        for (let i = 0; i < regions.length; i++) {
+          const region = regions[i];
           try {
             const regionReviews = await appStoreAPI.fetchReviews(appId, [region], 3);
             allReviews.push(...regionReviews);
@@ -95,10 +96,26 @@ export async function fetchAppStoreData(appId: string, regions: string[]): Promi
         };
       } catch (error) {
         console.error("Error in fetchAppStoreData:", error);
+
+        // Provide more specific error messages based on the error type
+        let errorMessage = "Failed to fetch data. Please try again.";
+
+        if (error instanceof Error) {
+          if (error.message.includes("EAI_AGAIN") || error.message.includes("ENOTFOUND")) {
+            errorMessage = "Network connectivity issue. Please check your internet connection and try again.";
+          } else if (error.message.includes("timeout") || error.message.includes("ECONNABORTED")) {
+            errorMessage = "Request timed out. The App Store servers might be slow. Please try again.";
+          } else if (error.message.includes("ECONNREFUSED")) {
+            errorMessage = "Connection refused. Please check your network settings and try again.";
+          } else if (error.message.includes("ENETUNREACH")) {
+            errorMessage = "Network unreachable. Please check your internet connection and try again.";
+          }
+        }
+
         return {
           reviews: [],
           metadata: null,
-          error: "Failed to fetch data. Please try again.",
+          error: errorMessage,
         };
       }
     },
@@ -115,12 +132,6 @@ export interface AnalysisResult {
   keywordAnalysis: any;
   topReviews: any;
   filteredAnalysis: FilteredAnalysis;
-  // Advanced metrics
-  reviewLengthAnalysis: any;
-  engagementMetrics: any;
-  sentimentTrends: any;
-  performanceMetrics: any;
-  userBehaviorMetrics: any;
 }
 
 export async function analyzeReviews(reviews: AppStoreReview[], metadata?: AppMetadata): Promise<AnalysisResult> {
@@ -172,12 +183,6 @@ export async function analyzeReviews(reviews: AppStoreReview[], metadata?: AppMe
           keywordAnalysis: analyzer.getKeywordAnalysis(),
           topReviews: analyzer.getTopReviews(3),
           filteredAnalysis,
-          // Advanced metrics
-          reviewLengthAnalysis: analyzer.getReviewLengthAnalysis(),
-          engagementMetrics: analyzer.getEngagementMetrics(),
-          sentimentTrends: analyzer.getSentimentTrends(),
-          performanceMetrics: analyzer.getPerformanceMetrics(),
-          userBehaviorMetrics: analyzer.getUserBehaviorMetrics(),
         };
 
         console.log("✅ Analysis completed:", {

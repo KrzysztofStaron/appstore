@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import { benchmark } from "./benchmark";
 
 export const APP_STORE_REGIONS = [
@@ -196,6 +196,103 @@ export interface AppSearchResult {
 
 class AppStoreAPI {
   private baseURL = "https://itunes.apple.com";
+  private fallbackURLs = ["https://itunes.apple.com", "https://itunes.apple.com", "https://itunes.apple.com"];
+  private maxRetries = 3;
+  private retryDelay = 1000; // 1 second
+
+  // Helper method to retry failed requests with fallback URLs
+  private async retryRequest<T>(
+    requestFn: (baseURL: string) => Promise<T>,
+    retries: number = this.maxRetries
+  ): Promise<T> {
+    const urls = [this.baseURL, ...this.fallbackURLs];
+
+    for (let urlIndex = 0; urlIndex < urls.length; urlIndex++) {
+      const currentURL = urls[urlIndex];
+
+      for (let attempt = 1; attempt <= retries; attempt++) {
+        // Store original baseURL before any modifications
+        const originalBaseURL = this.baseURL;
+
+        try {
+          // Temporarily override baseURL for this request
+          this.baseURL = currentURL;
+
+          const result = await requestFn(currentURL);
+
+          // Restore original baseURL
+          this.baseURL = originalBaseURL;
+
+          return result;
+        } catch (error) {
+          const isLastAttempt = attempt === retries;
+          const isLastURL = urlIndex === urls.length - 1;
+          const isNetworkError = this.isNetworkError(error);
+
+          console.warn(`API request attempt ${attempt} failed for ${currentURL}:`, {
+            error: error instanceof Error ? error.message : String(error),
+            isNetworkError,
+            isLastAttempt,
+            isLastURL,
+          });
+
+          // Restore original baseURL
+          this.baseURL = originalBaseURL;
+
+          if (isLastAttempt && isLastURL) {
+            throw error;
+          }
+
+          // Only retry on network errors, not on API errors (4xx, 5xx)
+          if (!isNetworkError) {
+            throw error;
+          }
+
+          // If this is the last attempt for this URL, try the next URL
+          if (isLastAttempt) {
+            break;
+          }
+
+          // Exponential backoff
+          const delay = this.retryDelay * Math.pow(2, attempt - 1);
+          console.log(`Retrying in ${delay}ms...`);
+          await new Promise(resolve => setTimeout(resolve, delay));
+        }
+      }
+    }
+
+    throw new Error("All URLs and retries exhausted");
+  }
+
+  // Check if error is a network connectivity issue
+  private isNetworkError(error: any): boolean {
+    if (error instanceof AxiosError) {
+      // DNS resolution errors
+      if (error.code === "EAI_AGAIN" || error.code === "ENOTFOUND") {
+        return true;
+      }
+
+      // Network timeout
+      if (error.code === "ECONNABORTED") {
+        return true;
+      }
+
+      // Connection refused
+      if (error.code === "ECONNREFUSED") {
+        return true;
+      }
+
+      // Network unreachable
+      if (error.code === "ENETUNREACH") {
+        return true;
+      }
+    }
+
+    // Check error message for network-related keywords
+    const errorMessage = error?.message?.toLowerCase() || "";
+    const networkKeywords = ["network", "dns", "timeout", "connection", "unreachable", "refused"];
+    return networkKeywords.some(keyword => errorMessage.includes(keyword));
+  }
 
   async fetchReviews(
     appId: string,
@@ -217,24 +314,26 @@ class AppStoreAPI {
                 const pageReviews = await benchmark.measure(
                   `fetchReviews_${region}_page_${page}`,
                   async () => {
-                    const url = `${this.baseURL}/${region}/rss/customerreviews/id=${appId}/sortby=mostrecent/json`;
-                    const response = await axios.get(url, { timeout: 5000 });
+                    return this.retryRequest(async baseURL => {
+                      const url = `${baseURL}/${region}/rss/customerreviews/id=${appId}/sortby=mostrecent/json`;
+                      const response = await axios.get(url, { timeout: 10000 }); // Increased timeout
 
-                    const entries = response.data?.feed?.entry || [];
-                    if (!entries || entries.length === 0) {
-                      return [];
-                    }
+                      const entries = response.data?.feed?.entry || [];
+                      if (!entries || entries.length === 0) {
+                        return [];
+                      }
 
-                    return entries.map((entry: any) => ({
-                      id: entry.id?.label || "",
-                      region,
-                      title: entry.title?.label || "",
-                      content: entry.content?.label || "",
-                      rating: parseInt(entry["im:rating"]?.label || "0"),
-                      version: entry["im:version"]?.label || "",
-                      date: entry.updated?.label || "",
-                      author: entry.author?.name?.label || "",
-                    }));
+                      return entries.map((entry: any) => ({
+                        id: entry.id?.label || "",
+                        region,
+                        title: entry.title?.label || "",
+                        content: entry.content?.label || "",
+                        rating: parseInt(entry["im:rating"]?.label || "0"),
+                        version: entry["im:version"]?.label || "",
+                        date: entry.updated?.label || "",
+                        author: entry.author?.name?.label || "",
+                      }));
+                    });
                   },
                   { region, page, appId }
                 );
@@ -268,28 +367,30 @@ class AppStoreAPI {
     return benchmark.measure(
       "fetchAppMetadata",
       async () => {
-        const url = `${this.baseURL}/lookup?id=${appId}&country=${region}`;
-        const response = await axios.get(url, { timeout: 5000 });
+        return this.retryRequest(async baseURL => {
+          const url = `${baseURL}/lookup?id=${appId}&country=${region}`;
+          const response = await axios.get(url, { timeout: 10000 }); // Increased timeout
 
-        const results = response.data?.results;
-        if (!results || results.length === 0) {
-          return null;
-        }
+          const results = response.data?.results;
+          if (!results || results.length === 0) {
+            return null;
+          }
 
-        const app = results[0];
-        return {
-          trackName: app.trackName || "",
-          primaryGenreName: app.primaryGenreName || "",
-          version: app.version || "",
-          averageUserRating: app.averageUserRating || 0,
-          userRatingCount: app.userRatingCount || 0,
-          description: app.description || "",
-          sellerName: app.sellerName || "",
-          trackId: app.trackId || "",
-          releaseNotes: app.releaseNotes,
-          releaseDate: app.releaseDate || "",
-          currentVersionReleaseDate: app.currentVersionReleaseDate || "",
-        };
+          const app = results[0];
+          return {
+            trackName: app.trackName || "",
+            primaryGenreName: app.primaryGenreName || "",
+            version: app.version || "",
+            averageUserRating: app.averageUserRating || 0,
+            userRatingCount: app.userRatingCount || 0,
+            description: app.description || "",
+            sellerName: app.sellerName || "",
+            trackId: app.trackId || "",
+            releaseNotes: app.releaseNotes,
+            releaseDate: app.releaseDate || "",
+            currentVersionReleaseDate: app.currentVersionReleaseDate || "",
+          };
+        });
       },
       { appId, region }
     );
@@ -299,20 +400,22 @@ class AppStoreAPI {
     return benchmark.measure(
       "searchApps",
       async () => {
-        const url = `${this.baseURL}/search?term=${encodeURIComponent(
-          keyword
-        )}&country=${region}&entity=software&limit=${limit}`;
-        const response = await axios.get(url, { timeout: 5000 });
+        return this.retryRequest(async baseURL => {
+          const url = `${baseURL}/search?term=${encodeURIComponent(
+            keyword
+          )}&country=${region}&entity=software&limit=${limit}`;
+          const response = await axios.get(url, { timeout: 10000 }); // Increased timeout
 
-        const results = response.data?.results || [];
-        return results.map((app: any) => ({
-          trackId: app.trackId || "",
-          trackName: app.trackName || "",
-          primaryGenreName: app.primaryGenreName || "",
-          averageUserRating: app.averageUserRating || 0,
-          userRatingCount: app.userRatingCount || 0,
-          sellerName: app.sellerName || "",
-        }));
+          const results = response.data?.results || [];
+          return results.map((app: any) => ({
+            trackId: app.trackId || "",
+            trackName: app.trackName || "",
+            primaryGenreName: app.primaryGenreName || "",
+            averageUserRating: app.averageUserRating || 0,
+            userRatingCount: app.userRatingCount || 0,
+            sellerName: app.sellerName || "",
+          }));
+        });
       },
       { keyword, region, limit }
     );

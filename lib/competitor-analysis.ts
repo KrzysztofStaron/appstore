@@ -28,9 +28,6 @@ export interface CompetitorAnalysis {
     trendData: any;
     versionAnalysis: any;
     keywordAnalysis: any;
-    reviewLengthAnalysis: any;
-    performanceMetrics: any;
-    userBehaviorMetrics: any;
   };
   comparison: {
     ratingComparison: number; // difference from main app
@@ -203,9 +200,6 @@ export class CompetitorAnalyzer {
               trendData: analyzer.getTrendAnalysis(),
               versionAnalysis: analyzer.getVersionAnalysis(),
               keywordAnalysis: analyzer.getKeywordAnalysis(),
-              reviewLengthAnalysis: analyzer.getReviewLengthAnalysis(),
-              performanceMetrics: analyzer.getPerformanceMetrics(),
-              userBehaviorMetrics: analyzer.getUserBehaviorMetrics(),
             };
 
             analyses.push({
