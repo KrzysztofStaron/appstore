@@ -262,9 +262,16 @@ export default function AppStoreAnalyzer() {
       case "versions":
         return <VersionsView analysisResult={analysisResult} />;
       case "issues":
-        return <IssuesView analysisResult={analysisResult} reviews={reviews} />;
+        return <IssuesView analysisResult={analysisResult} reviews={reviews} appMetadata={appMetadata} />;
       case "tasks":
-        return <TasksView analysisResult={analysisResult} reviews={reviews} />;
+        return (
+          <TasksView
+            analysisResult={analysisResult}
+            reviews={reviews}
+            appMetadata={appMetadata}
+            onAnalysisUpdate={updatedAnalysis => setAnalysisResult(updatedAnalysis)}
+          />
+        );
       default:
         return (
           <DashboardView analysisResult={analysisResult} appMetadata={appMetadata} onNavigateToView={setCurrentView} />

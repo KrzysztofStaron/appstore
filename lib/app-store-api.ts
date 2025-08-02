@@ -318,56 +318,67 @@ class AppStoreAPI {
         const allReviews: AppStoreReview[] = [];
 
         for (const region of regions) {
-          const regionReviews = await benchmark.measure(
-            `fetchReviews_${region}`,
-            async () => {
-              const reviews: AppStoreReview[] = [];
+          try {
+            const regionReviews = await benchmark.measure(
+              `fetchReviews_${region}`,
+              async () => {
+                const reviews: AppStoreReview[] = [];
 
-              for (let page = 1; page <= maxPages; page++) {
-                const pageReviews = await benchmark.measure(
-                  `fetchReviews_${region}_page_${page}`,
-                  async () => {
-                    return this.retryRequest(async baseURL => {
-                      const url = `${baseURL}/${region}/rss/customerreviews/id=${appId}/sortby=mostrecent/json`;
-                      const response = await axios.get(url, { timeout: 10000 }); // Increased timeout
+                for (let page = 1; page <= maxPages; page++) {
+                  try {
+                    const pageReviews = await benchmark.measure(
+                      `fetchReviews_${region}_page_${page}`,
+                      async () => {
+                        return this.retryRequest(async baseURL => {
+                          const url = `${baseURL}/${region}/rss/customerreviews/id=${appId}/sortby=mostrecent/json`;
+                          const response = await axios.get(url, { timeout: 10000 }); // Increased timeout
 
-                      const entries = response.data?.feed?.entry || [];
-                      if (!entries || entries.length === 0) {
-                        return [];
-                      }
+                          const entries = response.data?.feed?.entry || [];
+                          if (!entries || entries.length === 0) {
+                            return [];
+                          }
 
-                      return entries.map((entry: any) => ({
-                        id: entry.id?.label || "",
-                        region,
-                        title: entry.title?.label || "",
-                        content: entry.content?.label || "",
-                        rating: parseInt(entry["im:rating"]?.label || "0"),
-                        version: entry["im:version"]?.label || "",
-                        date: entry.updated?.label || "",
-                        author: entry.author?.name?.label || "",
-                      }));
-                    });
-                  },
-                  { region, page, appId }
-                );
+                          return entries.map((entry: any) => ({
+                            id: entry.id?.label || "",
+                            region,
+                            title: entry.title?.label || "",
+                            content: entry.content?.label || "",
+                            rating: parseInt(entry["im:rating"]?.label || "0"),
+                            version: entry["im:version"]?.label || "",
+                            date: entry.updated?.label || "",
+                            author: entry.author?.name?.label || "",
+                          }));
+                        });
+                      },
+                      { region, page, appId }
+                    );
 
-                reviews.push(...pageReviews);
+                    reviews.push(...pageReviews);
 
-                // Stop if no more reviews
-                if (pageReviews.length === 0) break;
+                    // Stop if no more reviews
+                    if (pageReviews.length === 0) break;
 
-                // Rate limiting
-                if (page < maxPages) {
-                  await new Promise(resolve => setTimeout(resolve, 50));
+                    // Rate limiting
+                    if (page < maxPages) {
+                      await new Promise(resolve => setTimeout(resolve, 50));
+                    }
+                  } catch (error) {
+                    console.warn(`Failed to fetch page ${page} for region ${region}:`, error);
+                    // Continue with next page instead of failing completely
+                    break;
+                  }
                 }
-              }
 
-              return reviews;
-            },
-            { region, maxPages, appId }
-          );
+                return reviews;
+              },
+              { region, maxPages, appId }
+            );
 
-          allReviews.push(...regionReviews);
+            allReviews.push(...regionReviews);
+          } catch (error) {
+            console.warn(`Failed to fetch reviews for region ${region}:`, error);
+            // Continue with next region instead of failing completely
+          }
         }
 
         // Cache the result

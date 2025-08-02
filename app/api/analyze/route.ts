@@ -4,7 +4,7 @@ import { getCachedAnalysis, setCachedAnalysis } from "@/lib/cache";
 import { benchmark } from "@/lib/benchmark";
 
 export async function POST(request: NextRequest) {
-  const { reviews, metadata } = await request.json();
+  const { reviews, metadata, minVersion } = await request.json();
 
   if (!reviews || !Array.isArray(reviews) || reviews.length === 0) {
     return NextResponse.json({ error: "No reviews provided for analysis" }, { status: 400 });
@@ -119,7 +119,7 @@ export async function POST(request: NextRequest) {
           percentage: 95,
         });
 
-        const actionableSteps = await analyzer.generateActionableSteps();
+        const actionableSteps = await analyzer.generateActionableSteps(minVersion);
 
         sendProgress({
           stage: "Caching results...",

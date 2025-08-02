@@ -1075,11 +1075,11 @@ export class ReviewAnalyzer {
   }
 
   // Generate actionable steps using AI
-  async generateActionableSteps(): Promise<ActionableStepsResult> {
+  async generateActionableSteps(minVersion?: string): Promise<ActionableStepsResult> {
     return benchmark.measure(
       "generateActionableSteps",
       async () => {
-        const generator = new ActionableStepsGenerator(this.reviews, this.metadata || undefined);
+        const generator = new ActionableStepsGenerator(this.reviews, this.metadata || undefined, minVersion);
         return await generator.generateActionableSteps();
       },
       { totalReviews: this.reviews.length }

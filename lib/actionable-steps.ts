@@ -35,20 +35,33 @@ export interface ActionableStepsResult {
 export class ActionableStepsGenerator {
   private reviews: AppStoreReview[];
   private metadata: AppMetadata | null;
+  private minVersion: string;
 
-  constructor(reviews: AppStoreReview[], metadata?: AppMetadata) {
+  constructor(reviews: AppStoreReview[], metadata?: AppMetadata, minVersion?: string) {
     this.reviews = reviews;
     this.metadata = metadata || null;
+    this.minVersion = minVersion || "0.0";
   }
 
-  async generateActionableSteps(): Promise<ActionableStepsResult> {
+  async generateActionableSteps(minVersion?: string): Promise<ActionableStepsResult> {
+    // Update minVersion if provided
+    if (minVersion !== undefined) {
+      this.minVersion = minVersion;
+    }
+
     if (!process.env.OPENROUTER_API_KEY) {
       console.warn("OpenRouter API key not found, returning mock actionable steps");
       return this.generateMockActionableSteps();
     }
 
     try {
-      const prompt = this.buildPrompt();
+      // Filter reviews by minimum version
+      const filteredReviews = this.filterReviewsByVersion();
+      console.log(
+        `Filtered reviews from ${this.reviews.length} to ${filteredReviews.length} (min version: ${this.minVersion})`
+      );
+
+      const prompt = this.buildPrompt(filteredReviews);
       const response = await this.callOpenRouterAPI(prompt);
       const result = this.parseResponse(response);
 
@@ -61,19 +74,47 @@ export class ActionableStepsGenerator {
     }
   }
 
-  private buildPrompt(): string {
+  private filterReviewsByVersion(): AppStoreReview[] {
+    if (this.minVersion === "0.0") {
+      return this.reviews;
+    }
+
+    return this.reviews.filter(review => {
+      const reviewVersion = review.version;
+      const minVersion = this.minVersion;
+
+      // Simple version comparison
+      const reviewParts = reviewVersion.split(".").map(Number);
+      const minParts = minVersion.split(".").map(Number);
+
+      const maxLength = Math.max(reviewParts.length, minParts.length);
+
+      for (let i = 0; i < maxLength; i++) {
+        const reviewPart = reviewParts[i] || 0;
+        const minPart = minParts[i] || 0;
+
+        if (reviewPart > minPart) return true;
+        if (reviewPart < minPart) return false;
+      }
+
+      return true; // Equal versions are included
+    });
+  }
+
+  private buildPrompt(reviewsToAnalyze: AppStoreReview[] = this.reviews): string {
     const appName = this.metadata?.trackName || "the app";
-    const totalReviews = this.reviews.length;
+    const totalReviews = reviewsToAnalyze.length;
     const averageRating =
-      this.metadata?.averageUserRating || this.reviews.reduce((sum, r) => sum + r.rating, 0) / this.reviews.length;
+      this.metadata?.averageUserRating ||
+      reviewsToAnalyze.reduce((sum, r) => sum + r.rating, 0) / reviewsToAnalyze.length;
 
     // Group reviews by rating for better context
     const reviewsByRating = {
-      1: this.reviews.filter(r => r.rating === 1),
-      2: this.reviews.filter(r => r.rating === 2),
-      3: this.reviews.filter(r => r.rating === 3),
-      4: this.reviews.filter(r => r.rating === 4),
-      5: this.reviews.filter(r => r.rating === 5),
+      1: reviewsToAnalyze.filter(r => r.rating === 1),
+      2: reviewsToAnalyze.filter(r => r.rating === 2),
+      3: reviewsToAnalyze.filter(r => r.rating === 3),
+      4: reviewsToAnalyze.filter(r => r.rating === 4),
+      5: reviewsToAnalyze.filter(r => r.rating === 5),
     };
 
     // Sample reviews from each rating category
