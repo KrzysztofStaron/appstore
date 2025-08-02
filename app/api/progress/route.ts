@@ -78,6 +78,8 @@ export async function POST(request: NextRequest) {
 
         // Fetch reviews from all selected regions
         const allReviews: any[] = [];
+        let totalReviewsFetched = 0;
+        let successfulRegions = 0;
 
         for (let i = 0; i < regions.length; i++) {
           const region = regions[i];
@@ -87,11 +89,23 @@ export async function POST(request: NextRequest) {
             total: regions.length,
             stage: `Fetching reviews from ${region.toUpperCase()}...`,
             percentage: Math.round(10 + (i / regions.length) * 80),
+            details: `${successfulRegions}/${regions.length} regions completed, ${totalReviewsFetched} reviews fetched`,
           });
 
           try {
             const regionReviews = await appStoreAPI.fetchReviews(appId, [region], 3);
             allReviews.push(...regionReviews);
+            totalReviewsFetched += regionReviews.length;
+            successfulRegions++;
+
+            // Update progress with more details
+            sendProgress({
+              current: i + 1,
+              total: regions.length,
+              stage: `Fetched ${regionReviews.length} reviews from ${region.toUpperCase()}`,
+              percentage: Math.round(10 + ((i + 1) / regions.length) * 80),
+              details: `${successfulRegions}/${regions.length} regions completed, ${totalReviewsFetched} reviews fetched`,
+            });
 
             // Small delay to respect rate limits
             await new Promise(resolve => setTimeout(resolve, 500));

@@ -30,6 +30,7 @@ export default function AppStoreAnalyzer() {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [regionProgress, setRegionProgress] = useState<{ current: number; total: number } | null>(null);
   const [currentStage, setCurrentStage] = useState<string>("");
+  const [progressDetails, setProgressDetails] = useState<string>("");
 
   const handleAnalyze = () => {
     if (!appId.trim()) return;
@@ -185,6 +186,7 @@ export default function AppStoreAnalyzer() {
                     total: data.total || regionsToFetch.length,
                   });
                   setCurrentStage(data.stage || "");
+                  setProgressDetails(data.details || "");
                 }
               } catch (parseError) {
                 console.error("Error parsing progress data:", parseError);
@@ -199,6 +201,7 @@ export default function AppStoreAnalyzer() {
         setProgress(0);
         setRegionProgress(null);
         setCurrentStage("");
+        setProgressDetails("");
         setIsAnalyzing(false);
       }
     });
@@ -285,6 +288,7 @@ export default function AppStoreAnalyzer() {
         progress={progress}
         regionProgress={regionProgress}
         currentStage={currentStage}
+        progressDetails={progressDetails}
         error={error}
         appMetadata={appMetadata}
         reviews={reviews}

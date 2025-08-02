@@ -53,70 +53,70 @@ export async function POST(request: NextRequest) {
 
         sendProgress({
           stage: "Generating basic statistics...",
-          percentage: 20,
+          percentage: 15,
         });
 
         const basicStats = analyzer.getBasicStats();
 
         sendProgress({
-          stage: "Analyzing sentiment...",
-          percentage: 30,
+          stage: "Analyzing sentiment with AI...",
+          percentage: 25,
         });
 
-        const sentimentAnalysis = analyzer.getSentimentAnalysis();
+        const sentimentAnalysis = await analyzer.getSentimentAnalysis();
 
         sendProgress({
           stage: "Generating trend data...",
-          percentage: 40,
+          percentage: 35,
         });
 
         const trendData = analyzer.getTrendAnalysis();
 
         sendProgress({
           stage: "Analyzing versions...",
-          percentage: 50,
+          percentage: 45,
         });
 
         const versionAnalysis = analyzer.getVersionAnalysis();
 
         sendProgress({
           stage: "Analyzing regions...",
-          percentage: 60,
+          percentage: 55,
         });
 
         const regionalAnalysis = analyzer.getRegionalAnalysis();
 
         sendProgress({
           stage: "Extracting keywords...",
-          percentage: 70,
+          percentage: 65,
         });
 
         const keywordAnalysis = analyzer.getKeywordAnalysis();
 
         sendProgress({
           stage: "Finding top reviews...",
-          percentage: 80,
+          percentage: 75,
         });
 
         const topReviews = analyzer.getTopReviews(3);
 
         sendProgress({
           stage: "Filtering reviews...",
-          percentage: 90,
+          percentage: 85,
         });
 
         const filteredAnalysis = await analyzer.filterReviews(true);
 
         sendProgress({
           stage: "Calculating dynamic metrics...",
-          percentage: 85,
+          percentage: 90,
         });
 
         const dynamicMetrics = analyzer.getDynamicMetrics();
 
         sendProgress({
           stage: "Generating actionable steps...",
-          percentage: 90,
+          percentage: 95,
         });
 
         const actionableSteps = await analyzer.generateActionableSteps();

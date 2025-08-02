@@ -342,24 +342,61 @@ export class ReviewAnalyzer {
     );
   }
 
-  // Sentiment analysis based on ratings
-  // TODO: Add sentiment analysis based on the content of the reviews
-  getSentimentAnalysis(): SentimentAnalysis {
-    return benchmark.measureSync(
+  // Enhanced sentiment analysis using AI model
+  async getSentimentAnalysis(): Promise<SentimentAnalysis> {
+    return benchmark.measure(
       "getSentimentAnalysis",
-      () => {
+      async () => {
         const reviewsToAnalyze = this.getReviewsToAnalyze();
-        const positive = reviewsToAnalyze.filter(r => r.rating >= 4).length;
-        const negative = reviewsToAnalyze.filter(r => r.rating <= 2).length;
-        const neutral = reviewsToAnalyze.filter(r => r.rating === 3).length;
-        const total = reviewsToAnalyze.length;
 
-        return {
-          positive,
-          negative,
-          neutral,
-          total,
-        };
+        // If no reviews, return empty result
+        if (reviewsToAnalyze.length === 0) {
+          return {
+            positive: 0,
+            negative: 0,
+            neutral: 0,
+            total: 0,
+          };
+        }
+
+        try {
+          // Use AI sentiment analysis if available
+          const { sentimentAnalyzer, analyzeSentimentFallback } = await import("./sentiment-analysis");
+
+          const reviewsForAnalysis = reviewsToAnalyze.map(review => ({
+            id: review.id,
+            title: review.title,
+            content: review.content,
+          }));
+
+          const sentimentResults = await sentimentAnalyzer.analyzeReviews(reviewsForAnalysis);
+
+          // Count sentiments
+          const positive = sentimentResults.results.filter(r => r.label === "POSITIVE").length;
+          const negative = sentimentResults.results.filter(r => r.label === "NEGATIVE").length;
+          const neutral = sentimentResults.results.filter(r => r.label === "NEUTRAL").length;
+
+          return {
+            positive,
+            negative,
+            neutral,
+            total: reviewsToAnalyze.length,
+          };
+        } catch (error) {
+          console.warn("AI sentiment analysis failed, falling back to rating-based analysis:", error);
+
+          // Fallback to rating-based sentiment analysis
+          const positive = reviewsToAnalyze.filter(r => r.rating >= 4).length;
+          const negative = reviewsToAnalyze.filter(r => r.rating <= 2).length;
+          const neutral = reviewsToAnalyze.filter(r => r.rating === 3).length;
+
+          return {
+            positive,
+            negative,
+            neutral,
+            total: reviewsToAnalyze.length,
+          };
+        }
       },
       { totalReviews: this.getReviewsToAnalyze().length }
     );

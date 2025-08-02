@@ -16,6 +16,9 @@ export interface AppMetadata {
   averageUserRating: number;
   userRatingCount: number;
   version: string;
+  artworkUrl512?: string;
+  artworkUrl100?: string;
+  artworkUrl60?: string;
 }
 
 export interface ActionableStep {

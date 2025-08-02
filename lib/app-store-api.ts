@@ -1,5 +1,6 @@
 import axios, { AxiosError } from "axios";
 import { benchmark } from "./benchmark";
+import { requestDeduplicator, Cache } from "./performance";
 
 export const APP_STORE_REGIONS = [
   "ae",
@@ -183,6 +184,9 @@ export interface AppMetadata {
   releaseNotes?: string;
   releaseDate: string;
   currentVersionReleaseDate: string;
+  artworkUrl512?: string;
+  artworkUrl100?: string;
+  artworkUrl60?: string;
 }
 
 export interface AppSearchResult {
@@ -199,6 +203,8 @@ class AppStoreAPI {
   private fallbackURLs = ["https://itunes.apple.com", "https://itunes.apple.com", "https://itunes.apple.com"];
   private maxRetries = 3;
   private retryDelay = 1000; // 1 second
+  private metadataCache = new Cache<any>(30); // 30 minutes TTL
+  private reviewsCache = new Cache<any>(15); // 15 minutes TTL
 
   // Helper method to retry failed requests with fallback URLs
   private async retryRequest<T>(
@@ -299,6 +305,13 @@ class AppStoreAPI {
     regions: string[] = ["us", "gb", "ca"],
     maxPages: number = 3
   ): Promise<AppStoreReview[]> {
+    const cacheKey = `reviews:${appId}:${regions.sort().join(",")}:${maxPages}`;
+
+    // Check cache first
+    const cached = this.reviewsCache.get(cacheKey);
+    if (cached) {
+      return cached;
+    }
     return benchmark.measure(
       "fetchReviews",
       async () => {
@@ -357,6 +370,8 @@ class AppStoreAPI {
           allReviews.push(...regionReviews);
         }
 
+        // Cache the result
+        this.reviewsCache.set(cacheKey, allReviews);
         return allReviews;
       },
       { regions, maxPages, appId }
@@ -364,33 +379,52 @@ class AppStoreAPI {
   }
 
   async fetchAppMetadata(appId: string, region: string = "us"): Promise<AppMetadata | null> {
+    const cacheKey = `metadata:${appId}:${region}`;
+
+    // Check cache first
+    const cached = this.metadataCache.get(cacheKey);
+    if (cached) {
+      return cached;
+    }
+
     return benchmark.measure(
       "fetchAppMetadata",
       async () => {
-        return this.retryRequest(async baseURL => {
-          const url = `${baseURL}/lookup?id=${appId}&country=${region}`;
-          const response = await axios.get(url, { timeout: 10000 }); // Increased timeout
+        const result = await requestDeduplicator.deduplicate(cacheKey, async () => {
+          return this.retryRequest(async baseURL => {
+            const url = `${baseURL}/lookup?id=${appId}&country=${region}`;
+            const response = await axios.get(url, { timeout: 10000 }); // Increased timeout
 
-          const results = response.data?.results;
-          if (!results || results.length === 0) {
-            return null;
-          }
+            const results = response.data?.results;
+            if (!results || results.length === 0) {
+              return null;
+            }
 
-          const app = results[0];
-          return {
-            trackName: app.trackName || "",
-            primaryGenreName: app.primaryGenreName || "",
-            version: app.version || "",
-            averageUserRating: app.averageUserRating || 0,
-            userRatingCount: app.userRatingCount || 0,
-            description: app.description || "",
-            sellerName: app.sellerName || "",
-            trackId: app.trackId || "",
-            releaseNotes: app.releaseNotes,
-            releaseDate: app.releaseDate || "",
-            currentVersionReleaseDate: app.currentVersionReleaseDate || "",
-          };
+            const app = results[0];
+            const metadata = {
+              trackName: app.trackName || "",
+              primaryGenreName: app.primaryGenreName || "",
+              version: app.version || "",
+              averageUserRating: app.averageUserRating || 0,
+              userRatingCount: app.userRatingCount || 0,
+              description: app.description || "",
+              sellerName: app.sellerName || "",
+              trackId: app.trackId || "",
+              releaseNotes: app.releaseNotes,
+              releaseDate: app.releaseDate || "",
+              currentVersionReleaseDate: app.currentVersionReleaseDate || "",
+              artworkUrl512: app.artworkUrl512 || app.artworkUrl100 || app.artworkUrl60,
+              artworkUrl100: app.artworkUrl100 || app.artworkUrl60,
+              artworkUrl60: app.artworkUrl60,
+            };
+
+            // Cache the result
+            this.metadataCache.set(cacheKey, metadata);
+            return metadata;
+          });
         });
+
+        return result;
       },
       { appId, region }
     );

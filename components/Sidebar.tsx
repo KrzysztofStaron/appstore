@@ -39,6 +39,7 @@ interface SidebarProps {
   progress: number;
   regionProgress: { current: number; total: number } | null;
   currentStage: string;
+  progressDetails: string;
   error: string | null;
   appMetadata: AppMetadata | null;
   reviews: any[];
@@ -70,6 +71,7 @@ export function Sidebar({
   progress,
   regionProgress,
   currentStage,
+  progressDetails,
   error,
   appMetadata,
   reviews,
@@ -151,7 +153,8 @@ export function Sidebar({
                 <span>{Math.round(progress)}%</span>
               </div>
               <Progress value={progress} className="h-1 bg-zinc-800" />
-              {regionProgress && (
+              {progressDetails && <div className="text-xs text-zinc-500">{progressDetails}</div>}
+              {regionProgress && !progressDetails && (
                 <div className="text-xs text-zinc-500">
                   Region {regionProgress.current} of {regionProgress.total} (
                   {Math.round((regionProgress.current / regionProgress.total) * 100)}%)
@@ -173,7 +176,24 @@ export function Sidebar({
       {appMetadata && (
         <div className="p-6 border-b border-zinc-800/50">
           <div className="flex items-center gap-3 mb-4">
-            <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-blue-600 rounded-xl flex items-center justify-center">
+            {appMetadata.artworkUrl100 ? (
+              <img
+                src={appMetadata.artworkUrl100}
+                alt={appMetadata.trackName}
+                className="w-12 h-12 rounded-xl object-cover"
+                onError={e => {
+                  // Fallback to gradient if image fails to load
+                  const target = e.target as HTMLImageElement;
+                  target.style.display = "none";
+                  target.nextElementSibling?.classList.remove("hidden");
+                }}
+              />
+            ) : null}
+            <div
+              className={`w-12 h-12 bg-gradient-to-br from-green-500 to-blue-600 rounded-xl flex items-center justify-center ${
+                appMetadata.artworkUrl100 ? "hidden" : ""
+              }`}
+            >
               <span className="text-white font-bold text-lg">{appMetadata.trackName.charAt(0)}</span>
             </div>
             <div>
