@@ -1,14 +1,17 @@
 we=# App Store Review Analysis Tool
 
 <<<<<<< HEAD
-> **Transform App Store reviews into actionable insights with AI-powered analysis**
-=======
-A comprehensive tool for analyzing user reviews from the Apple App Store, providing actionable insights for developers and businesses.
->>>>>>> 51497c3 (docs: improve README with comprehensive documentation)
+
+> # **Transform App Store reviews into actionable insights with AI-powered analysis**
+>
+> A comprehensive tool for analyzing user reviews from the Apple App Store, providing actionable insights for developers and businesses.
+>
+> > > > > > > 51497c3 (docs: improve README with comprehensive documentation)
 
 A modern web application that automatically collects, analyzes, and visualizes user reviews from the Apple App Store. Built with Next.js, React, and OpenAI for comprehensive review intelligence.
 
 <<<<<<< HEAD
+
 ## 🎯 What It Does
 
 - **Collects** reviews from 175+ App Store regions automatically
@@ -33,8 +36,8 @@ echo "OPENROUTER_API_KEY=your_key_here" > .env.local
 pnpm dev
 ```
 
-Visit `http://localhost:3000` and enter an App Store ID (e.g., `6670324846` for Grok).
-=======
+# Visit `http://localhost:3000` and enter an App Store ID (e.g., `6670324846` for Grok).
+
 - **Review Collection**: Automated fetching from App Store RSS API across 175 regions
 - **Advanced Analysis**: Sentiment analysis, keyword extraction, trend analysis
 - **Competitor Analysis**: Market positioning and competitive intelligence
@@ -60,11 +63,54 @@ Visit `http://localhost:3000` and enter an App Store ID (e.g., `6670324846` for 
    ```
 4. Run the development server: `pnpm dev`
 5. Open [http://localhost:3000](http://localhost:3000)
->>>>>>> 51497c3 (docs: improve README with comprehensive documentation)
+
+## 🔧 Configuration
+
+The app includes robust error handling and retry logic for API calls. You can configure various settings using environment variables:
+
+### LLM Filtering Configuration
+
+```bash
+# Enable/disable LLM filtering (default: true if API key is present)
+OPENROUTER_API_KEY=your_api_key_here
+
+# Maximum number of reviews to process with LLM (default: 100)
+MAX_REVIEWS=50
+
+# Batch size for processing reviews (default: 5)
+BATCH_SIZE=3
+
+# Maximum concurrent batches (default: 3)
+MAX_CONCURRENT_BATCHES=2
+
+# Retry attempts for failed requests (default: 3)
+RETRY_ATTEMPTS=5
+
+# Delay between retries in milliseconds (default: 1000)
+RETRY_DELAY=2000
+
+# Rate limiting delay between requests (default: 200)
+RATE_LIMIT_DELAY=500
+
+# Request timeout in milliseconds (default: 10000)
+REQUEST_TIMEOUT=15000
+```
+
+### Error Handling
+
+The app includes comprehensive error handling:
+
+- **Automatic retries** with exponential backoff
+- **Rate limiting** to prevent API throttling
+- **Graceful fallback** to heuristic filtering when LLM fails
+- **Connection timeout** handling
+- **Detailed logging** for debugging
+  > > > > > > > 51497c3 (docs: improve README with comprehensive documentation)
 
 ## 📊 Features
 
 <<<<<<< HEAD
+
 ### Core Analysis
 
 - **Multi-region data collection** from App Store RSS API
@@ -97,7 +143,9 @@ Visit `http://localhost:3000` and enter an App Store ID (e.g., `6670324846` for 
 - **Styling**: Tailwind CSS
 
 ## 📁 Project Structure
+
 =======
+
 1. Enter an App Store app ID (e.g., `6670324846` for Grok)
 2. Select regions to analyze (default: US, GB, CA, AU)
 3. Click "Analyze Reviews" to fetch and process data
@@ -143,7 +191,8 @@ The tool uses the public App Store RSS API:
 ## Development
 
 ### Project Structure
->>>>>>> 51497c3 (docs: improve README with comprehensive documentation)
+
+> > > > > > > 51497c3 (docs: improve README with comprehensive documentation)
 
 ```
 appstore/
@@ -177,15 +226,17 @@ GET /lookup?id={app_id}
 // Competitor search
 GET /search?term={keyword}&country={region}&entity=software
 ```
+
 =======
-│   ├── analysis.ts        # Analysis algorithms
-│   ├── review-filter.ts   # LLM filtering
-│   ├── competitor-analysis.ts # Competitor analysis
-│   ├── benchmark.ts       # Performance tracking
-│   └── cache.ts          # Caching system
-└── components/            # UI components
-    └── ui/               # shadcn/ui components
-```
+│ ├── analysis.ts # Analysis algorithms
+│ ├── review-filter.ts # LLM filtering
+│ ├── competitor-analysis.ts # Competitor analysis
+│ ├── benchmark.ts # Performance tracking
+│ └── cache.ts # Caching system
+└── components/ # UI components
+└── ui/ # shadcn/ui components
+
+````
 
 ### Key Components
 
@@ -238,7 +289,7 @@ GET /search?term={keyword}&country={region}&entity=software
 
 ```env
 OPENROUTER_API_KEY=your_openrouter_api_key_here
-```
+````
 
 ### Default Settings
 
@@ -299,6 +350,7 @@ pnpm lint         # Run ESLint
 ### Guidelines
 
 <<<<<<< HEAD
+
 - Follow TypeScript best practices
 - Add proper error handling
 - Include JSDoc comments
@@ -331,4 +383,5 @@ MIT License - see LICENSE file for details
 _Built with Next.js, React, and modern web technologies for comprehensive App Store review analysis._
 
 <!-- Development activity: July 24-26, 2024 -->
->>>>>>> 51497c3 (docs: improve README with comprehensive documentation)
+
+> > > > > > > 51497c3 (docs: improve README with comprehensive documentation)

@@ -1,0 +1,330 @@
+# UI Component Development Patterns
+
+## shadcn/ui Integration
+
+### Component Structure
+
+Follow the established pattern for view components:
+
+```typescript
+// components/views/ExampleView.tsx
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+
+interface ExampleViewProps {
+  data: any;
+  isLoading?: boolean;
+}
+
+export default function ExampleView({ data, isLoading }: ExampleViewProps) {
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>Example View</CardTitle>
+      </CardHeader>
+      <CardContent>{/* Content here */}</CardContent>
+    </Card>
+  );
+}
+```
+
+### Available UI Components
+
+Use these shadcn/ui components from [components/ui/](mdc:components/ui/):
+
+- `Card` - For content containers
+- `Badge` - For status indicators and labels
+- `Button` - For actions and interactions
+- `Progress` - For loading states and progress indicators
+- `Tabs` - For tabbed interfaces
+- `Select` - For dropdown selections
+- `Input` - For form inputs
+- `Label` - For form labels
+- `Alert` - For notifications and warnings
+- `ScrollArea` - For scrollable content areas
+
+## Styling Patterns
+
+### Tailwind CSS Classes
+
+Use Tailwind CSS for styling with consistent patterns:
+
+```typescript
+// Layout patterns
+<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+<div className="flex flex-col space-y-4">
+<div className="flex items-center justify-between">
+
+// Spacing patterns
+<div className="p-4 md:p-6">
+<div className="space-y-4">
+<div className="gap-4">
+
+// Responsive patterns
+<div className="text-sm md:text-base lg:text-lg">
+<div className="hidden md:block">
+<div className="md:hidden">
+```
+
+### Color Schemes
+
+Use consistent color patterns for different states:
+
+```typescript
+// Success/Positive
+className = "text-green-600 bg-green-50 border-green-200";
+
+// Error/Negative
+className = "text-red-600 bg-red-50 border-red-200";
+
+// Warning
+className = "text-yellow-600 bg-yellow-50 border-yellow-200";
+
+// Info/Neutral
+className = "text-blue-600 bg-blue-50 border-blue-200";
+
+// Loading states
+className = "text-gray-500 bg-gray-50 border-gray-200";
+```
+
+## Data Visualization
+
+### Chart Components
+
+Use Recharts for data visualization:
+
+```typescript
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
+
+export function TrendChart({ data }: { data: TrendData[] }) {
+  return (
+    <ResponsiveContainer width="100%" height={300}>
+      <LineChart data={data}>
+        <CartesianGrid strokeDasharray="3 3" />
+        <XAxis dataKey="date" />
+        <YAxis />
+        <Tooltip />
+        <Line type="monotone" dataKey="averageRating" stroke="#10B981" />
+      </LineChart>
+    </ResponsiveContainer>
+  );
+}
+```
+
+### Loading States
+
+Implement proper loading states:
+
+```typescript
+export function DataCard({ data, isLoading }: { data: any; isLoading: boolean }) {
+  if (isLoading) {
+    return (
+      <Card>
+        <CardHeader>
+          <div className="h-4 bg-gray-200 rounded animate-pulse" />
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-2">
+            <div className="h-3 bg-gray-200 rounded animate-pulse" />
+            <div className="h-3 bg-gray-200 rounded animate-pulse w-2/3" />
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>{data.title}</CardTitle>
+      </CardHeader>
+      <CardContent>{data.content}</CardContent>
+    </Card>
+  );
+}
+```
+
+## Form Patterns
+
+### Form Components
+
+Use consistent form patterns:
+
+```typescript
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
+
+export function SearchForm({ onSubmit }: { onSubmit: (query: string) => void }) {
+  const [query, setQuery] = useState("");
+
+  return (
+    <form
+      onSubmit={e => {
+        e.preventDefault();
+        onSubmit(query);
+      }}
+    >
+      <div className="space-y-4">
+        <div>
+          <Label htmlFor="search">Search</Label>
+          <Input
+            id="search"
+            value={query}
+            onChange={e => setQuery(e.target.value)}
+            placeholder="Enter search term..."
+          />
+        </div>
+        <Button type="submit">Search</Button>
+      </div>
+    </form>
+  );
+}
+```
+
+## Navigation Patterns
+
+### Sidebar Navigation
+
+Follow the pattern established in [components/Sidebar.tsx](mdc:components/Sidebar.tsx):
+
+```typescript
+import { cn } from "@/lib/utils";
+
+interface NavItemProps {
+  href: string;
+  icon: React.ReactNode;
+  children: React.ReactNode;
+  isActive?: boolean;
+}
+
+export function NavItem({ href, icon, children, isActive }: NavItemProps) {
+  return (
+    <Link
+      href={href}
+      className={cn(
+        "flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium",
+        isActive ? "bg-gray-100 text-gray-900" : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+      )}
+    >
+      {icon}
+      <span>{children}</span>
+    </Link>
+  );
+}
+```
+
+## Error States
+
+### Error Boundaries
+
+Implement error boundaries for component error handling:
+
+```typescript
+export function ErrorBoundary({ children }: { children: React.ReactNode }) {
+  return (
+    <ErrorBoundary
+      fallback={
+        <Card>
+          <CardContent className="p-6">
+            <div className="text-center">
+              <div className="text-red-600 mb-2">Something went wrong</div>
+              <Button onClick={() => window.location.reload()}>Try again</Button>
+            </div>
+          </CardContent>
+        </Card>
+      }
+    >
+      {children}
+    </ErrorBoundary>
+  );
+}
+```
+
+### Error Messages
+
+Use consistent error message patterns:
+
+```typescript
+export function ErrorMessage({ error }: { error: Error }) {
+  return (
+    <Alert variant="destructive">
+      <AlertCircle className="h-4 w-4" />
+      <AlertTitle>Error</AlertTitle>
+      <AlertDescription>{error.message || "An unexpected error occurred"}</AlertDescription>
+    </Alert>
+  );
+}
+```
+
+## Accessibility
+
+### ARIA Labels
+
+Always include proper ARIA labels:
+
+```typescript
+<Button aria-label="Refresh data">
+  <RefreshCw className="h-4 w-4" />
+</Button>
+
+<Input aria-label="Search reviews" placeholder="Search..." />
+
+<Card role="region" aria-label="Review statistics">
+  {/* Content */}
+</Card>
+```
+
+### Keyboard Navigation
+
+Ensure keyboard navigation works:
+
+```typescript
+<div
+  role="button"
+  tabIndex={0}
+  onKeyDown={e => {
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      onClick();
+    }
+  }}
+  onClick={onClick}
+>
+  {/* Content */}
+</div>
+```
+
+## Performance Optimization
+
+### Lazy Loading
+
+Use dynamic imports for heavy components:
+
+```typescript
+const HeavyChart = dynamic(() => import("./HeavyChart"), {
+  loading: () => <div>Loading chart...</div>,
+  ssr: false,
+});
+```
+
+### Memoization
+
+Use React.memo for expensive components:
+
+```typescript
+export const ExpensiveComponent = React.memo(({ data }: { data: any[] }) => {
+  // Expensive rendering logic
+  return <div>{/* Rendered content */}</div>;
+});
+```
+
+description:
+globs:
+alwaysApply: false
+
+---

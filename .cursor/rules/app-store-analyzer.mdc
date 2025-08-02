@@ -1,0 +1,133 @@
+# App Store Review Analysis Tool - Development Guide
+
+## Project Overview
+
+This is a Next.js application that analyzes App Store reviews using AI-powered filtering and analysis. The tool fetches reviews from the App Store RSS API across 175+ regions and provides actionable insights for developers.
+
+## Core Architecture
+
+### Main Entry Points
+
+- [app/page.tsx](mdc:app/page.tsx) - Main dashboard interface
+- [app/api/analyze/route.ts](mdc:app/api/analyze/route.ts) - Analysis API endpoint
+- [lib/analysis.ts](mdc:lib/analysis.ts) - Core analysis engine
+
+### Key Libraries
+
+- [lib/app-store-api.ts](mdc:lib/app-store-api.ts) - App Store RSS API client
+- [lib/review-filter.ts](mdc:lib/review-filter.ts) - AI-powered review filtering with retry logic
+- [lib/config.ts](mdc:lib/config.ts) - Configuration management
+- [lib/benchmark.ts](mdc:lib/benchmark.ts) - Performance tracking
+
+## Error Handling & Reliability
+
+### LLM Filtering Configuration
+
+The system uses robust error handling for OpenRouter API calls:
+
+- **Retry Logic**: Configurable retry attempts with exponential backoff
+- **Rate Limiting**: Automatic delays between requests to prevent throttling
+- **Graceful Fallback**: Falls back to heuristic filtering when LLM fails
+- **Connection Timeouts**: Handles network timeouts and connection errors
+
+### Configuration Options
+
+Environment variables control behavior:
+
+```bash
+OPENROUTER_API_KEY=your_key
+MAX_REVIEWS=100
+BATCH_SIZE=5
+MAX_CONCURRENT_BATCHES=3
+RETRY_ATTEMPTS=3
+RETRY_DELAY=1000
+RATE_LIMIT_DELAY=200
+REQUEST_TIMEOUT=10000
+```
+
+## Development Patterns
+
+### Error Handling Best Practices
+
+- Always use try-catch blocks for API calls
+- Implement retry logic with exponential backoff
+- Provide fallback mechanisms for critical operations
+- Log detailed error information for debugging
+- Use Promise.allSettled() for batch operations
+
+### TypeScript Conventions
+
+- Use proper typing for all function parameters and return values
+- Handle unknown error types with type assertions when necessary
+- Use interfaces for complex data structures
+- Prefer async/await over raw promises
+
+### Performance Considerations
+
+- Limit concurrent API requests to prevent rate limiting
+- Use batch processing for large datasets
+- Implement caching where appropriate
+- Monitor performance with the benchmark system
+
+## File Structure Guidelines
+
+### Components
+
+- [components/views/](mdc:components/views/) - Main view components
+- [components/ui/](mdc:components/ui/) - Reusable UI components (shadcn/ui)
+- [components/Sidebar.tsx](mdc:components/Sidebar.tsx) - Navigation sidebar
+
+### API Routes
+
+- [app/api/](mdc:app/api/) - API endpoints
+- [app/actions.ts](mdc:app/actions.ts) - Server actions
+
+### Data Processing
+
+- [lib/](mdc:lib/) - Core business logic and utilities
+- [data.json](mdc:data.json) - Sample data for development
+
+## Common Development Tasks
+
+### Adding New Analysis Features
+
+1. Extend the analysis engine in [lib/analysis.ts](mdc:lib/analysis.ts)
+2. Add corresponding UI components in [components/views/](mdc:components/views/)
+3. Update types in [app/types.ts](mdc:app/types.ts)
+4. Add configuration options in [lib/config.ts](mdc:lib/config.ts)
+
+### Debugging API Issues
+
+1. Check error logs for specific error codes and status codes
+2. Verify OpenRouter API key configuration
+3. Review rate limiting and retry settings
+4. Test with smaller batch sizes if needed
+
+### Performance Optimization
+
+1. Use the benchmark system to track performance
+2. Adjust batch sizes and concurrency limits
+3. Implement caching for frequently accessed data
+4. Monitor API usage and costs
+
+## Testing & Quality Assurance
+
+### Error Scenarios to Test
+
+- Network timeouts and connection failures
+- API rate limiting (429 errors)
+- Invalid API keys
+- Large datasets that exceed limits
+- Malformed review data
+
+### Configuration Testing
+
+- Test with different environment variable combinations
+- Verify fallback behavior when LLM is disabled
+- Test performance with various batch sizes
+- Validate retry logic with simulated failures
+  description:
+  globs:
+  alwaysApply: false
+
+---

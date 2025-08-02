@@ -1,5 +1,6 @@
 import OpenAI from "openai";
 import { benchmark } from "./benchmark";
+import { getConfig, type AppStoreAnalyzerConfig } from "./config";
 
 export interface ReviewFilterResult {
   isInformative: boolean;
@@ -10,17 +11,62 @@ export interface ReviewFilterResult {
 
 export class ReviewFilter {
   private openai: OpenAI;
+  private config: AppStoreAnalyzerConfig;
 
-  constructor(apiKey?: string) {
+  constructor(apiKey?: string, config?: AppStoreAnalyzerConfig) {
+    this.config = config || getConfig();
+
     this.openai = new OpenAI({
       apiKey: apiKey || process.env.OPENROUTER_API_KEY,
-      baseURL: "https://openrouter.ai/api/v1",
+      baseURL: this.config.api.baseURL,
+      timeout: this.config.llm.timeout,
     });
   }
 
+  // Helper function to delay execution
+  private async delay(ms: number): Promise<void> {
+    return new Promise(resolve => setTimeout(resolve, ms));
+  }
+
+  // Helper function to check if error is retryable
+  private isRetryableError(error: any): boolean {
+    if (!error) return false;
+
+    // Network errors
+    if (error.code === "ETIMEDOUT" || error.code === "ECONNRESET" || error.code === "ENOTFOUND") {
+      return true;
+    }
+
+    // HTTP errors
+    if (
+      error.status === 429 ||
+      error.status === 500 ||
+      error.status === 502 ||
+      error.status === 503 ||
+      error.status === 504
+    ) {
+      return true;
+    }
+
+    // OpenAI API errors
+    if (error.type === "system" || error.type === "server_error") {
+      return true;
+    }
+
+    return false;
+  }
+
   async filterReview(review: { title: string; content: string }): Promise<ReviewFilterResult> {
-    try {
-      const prompt = `Analyze this app store review and determine if it provides actionable information for developers.
+    let lastError: any;
+
+    for (let attempt = 1; attempt <= this.config.llm.retryAttempts; attempt++) {
+      try {
+        // Add rate limiting delay
+        if (attempt > 1) {
+          await this.delay(this.config.llm.rateLimitDelay * attempt); // Exponential backoff
+        }
+
+        const prompt = `Analyze this app store review and determine if it provides actionable information for developers.
 
 Review Title: "${review.title}"
 Review Content: "${review.content}"
@@ -58,51 +104,70 @@ Categories:
 - general: General feedback that's informative but doesn't fit other categories
 - non-informative: Generic praise/complaints without actionable details`;
 
-      const response = await this.openai.chat.completions.create({
-        model: "mistralai/ministral-3b",
-        messages: [
-          {
-            role: "system",
-            content:
-              "You are a helpful assistant that analyzes app store reviews to determine if they provide actionable information for developers. Always respond with valid JSON.",
-          },
-          {
-            role: "user",
-            content: prompt,
-          },
-        ],
-        temperature: 0.1,
-        max_tokens: 200,
-      });
+        const response = await this.openai.chat.completions.create({
+          model: this.config.api.model,
+          messages: [
+            {
+              role: "system",
+              content:
+                "You are a helpful assistant that analyzes app store reviews to determine if they provide actionable information for developers. Always respond with valid JSON.",
+            },
+            {
+              role: "user",
+              content: prompt,
+            },
+          ],
+          temperature: this.config.api.temperature,
+          max_tokens: this.config.api.maxTokens,
+        });
 
-      const result = JSON.parse(response.choices[0].message.content || "{}");
+        const result = JSON.parse(response.choices[0].message.content || "{}");
 
-      return {
-        isInformative: result.isInformative || false,
-        confidence: result.confidence || 0.5,
-        reason: result.reason || "Unable to analyze",
-        category: result.category || "non-informative",
-      };
-    } catch (error) {
-      console.error("Error filtering review:", error);
-      // Fallback: consider reviews with more content as potentially informative
-      const totalLength = (review.title + review.content).length;
-      const isInformative = totalLength > 20;
+        return {
+          isInformative: result.isInformative || false,
+          confidence: result.confidence || 0.5,
+          reason: result.reason || "Unable to analyze",
+          category: result.category || "non-informative",
+        };
+      } catch (error: any) {
+        lastError = error;
+        console.warn(
+          `Attempt ${attempt}/${this.config.llm.retryAttempts} failed for review filtering:`,
+          error.message || error
+        );
 
-      return {
-        isInformative,
-        confidence: 0.5,
-        reason: "Fallback analysis due to API error",
-        category: isInformative ? "general" : "non-informative",
-      };
+        // If it's not a retryable error, break immediately
+        if (!this.isRetryableError(error)) {
+          break;
+        }
+
+        // If this is the last attempt, don't wait
+        if (attempt < this.config.llm.retryAttempts) {
+          await this.delay(this.config.llm.retryDelay * attempt);
+        }
+      }
     }
+
+    console.error("All retry attempts failed for review filtering:", lastError);
+
+    // Fallback: consider reviews with more content as potentially informative
+    const totalLength = (review.title + review.content).length;
+    const isInformative = totalLength > 20;
+
+    return {
+      isInformative,
+      confidence: 0.5,
+      reason: "Fallback analysis due to API error",
+      category: isInformative ? "general" : "non-informative",
+    };
   }
 
   async filterReviews(reviews: Array<{ title: string; content: string }>): Promise<{
     informative: Array<{ review: any; filterResult: ReviewFilterResult }>;
     nonInformative: Array<{ review: any; filterResult: ReviewFilterResult }>;
   }> {
-    const batchSize = 20; // Increased batch size for better parallelism
+    const batchSize = this.config.llm.batchSize;
+    const maxConcurrentBatches = this.config.llm.maxConcurrentBatches;
 
     return benchmark.measure(
       "filterReviews_llm_parallel",
@@ -112,39 +177,72 @@ Categories:
           nonInformative: [] as Array<{ review: any; filterResult: ReviewFilterResult }>,
         };
 
-        // Process reviews in parallel batches
+        // Process reviews in smaller batches with controlled concurrency
         const batches = [];
-
         for (let i = 0; i < reviews.length; i += batchSize) {
           const batch = reviews.slice(i, i + batchSize);
           batches.push(batch);
         }
 
-        // Process all batches in parallel
-        const batchPromises = batches.map(async (batch, batchIndex) => {
-          const batchResults = await Promise.all(
-            batch.map(async review => {
-              const filterResult = await this.filterReview(review);
-              return { review, filterResult };
-            })
-          );
-          return batchResults;
-        });
+        // Process batches with controlled concurrency
+        for (let i = 0; i < batches.length; i += maxConcurrentBatches) {
+          const currentBatches = batches.slice(i, i + maxConcurrentBatches);
 
-        const allBatchResults = await Promise.all(batchPromises);
+          const batchPromises = currentBatches.map(async (batch, batchIndex) => {
+            const batchResults = await Promise.allSettled(
+              batch.map(async review => {
+                try {
+                  const filterResult = await this.filterReview(review);
+                  return { review, filterResult };
+                } catch (error: any) {
+                  console.error("Individual review filtering failed:", error);
+                  // Return a fallback result for this review
+                  const totalLength = (review.title + review.content).length;
+                  const isInformative = totalLength > 20;
+                  return {
+                    review,
+                    filterResult: {
+                      isInformative,
+                      confidence: 0.5,
+                      reason: "Fallback due to individual error",
+                      category: isInformative ? "general" : "non-informative",
+                    },
+                  };
+                }
+              })
+            );
 
-        // Flatten and categorize results
-        allBatchResults.flat().forEach(({ review, filterResult }) => {
-          if (filterResult.isInformative) {
-            results.informative.push({ review, filterResult });
-          } else {
-            results.nonInformative.push({ review, filterResult });
+            // Extract successful results
+            return batchResults
+              .filter(result => result.status === "fulfilled")
+              .map(result => (result as PromiseFulfilledResult<any>).value);
+          });
+
+          const batchResults = await Promise.all(batchPromises);
+
+          // Flatten and categorize results
+          batchResults.flat().forEach(({ review, filterResult }) => {
+            if (filterResult.isInformative) {
+              results.informative.push({ review, filterResult });
+            } else {
+              results.nonInformative.push({ review, filterResult });
+            }
+          });
+
+          // Add delay between batch groups to prevent rate limiting
+          if (i + maxConcurrentBatches < batches.length) {
+            await this.delay(1000); // 1 second delay between batch groups
           }
-        });
+        }
 
         return results;
       },
-      { totalReviews: reviews.length, batchSize, totalBatches: Math.ceil(reviews.length / batchSize) }
+      {
+        totalReviews: reviews.length,
+        batchSize,
+        maxConcurrentBatches,
+        totalBatches: Math.ceil(reviews.length / batchSize),
+      }
     );
   }
 

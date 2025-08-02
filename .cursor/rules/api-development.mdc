@@ -1,0 +1,379 @@
+# API Development Patterns
+
+## Next.js API Routes
+
+### Route Structure
+
+Follow the established pattern for API routes:
+
+```typescript
+// app/api/analyze/route.ts
+import { NextRequest, NextResponse } from "next/server";
+import { ReviewAnalyzer } from "@/lib/analysis";
+
+export async function POST(request: NextRequest) {
+  try {
+    const body = await request.json();
+    const { appId, regions } = body;
+
+    // Validate input
+    if (!appId) {
+      return NextResponse.json({ error: "App ID is required" }, { status: 400 });
+    }
+
+    // Process request
+    const analyzer = new ReviewAnalyzer(reviews);
+    const result = await analyzer.analyze();
+
+    return NextResponse.json(result);
+  } catch (error: any) {
+    console.error("API Error:", error);
+
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+  }
+}
+```
+
+### Error Handling
+
+Implement comprehensive error handling for API routes:
+
+```typescript
+export async function POST(request: NextRequest) {
+  try {
+    // Request processing
+  } catch (error: any) {
+    // Log detailed error information
+    console.error("API Error:", {
+      message: error.message,
+      stack: error.stack,
+      code: error.code,
+      status: error.status,
+    });
+
+    // Return appropriate error response
+    if (error.code === "VALIDATION_ERROR") {
+      return NextResponse.json({ error: error.message }, { status: 400 });
+    }
+
+    if (error.code === "NOT_FOUND") {
+      return NextResponse.json({ error: "Resource not found" }, { status: 404 });
+    }
+
+    // Default error response
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+  }
+}
+```
+
+## App Store API Integration
+
+### API Client Pattern
+
+Use the pattern established in [lib/app-store-api.ts](mdc:lib/app-store-api.ts):
+
+```typescript
+export class AppStoreAPI {
+  private baseURL = "https://itunes.apple.com";
+  private timeout = 10000;
+
+  async fetchReviews(appId: string, region: string, page: number = 1) {
+    const url = `${this.baseURL}/rss/customerreviews/id=${appId}/sortby=mostrecent/json?cc=${region}&page=${page}`;
+
+    try {
+      const response = await fetch(url, {
+        signal: AbortSignal.timeout(this.timeout),
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      return this.parseReviews(data);
+    } catch (error: any) {
+      console.error(`Error fetching reviews for ${appId} in ${region}:`, error);
+      throw error;
+    }
+  }
+
+  private parseReviews(data: any): AppStoreReview[] {
+    // Parse and validate review data
+    const entries = data.feed?.entry || [];
+    return entries.map(this.parseReview).filter(Boolean);
+  }
+}
+```
+
+### Rate Limiting
+
+Implement rate limiting for external API calls:
+
+```typescript
+export class RateLimitedAPI {
+  private lastRequestTime = 0;
+  private minInterval = 1000; // 1 second between requests
+
+  async makeRequest(url: string) {
+    const now = Date.now();
+    const timeSinceLastRequest = now - this.lastRequestTime;
+
+    if (timeSinceLastRequest < this.minInterval) {
+      await this.delay(this.minInterval - timeSinceLastRequest);
+    }
+
+    this.lastRequestTime = Date.now();
+    return fetch(url);
+  }
+
+  private delay(ms: number): Promise<void> {
+    return new Promise(resolve => setTimeout(resolve, ms));
+  }
+}
+```
+
+## Data Processing
+
+### Batch Processing
+
+Use batch processing for large datasets:
+
+```typescript
+export async function processBatch<T, R>(
+  items: T[],
+  processor: (item: T) => Promise<R>,
+  batchSize: number = 10
+): Promise<R[]> {
+  const results: R[] = [];
+
+  for (let i = 0; i < items.length; i += batchSize) {
+    const batch = items.slice(i, i + batchSize);
+    const batchResults = await Promise.allSettled(batch.map(processor));
+
+    // Collect successful results
+    batchResults.forEach(result => {
+      if (result.status === "fulfilled") {
+        results.push(result.value);
+      }
+    });
+
+    // Add delay between batches
+    if (i + batchSize < items.length) {
+      await new Promise(resolve => setTimeout(resolve, 1000));
+    }
+  }
+
+  return results;
+}
+```
+
+### Data Validation
+
+Implement proper data validation:
+
+```typescript
+export function validateReviewData(data: any): AppStoreReview | null {
+  try {
+    // Required fields
+    if (!data.id?.label || !data.title?.label || !data.content?.label) {
+      return null;
+    }
+
+    // Validate rating
+    const rating = parseInt(data["im:rating"]?.label || "0");
+    if (isNaN(rating) || rating < 1 || rating > 5) {
+      return null;
+    }
+
+    // Validate date
+    const date = new Date(data.updated?.label);
+    if (isNaN(date.getTime())) {
+      return null;
+    }
+
+    return {
+      id: data.id.label,
+      title: data.title.label,
+      content: data.content.label,
+      rating,
+      date: date.toISOString(),
+      version: data["im:version"]?.label || "",
+      region: data.region || "",
+    };
+  } catch (error) {
+    console.error("Review validation error:", error);
+    return null;
+  }
+}
+```
+
+## Caching Strategy
+
+### Cache Implementation
+
+Implement caching for expensive operations:
+
+```typescript
+export class Cache {
+  private cache = new Map<string, { data: any; timestamp: number }>();
+  private ttl: number;
+
+  constructor(ttl: number = 3600000) {
+    // 1 hour default
+    this.ttl = ttl;
+  }
+
+  get(key: string): any | null {
+    const item = this.cache.get(key);
+    if (!item) return null;
+
+    if (Date.now() - item.timestamp > this.ttl) {
+      this.cache.delete(key);
+      return null;
+    }
+
+    return item.data;
+  }
+
+  set(key: string, data: any): void {
+    this.cache.set(key, {
+      data,
+      timestamp: Date.now(),
+    });
+  }
+
+  clear(): void {
+    this.cache.clear();
+  }
+}
+```
+
+### Cache Usage
+
+Use caching in API operations:
+
+```typescript
+const cache = new Cache(1800000); // 30 minutes
+
+export async function getCachedReviews(appId: string, region: string) {
+  const cacheKey = `reviews_${appId}_${region}`;
+
+  // Check cache first
+  const cached = cache.get(cacheKey);
+  if (cached) {
+    return cached;
+  }
+
+  // Fetch from API
+  const reviews = await fetchReviews(appId, region);
+
+  // Cache the result
+  cache.set(cacheKey, reviews);
+
+  return reviews;
+}
+```
+
+## Performance Monitoring
+
+### Benchmarking
+
+Use the benchmark system for performance tracking:
+
+```typescript
+import { benchmark } from "@/lib/benchmark";
+
+export async function analyzeReviews(reviews: AppStoreReview[]) {
+  return benchmark.measure(
+    "review_analysis",
+    async () => {
+      const analyzer = new ReviewAnalyzer(reviews);
+      return await analyzer.analyze();
+    },
+    { reviewCount: reviews.length }
+  );
+}
+```
+
+### Progress Tracking
+
+Implement progress tracking for long-running operations:
+
+```typescript
+export async function processWithProgress<T>(
+  items: T[],
+  processor: (item: T, index: number) => Promise<any>,
+  onProgress?: (progress: number) => void
+): Promise<any[]> {
+  const results: any[] = [];
+
+  for (let i = 0; i < items.length; i++) {
+    const result = await processor(items[i], i);
+    results.push(result);
+
+    if (onProgress) {
+      const progress = ((i + 1) / items.length) * 100;
+      onProgress(progress);
+    }
+  }
+
+  return results;
+}
+```
+
+## Security Considerations
+
+### Input Validation
+
+Always validate and sanitize input:
+
+```typescript
+export function validateAppId(appId: string): boolean {
+  // App Store IDs are numeric
+  return /^\d+$/.test(appId) && appId.length > 0;
+}
+
+export function validateRegion(region: string): boolean {
+  // ISO 3166-1 alpha-2 country codes
+  return /^[A-Z]{2}$/.test(region.toUpperCase());
+}
+
+export function sanitizeInput(input: string): string {
+  return input.trim().replace(/[<>]/g, "");
+}
+```
+
+### Rate Limiting
+
+Implement rate limiting for API endpoints:
+
+```typescript
+import { NextRequest } from "next/server";
+
+const requestCounts = new Map<string, { count: number; resetTime: number }>();
+
+export function checkRateLimit(request: NextRequest, limit: number = 100, window: number = 60000): boolean {
+  const ip = request.ip || "unknown";
+  const now = Date.now();
+
+  const userRequests = requestCounts.get(ip);
+
+  if (!userRequests || now > userRequests.resetTime) {
+    requestCounts.set(ip, { count: 1, resetTime: now + window });
+    return true;
+  }
+
+  if (userRequests.count >= limit) {
+    return false;
+  }
+
+  userRequests.count++;
+  return true;
+}
+```
+
+description:
+globs:
+alwaysApply: false
+
+---

@@ -1,6 +1,8 @@
 import { AppStoreReview, AppMetadata } from "./app-store-api";
 import { ReviewFilter, ReviewFilterResult } from "./review-filter";
 import { benchmark } from "./benchmark";
+import { ActionableStepsGenerator, ActionableStepsResult } from "./actionable-steps";
+import { getConfig } from "./config";
 
 export interface SentimentAnalysis {
   positive: number;
@@ -53,6 +55,47 @@ export interface AdvancedAnalysisResult {
   keywordAnalysis: KeywordAnalysis[];
   topReviews: any;
   filteredAnalysis: FilteredAnalysis;
+  actionableSteps: ActionableStepsResult;
+  dynamicMetrics: {
+    ratingTrend: {
+      weeklyChange: number;
+      monthlyChange: number;
+      trendDirection: "up" | "down" | "stable";
+      trendDescription: string;
+    };
+    userComplaints: {
+      crashReports: number;
+      performanceIssues: number;
+      bugReports: number;
+      totalIssues: number;
+    };
+    performanceMetrics: {
+      speedComplaints: number;
+      speedComplaintChange: number;
+      lagComplaints: number;
+      freezeComplaints: number;
+    };
+    keywordTrends: {
+      topPositiveKeywords: Array<{ keyword: string; count: number; trend: number }>;
+      topNegativeKeywords: Array<{ keyword: string; count: number; trend: number }>;
+    };
+    timeBasedStats: {
+      weeksTracked: number;
+      daysTracked: number;
+      averageReviewsPerDay: number;
+      recentActivity: {
+        last7Days: number;
+        last30Days: number;
+        last90Days: number;
+      };
+    };
+    impactAssessment: {
+      criticalIssues: number;
+      highPriorityIssues: number;
+      mediumPriorityIssues: number;
+      lowPriorityIssues: number;
+    };
+  };
 }
 
 export class ReviewAnalyzer {
@@ -65,9 +108,18 @@ export class ReviewAnalyzer {
   constructor(reviews: AppStoreReview[], metadata?: AppMetadata) {
     this.reviews = reviews;
     this.metadata = metadata || null;
-    this.reviewFilter = new ReviewFilter();
+
+    const config = getConfig();
+    this.reviewFilter = new ReviewFilter(undefined, config);
 
     console.log(`🔍 ReviewAnalyzer initialized with ${reviews.length} reviews`);
+    console.log(`⚙️ LLM filtering: ${config.llm.enabled ? "enabled" : "disabled"}`);
+    if (config.llm.enabled) {
+      console.log(`📊 Max reviews for LLM: ${config.llm.maxReviews}`);
+      console.log(`📦 Batch size: ${config.llm.batchSize}`);
+      console.log(`🔄 Max concurrent batches: ${config.llm.maxConcurrentBatches}`);
+    }
+
     if (reviews.length > 0) {
       console.log("Sample review:", {
         id: reviews[0].id,
@@ -121,14 +173,21 @@ export class ReviewAnalyzer {
     return benchmark.measure(
       "filterReviews",
       async () => {
-        if (useLLM && process.env.OPENROUTER_API_KEY) {
+        const config = getConfig();
+
+        // Check if we should use LLM filtering
+        const shouldUseLLM =
+          useLLM && config.llm.enabled && this.reviews.length > 0 && this.reviews.length <= config.llm.maxReviews;
+
+        if (shouldUseLLM) {
           try {
+            console.log(`🔍 Starting LLM filtering for ${this.reviews.length} reviews...`);
+
             const filterResults = await this.reviewFilter.filterReviews(
               this.reviews.map(review => ({ title: review.title, content: review.content }))
             );
 
             // Map the filtered results back to the original reviews
-            // We need to find the original reviews that match the filtered results
             this.filteredReviews = filterResults.informative
               .map(item => {
                 // Find the original review that matches this filtered review
@@ -140,6 +199,8 @@ export class ReviewAnalyzer {
               .filter(Boolean); // Remove any undefined results
 
             this.filterResults = filterResults.informative.map(item => item.filterResult);
+
+            console.log(`✅ LLM filtering completed: ${this.filteredReviews.length} informative reviews found`);
 
             // If LLM filtering resulted in no reviews, fall back to heuristic
             if (this.filteredReviews.length === 0) {
@@ -160,11 +221,31 @@ export class ReviewAnalyzer {
               informativePercentage: Math.round((this.filteredReviews.length / this.reviews.length) * 100),
               categoryBreakdown,
             };
-          } catch (error) {
-            console.error("LLM filtering failed, falling back to heuristic:", error);
+          } catch (error: any) {
+            console.error("❌ LLM filtering failed, falling back to heuristic:", error.message || error);
+
+            // Log specific error details for debugging
+            if (error.code) {
+              console.error(`Error code: ${error.code}`);
+            }
+            if (error.status) {
+              console.error(`HTTP status: ${error.status}`);
+            }
+
             return this.filterReviewsHeuristic();
           }
         } else {
+          if (!config.llm.enabled) {
+            console.log("ℹ️ LLM filtering disabled in configuration, using heuristic filtering");
+          } else if (this.reviews.length === 0) {
+            console.log("ℹ️ No reviews to filter, using heuristic filtering");
+          } else if (this.reviews.length > config.llm.maxReviews) {
+            console.log(
+              `ℹ️ Too many reviews (${this.reviews.length} > ${config.llm.maxReviews}), using heuristic filtering for performance`
+            );
+          } else {
+            console.log("ℹ️ LLM filtering disabled, using heuristic filtering");
+          }
           return this.filterReviewsHeuristic();
         }
       },
@@ -602,6 +683,352 @@ export class ReviewAnalyzer {
         return { positive, negative };
       },
       { count, totalReviews: this.getReviewsToAnalyze().length }
+    );
+  }
+
+  // Get dynamic metrics for dashboard
+  getDynamicMetrics() {
+    return benchmark.measureSync(
+      "getDynamicMetrics",
+      () => {
+        const reviewsToAnalyze = this.getReviewsToAnalyze();
+        const trendData = this.getTrendAnalysis();
+
+        // Calculate rating trends
+        const ratingTrend = this.calculateRatingTrend(trendData);
+
+        // Calculate user complaints
+        const userComplaints = this.calculateUserComplaints(reviewsToAnalyze);
+
+        // Calculate performance metrics
+        const performanceMetrics = this.calculatePerformanceMetrics(reviewsToAnalyze);
+
+        // Calculate keyword trends
+        const keywordTrends = this.calculateKeywordTrends(reviewsToAnalyze);
+
+        // Calculate time-based stats
+        const timeBasedStats = this.calculateTimeBasedStats(reviewsToAnalyze);
+
+        // Calculate impact assessment
+        const impactAssessment = this.calculateImpactAssessment(userComplaints, performanceMetrics);
+
+        return {
+          ratingTrend,
+          userComplaints,
+          performanceMetrics,
+          keywordTrends,
+          timeBasedStats,
+          impactAssessment,
+        };
+      },
+      { totalReviews: this.getReviewsToAnalyze().length }
+    );
+  }
+
+  // Calculate rating trend over time
+  private calculateRatingTrend(trendData: TrendData[]) {
+    if (trendData.length < 2) {
+      return {
+        weeklyChange: 0,
+        monthlyChange: 0,
+        trendDirection: "stable" as const,
+        trendDescription: "Insufficient data for trend analysis",
+      };
+    }
+
+    // Sort by date
+    const sortedData = [...trendData].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+
+    // Calculate weekly change (last 7 days vs previous 7 days)
+    const now = new Date();
+    const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+    const twoWeeksAgo = new Date(now.getTime() - 14 * 24 * 60 * 60 * 1000);
+
+    const recentWeek = sortedData.filter(d => new Date(d.date) >= weekAgo);
+    const previousWeek = sortedData.filter(d => new Date(d.date) >= twoWeeksAgo && new Date(d.date) < weekAgo);
+
+    const recentAvg =
+      recentWeek.length > 0 ? recentWeek.reduce((sum, d) => sum + d.averageRating, 0) / recentWeek.length : 0;
+    const previousAvg =
+      previousWeek.length > 0 ? previousWeek.reduce((sum, d) => sum + d.averageRating, 0) / previousWeek.length : 0;
+
+    const weeklyChange = recentAvg - previousAvg;
+
+    // Calculate monthly change (last 30 days vs previous 30 days)
+    const monthAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+    const twoMonthsAgo = new Date(now.getTime() - 60 * 24 * 60 * 60 * 1000);
+
+    const recentMonth = sortedData.filter(d => new Date(d.date) >= monthAgo);
+    const previousMonth = sortedData.filter(d => new Date(d.date) >= twoMonthsAgo && new Date(d.date) < monthAgo);
+
+    const recentMonthAvg =
+      recentMonth.length > 0 ? recentMonth.reduce((sum, d) => sum + d.averageRating, 0) / recentMonth.length : 0;
+    const previousMonthAvg =
+      previousMonth.length > 0 ? previousMonth.reduce((sum, d) => sum + d.averageRating, 0) / previousMonth.length : 0;
+
+    const monthlyChange = recentMonthAvg - previousMonthAvg;
+
+    // Determine trend direction
+    let trendDirection: "up" | "down" | "stable";
+    let trendDescription: string;
+
+    if (monthlyChange > 0.1) {
+      trendDirection = "up";
+      trendDescription = `Rating improved by ${Math.abs(monthlyChange).toFixed(1)} points over the last month`;
+    } else if (monthlyChange < -0.1) {
+      trendDirection = "down";
+      trendDescription = `Rating decreased by ${Math.abs(monthlyChange).toFixed(1)} points over the last month`;
+    } else {
+      trendDirection = "stable";
+      trendDescription = "Rating has remained stable over the last month";
+    }
+
+    return {
+      weeklyChange: Math.round(weeklyChange * 100) / 100,
+      monthlyChange: Math.round(monthlyChange * 100) / 100,
+      trendDirection,
+      trendDescription,
+    };
+  }
+
+  // Calculate user complaints from reviews
+  private calculateUserComplaints(reviews: AppStoreReview[]) {
+    const crashKeywords = ["crash", "crashes", "crashed", "crashing", "error", "errors", "failed", "failure"];
+    const performanceKeywords = ["slow", "lag", "laggy", "freeze", "frozen", "freezing", "unresponsive", "performance"];
+    const bugKeywords = [
+      "bug",
+      "bugs",
+      "glitch",
+      "glitches",
+      "broken",
+      "not working",
+      "doesn't work",
+      "issue",
+      "issues",
+    ];
+
+    const crashReports = reviews.filter(review =>
+      crashKeywords.some(
+        keyword => review.content.toLowerCase().includes(keyword) || review.title.toLowerCase().includes(keyword)
+      )
+    ).length;
+
+    const performanceIssues = reviews.filter(review =>
+      performanceKeywords.some(
+        keyword => review.content.toLowerCase().includes(keyword) || review.title.toLowerCase().includes(keyword)
+      )
+    ).length;
+
+    const bugReports = reviews.filter(review =>
+      bugKeywords.some(
+        keyword => review.content.toLowerCase().includes(keyword) || review.title.toLowerCase().includes(keyword)
+      )
+    ).length;
+
+    return {
+      crashReports,
+      performanceIssues,
+      bugReports,
+      totalIssues: crashReports + performanceIssues + bugReports,
+    };
+  }
+
+  // Calculate performance metrics
+  private calculatePerformanceMetrics(reviews: AppStoreReview[]) {
+    const speedKeywords = ["slow", "speed", "fast", "quick", "loading", "load time"];
+    const lagKeywords = ["lag", "laggy", "stutter", "jitter"];
+    const freezeKeywords = ["freeze", "frozen", "freezing", "unresponsive", "hangs"];
+
+    const speedComplaints = reviews.filter(
+      review =>
+        speedKeywords.some(
+          keyword => review.content.toLowerCase().includes(keyword) || review.title.toLowerCase().includes(keyword)
+        ) && review.rating <= 3
+    ).length;
+
+    const lagComplaints = reviews.filter(review =>
+      lagKeywords.some(
+        keyword => review.content.toLowerCase().includes(keyword) || review.title.toLowerCase().includes(keyword)
+      )
+    ).length;
+
+    const freezeComplaints = reviews.filter(review =>
+      freezeKeywords.some(
+        keyword => review.content.toLowerCase().includes(keyword) || review.title.toLowerCase().includes(keyword)
+      )
+    ).length;
+
+    // Calculate change in speed complaints (comparing recent vs older reviews)
+    const recentReviews = this.getRecentReviews(30);
+    const olderReviews = reviews.filter(review => {
+      const reviewDate = new Date(review.date);
+      const monthAgo = new Date();
+      monthAgo.setDate(monthAgo.getDate() - 30);
+      return reviewDate < monthAgo;
+    });
+
+    const recentSpeedComplaints = recentReviews.filter(
+      review =>
+        speedKeywords.some(
+          keyword => review.content.toLowerCase().includes(keyword) || review.title.toLowerCase().includes(keyword)
+        ) && review.rating <= 3
+    ).length;
+
+    const olderSpeedComplaints = olderReviews.filter(
+      review =>
+        speedKeywords.some(
+          keyword => review.content.toLowerCase().includes(keyword) || review.title.toLowerCase().includes(keyword)
+        ) && review.rating <= 3
+    ).length;
+
+    const speedComplaintChange = recentSpeedComplaints - olderSpeedComplaints;
+
+    return {
+      speedComplaints,
+      speedComplaintChange,
+      lagComplaints,
+      freezeComplaints,
+    };
+  }
+
+  // Calculate keyword trends
+  private calculateKeywordTrends(reviews: AppStoreReview[]) {
+    const positiveKeywords = [
+      "great",
+      "awesome",
+      "excellent",
+      "amazing",
+      "love",
+      "perfect",
+      "best",
+      "fast",
+      "useful",
+      "helpful",
+    ];
+    const negativeKeywords = ["bad", "terrible", "awful", "hate", "worst", "slow", "broken", "useless", "waste"];
+
+    const recentReviews = this.getRecentReviews(30);
+    const olderReviews = reviews.filter(review => {
+      const reviewDate = new Date(review.date);
+      const monthAgo = new Date();
+      monthAgo.setDate(monthAgo.getDate() - 30);
+      return reviewDate < monthAgo;
+    });
+
+    const topPositiveKeywords = positiveKeywords
+      .map(keyword => {
+        const recentCount = recentReviews.filter(
+          review =>
+            (review.content.toLowerCase().includes(keyword) || review.title.toLowerCase().includes(keyword)) &&
+            review.rating >= 4
+        ).length;
+
+        const olderCount = olderReviews.filter(
+          review =>
+            (review.content.toLowerCase().includes(keyword) || review.title.toLowerCase().includes(keyword)) &&
+            review.rating >= 4
+        ).length;
+
+        const trend = recentCount - olderCount;
+
+        return { keyword, count: recentCount, trend };
+      })
+      .filter(item => item.count > 0)
+      .sort((a, b) => b.count - a.count)
+      .slice(0, 5);
+
+    const topNegativeKeywords = negativeKeywords
+      .map(keyword => {
+        const recentCount = recentReviews.filter(
+          review =>
+            (review.content.toLowerCase().includes(keyword) || review.title.toLowerCase().includes(keyword)) &&
+            review.rating <= 2
+        ).length;
+
+        const olderCount = olderReviews.filter(
+          review =>
+            (review.content.toLowerCase().includes(keyword) || review.title.toLowerCase().includes(keyword)) &&
+            review.rating <= 2
+        ).length;
+
+        const trend = recentCount - olderCount;
+
+        return { keyword, count: recentCount, trend };
+      })
+      .filter(item => item.count > 0)
+      .sort((a, b) => b.count - a.count)
+      .slice(0, 5);
+
+    return {
+      topPositiveKeywords,
+      topNegativeKeywords,
+    };
+  }
+
+  // Calculate time-based statistics
+  private calculateTimeBasedStats(reviews: AppStoreReview[]) {
+    if (reviews.length === 0) {
+      return {
+        weeksTracked: 0,
+        daysTracked: 0,
+        averageReviewsPerDay: 0,
+        recentActivity: {
+          last7Days: 0,
+          last30Days: 0,
+          last90Days: 0,
+        },
+      };
+    }
+
+    const dates = reviews.map(review => new Date(review.date)).sort((a, b) => a.getTime() - b.getTime());
+    const firstDate = dates[0];
+    const lastDate = dates[dates.length - 1];
+
+    const daysTracked = Math.ceil((lastDate.getTime() - firstDate.getTime()) / (1000 * 60 * 60 * 24));
+    const weeksTracked = Math.ceil(daysTracked / 7);
+    const averageReviewsPerDay = reviews.length / Math.max(daysTracked, 1);
+
+    const now = new Date();
+    const last7Days = this.getRecentReviews(7).length;
+    const last30Days = this.getRecentReviews(30).length;
+    const last90Days = this.getRecentReviews(90).length;
+
+    return {
+      weeksTracked,
+      daysTracked,
+      averageReviewsPerDay: Math.round(averageReviewsPerDay * 100) / 100,
+      recentActivity: {
+        last7Days,
+        last30Days,
+        last90Days,
+      },
+    };
+  }
+
+  // Calculate impact assessment
+  private calculateImpactAssessment(userComplaints: any, performanceMetrics: any) {
+    const criticalIssues = userComplaints.crashReports;
+    const highPriorityIssues = userComplaints.performanceIssues;
+    const mediumPriorityIssues = performanceMetrics.lagComplaints + performanceMetrics.freezeComplaints;
+    const lowPriorityIssues = userComplaints.bugReports - criticalIssues; // Exclude crashes from bugs
+
+    return {
+      criticalIssues,
+      highPriorityIssues,
+      mediumPriorityIssues,
+      lowPriorityIssues,
+    };
+  }
+
+  // Generate actionable steps using AI
+  async generateActionableSteps(): Promise<ActionableStepsResult> {
+    return benchmark.measure(
+      "generateActionableSteps",
+      async () => {
+        const generator = new ActionableStepsGenerator(this.reviews, this.metadata || undefined);
+        return await generator.generateActionableSteps();
+      },
+      { totalReviews: this.reviews.length }
     );
   }
 }

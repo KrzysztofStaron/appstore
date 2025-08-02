@@ -1,0 +1,232 @@
+# TypeScript Development Patterns
+
+## Error Handling Patterns
+
+### API Error Handling
+
+Always use proper error handling for API calls:
+
+```typescript
+try {
+  const result = await apiCall();
+  return result;
+} catch (error: any) {
+  console.error("API call failed:", error.message || error);
+
+  // Log specific error details for debugging
+  if (error.code) {
+    console.error(`Error code: ${error.code}`);
+  }
+  if (error.status) {
+    console.error(`HTTP status: ${error.status}`);
+  }
+
+  // Provide fallback or re-throw as appropriate
+  throw error;
+}
+```
+
+### Retry Logic Pattern
+
+Use configurable retry logic with exponential backoff:
+
+```typescript
+for (let attempt = 1; attempt <= maxRetries; attempt++) {
+  try {
+    const result = await operation();
+    return result;
+  } catch (error: any) {
+    if (!isRetryableError(error) || attempt === maxRetries) {
+      throw error;
+    }
+    await delay(retryDelay * attempt);
+  }
+}
+```
+
+## Type Safety
+
+### Error Type Handling
+
+When dealing with unknown error types:
+
+```typescript
+// Use type assertion for error handling
+catch (error: any) {
+  // Handle error with proper typing
+}
+
+// Or use type guards
+function isRetryableError(error: unknown): error is RetryableError {
+  return error && typeof error === 'object' && 'code' in error;
+}
+```
+
+### Interface Definitions
+
+Define clear interfaces for complex data structures:
+
+```typescript
+interface ReviewFilterResult {
+  isInformative: boolean;
+  confidence: number;
+  reason: string;
+  category?: "bug" | "feature" | "performance" | "ui" | "general" | "non-informative";
+}
+```
+
+## Async/Await Patterns
+
+### Batch Processing
+
+Use Promise.allSettled() for batch operations that should continue on individual failures:
+
+```typescript
+const results = await Promise.allSettled(
+  items.map(async item => {
+    try {
+      return await processItem(item);
+    } catch (error) {
+      // Handle individual item failure
+      return fallbackResult;
+    }
+  })
+);
+
+// Extract successful results
+const successfulResults = results
+  .filter(result => result.status === "fulfilled")
+  .map(result => (result as PromiseFulfilledResult<any>).value);
+```
+
+### Controlled Concurrency
+
+Limit concurrent operations to prevent overwhelming APIs:
+
+```typescript
+for (let i = 0; i < batches.length; i += maxConcurrentBatches) {
+  const currentBatches = batches.slice(i, i + maxConcurrentBatches);
+  const batchResults = await Promise.all(currentBatches.map(processBatch));
+
+  // Add delay between batch groups
+  if (i + maxConcurrentBatches < batches.length) {
+    await delay(1000);
+  }
+}
+```
+
+## Configuration Management
+
+### Environment Variable Handling
+
+Use proper parsing for environment variables:
+
+```typescript
+const config = {
+  maxReviews: parseInt(process.env.MAX_REVIEWS || "100", 10),
+  batchSize: parseInt(process.env.BATCH_SIZE || "5", 10),
+  retryAttempts: parseInt(process.env.RETRY_ATTEMPTS || "3", 10),
+};
+```
+
+### Default Values
+
+Always provide sensible defaults:
+
+```typescript
+export const defaultConfig: AppStoreAnalyzerConfig = {
+  llm: {
+    enabled: true,
+    maxReviews: 100,
+    batchSize: 5,
+    retryAttempts: 3,
+    // ... other defaults
+  },
+};
+```
+
+## Performance Patterns
+
+### Benchmarking
+
+Use the benchmark system for performance tracking:
+
+```typescript
+return benchmark.measure(
+  "operationName",
+  async () => {
+    // Operation logic here
+    return result;
+  },
+  { metadata: "for tracking" }
+);
+```
+
+### Caching Patterns
+
+Implement caching for expensive operations:
+
+```typescript
+const cacheKey = `reviews_${appId}_${region}`;
+const cached = cache.get(cacheKey);
+if (cached && !isExpired(cached)) {
+  return cached.data;
+}
+
+const result = await fetchReviews(appId, region);
+cache.set(cacheKey, { data: result, timestamp: Date.now() });
+return result;
+```
+
+## Component Patterns
+
+### React Server Components
+
+Prefer server components when possible:
+
+```typescript
+// Server Component
+export default async function DashboardView({ reviews }: { reviews: Review[] }) {
+  const analysis = await analyzeReviews(reviews);
+  return <Dashboard analysis={analysis} />;
+}
+```
+
+### Client Components
+
+Use 'use client' directive only when necessary:
+
+```typescript
+"use client";
+
+import { useState, useEffect } from "react";
+
+export function InteractiveChart({ data }: { data: ChartData[] }) {
+  const [isLoading, setIsLoading] = useState(false);
+  // Client-side logic here
+}
+```
+
+## Testing Patterns
+
+### Error Scenario Testing
+
+Test error handling thoroughly:
+
+```typescript
+describe("API Error Handling", () => {
+  it("should retry on network errors", async () => {
+    // Test retry logic
+  });
+
+  it("should fallback gracefully on API failures", async () => {
+    // Test fallback behavior
+  });
+});
+```
+
+description:
+globs:
+alwaysApply: false
+
+---

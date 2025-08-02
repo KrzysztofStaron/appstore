@@ -345,7 +345,7 @@ class AppStoreAPI {
 
                 // Rate limiting
                 if (page < maxPages) {
-                  await new Promise(resolve => setTimeout(resolve, 100));
+                  await new Promise(resolve => setTimeout(resolve, 50));
                 }
               }
 

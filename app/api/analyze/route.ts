@@ -108,8 +108,22 @@ export async function POST(request: NextRequest) {
         const filteredAnalysis = await analyzer.filterReviews(true);
 
         sendProgress({
+          stage: "Calculating dynamic metrics...",
+          percentage: 85,
+        });
+
+        const dynamicMetrics = analyzer.getDynamicMetrics();
+
+        sendProgress({
+          stage: "Generating actionable steps...",
+          percentage: 90,
+        });
+
+        const actionableSteps = await analyzer.generateActionableSteps();
+
+        sendProgress({
           stage: "Caching results...",
-          percentage: 95,
+          percentage: 98,
         });
 
         const analysis = {
@@ -121,6 +135,8 @@ export async function POST(request: NextRequest) {
           keywordAnalysis,
           topReviews,
           filteredAnalysis,
+          actionableSteps,
+          dynamicMetrics,
         };
 
         // Cache analysis
