@@ -142,4 +142,5 @@ export type ViewType =
   | "regions"
   | "versions"
   | "tasks"
-  | "insights";
+  | "insights"
+  | "issues";

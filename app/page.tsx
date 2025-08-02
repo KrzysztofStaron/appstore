@@ -11,6 +11,7 @@ import { TrendsView } from "@/components/views/TrendsView";
 import { KeywordsView } from "@/components/views/KeywordsView";
 import { RegionsView } from "@/components/views/RegionsView";
 import { VersionsView } from "@/components/views/VersionsView";
+import { IssuesView } from "@/components/views/IssuesView";
 import { TasksView } from "@/components/views/TasksView";
 import { InsightsView } from "@/components/views/InsightsView";
 import { AppStoreReview, AppMetadata, AnalysisResult, ViewType } from "@/app/types";
@@ -256,6 +257,8 @@ export default function AppStoreAnalyzer() {
         return <RegionsView analysisResult={analysisResult} />;
       case "versions":
         return <VersionsView analysisResult={analysisResult} />;
+      case "issues":
+        return <IssuesView analysisResult={analysisResult} reviews={reviews} />;
       case "tasks":
         return <TasksView analysisResult={analysisResult} reviews={reviews} />;
       case "insights":

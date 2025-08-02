@@ -343,6 +343,7 @@ export class ReviewAnalyzer {
   }
 
   // Sentiment analysis based on ratings
+  // TODO: Add sentiment analysis based on the content of the reviews
   getSentimentAnalysis(): SentimentAnalysis {
     return benchmark.measureSync(
       "getSentimentAnalysis",

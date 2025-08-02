@@ -26,7 +26,7 @@ export function TrendsView({ analysisResult }: TrendsViewProps) {
         <CardHeader>
           <CardTitle className="text-white">Rating Trends</CardTitle>
           <CardDescription className="text-zinc-400">
-            Your app's rating performance over the last 7 weeks
+            Average rating of the most relevant reviews in each 7 day period
           </CardDescription>
         </CardHeader>
         <CardContent>
