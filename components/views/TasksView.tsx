@@ -79,16 +79,16 @@ export function TasksView({ analysisResult, reviews }: TasksViewProps) {
 
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
                     <div className="flex items-center gap-2 text-sm text-zinc-400">
-                      <Users className="h-4 w-4" />
-                      <span>{step.affectedUsers} users affected</span>
-                    </div>
-                    <div className="flex items-center gap-2 text-sm text-zinc-400">
                       <Target className="h-4 w-4" />
                       <span>Confidence: {Math.round(step.confidence * 100)}%</span>
                     </div>
                     <div className="flex items-center gap-2 text-sm text-zinc-400">
                       <Activity className="h-4 w-4" />
-                      <span>{step.estimatedImpact}</span>
+                      <span className="capitalize">{step.timeframe}</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-sm text-zinc-400">
+                      <span className="text-2xl">{getCategoryIcon(step.category)}</span>
+                      <span className="capitalize">{step.category}</span>
                     </div>
                   </div>
 

@@ -53,8 +53,7 @@ const sidebarItems = [
   { id: "regions", label: "Regions", icon: Globe, color: "text-cyan-400" },
   { id: "versions", label: "Versions", icon: Layers, color: "text-orange-400" },
   { id: "issues", label: "Issues", icon: AlertCircle, color: "text-red-400" },
-  { id: "tasks", label: "AI Action Items", icon: Target, color: "text-red-400" },
-  { id: "insights", label: "AI Insights", icon: Sparkles, color: "text-pink-400" },
+  { id: "tasks", label: "Actionable Steps", icon: Target, color: "text-red-400" },
 ];
 
 export function Sidebar({

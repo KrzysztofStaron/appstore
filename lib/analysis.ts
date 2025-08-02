@@ -349,8 +349,11 @@ export class ReviewAnalyzer {
       async () => {
         const reviewsToAnalyze = this.getReviewsToAnalyze();
 
+        console.log(`🎯 getSentimentAnalysis called with ${reviewsToAnalyze.length} reviews`);
+
         // If no reviews, return empty result
         if (reviewsToAnalyze.length === 0) {
+          console.warn("⚠️ No reviews to analyze for sentiment");
           return {
             positive: 0,
             negative: 0,
@@ -369,19 +372,28 @@ export class ReviewAnalyzer {
             content: review.content,
           }));
 
-          const sentimentResults = await sentimentAnalyzer.analyzeReviews(reviewsForAnalysis);
+          console.log(`🤖 Calling AI sentiment analysis for ${reviewsForAnalysis.length} reviews`);
 
-          // Count sentiments
-          const positive = sentimentResults.results.filter(r => r.label === "POSITIVE").length;
-          const negative = sentimentResults.results.filter(r => r.label === "NEGATIVE").length;
-          const neutral = sentimentResults.results.filter(r => r.label === "NEUTRAL").length;
+          const sentimentResult = await sentimentAnalyzer.analyzeReviews(reviewsForAnalysis);
 
-          return {
+          console.log(`✅ AI sentiment analysis completed:`, sentimentResult);
+
+          // Convert percentages to counts based on total reviews
+          const total = reviewsToAnalyze.length;
+          const positive = Math.round((sentimentResult.positive / 100) * total);
+          const negative = Math.round((sentimentResult.negative / 100) * total);
+          const neutral = total - positive - negative; // Ensure they add up to total
+
+          const result = {
             positive,
             negative,
             neutral,
-            total: reviewsToAnalyze.length,
+            total,
           };
+
+          console.log(`📊 Final sentiment analysis result:`, result);
+
+          return result;
         } catch (error) {
           console.warn("AI sentiment analysis failed, falling back to rating-based analysis:", error);
 
@@ -390,12 +402,16 @@ export class ReviewAnalyzer {
           const negative = reviewsToAnalyze.filter(r => r.rating <= 2).length;
           const neutral = reviewsToAnalyze.filter(r => r.rating === 3).length;
 
-          return {
+          const fallbackResult = {
             positive,
             negative,
             neutral,
             total: reviewsToAnalyze.length,
           };
+
+          console.log(`🔄 Fallback sentiment analysis result:`, fallbackResult);
+
+          return fallbackResult;
         }
       },
       { totalReviews: this.getReviewsToAnalyze().length }

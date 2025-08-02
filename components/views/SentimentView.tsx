@@ -11,23 +11,41 @@ interface SentimentViewProps {
 }
 
 export function SentimentView({ analysisResult }: SentimentViewProps) {
+  console.log("🎨 SentimentView rendering with data:", analysisResult.sentimentAnalysis);
+
+  // Get the sentiment data directly from the analysis result
+  const { positive, negative, neutral, total } = analysisResult.sentimentAnalysis;
+
+  // Calculate percentages
+  const positivePercent = total > 0 ? Math.round((positive / total) * 100) : 0;
+  const negativePercent = total > 0 ? Math.round((negative / total) * 100) : 0;
+  const neutralPercent = total > 0 ? Math.round((neutral / total) * 100) : 0;
+
   const sentimentData = [
     {
       name: "Positive",
-      value: Math.round((analysisResult.sentimentAnalysis.positive / analysisResult.sentimentAnalysis.total) * 100),
+      value: positivePercent,
       color: "#10B981",
     },
     {
       name: "Neutral",
-      value: Math.round((analysisResult.sentimentAnalysis.neutral / analysisResult.sentimentAnalysis.total) * 100),
+      value: neutralPercent,
       color: "#F59E0B",
     },
     {
       name: "Negative",
-      value: Math.round((analysisResult.sentimentAnalysis.negative / analysisResult.sentimentAnalysis.total) * 100),
+      value: negativePercent,
       color: "#EF4444",
     },
   ];
+
+  console.log("📊 SentimentView calculated data:", sentimentData);
+
+  // Validate percentages add up to 100%
+  const totalPercentage = sentimentData.reduce((sum, item) => sum + item.value, 0);
+  if (totalPercentage !== 100) {
+    console.warn(`⚠️ SentimentView percentages don't add up to 100%: ${totalPercentage}%`);
+  }
 
   return (
     <div className="space-y-8">
@@ -80,21 +98,10 @@ export function SentimentView({ analysisResult }: SentimentViewProps) {
                   <h3 className="text-white font-semibold">Positive Sentiment</h3>
                 </div>
                 <Badge className="bg-green-500/20 text-green-400">
-                  {Math.round(
-                    (analysisResult.sentimentAnalysis.positive / analysisResult.sentimentAnalysis.total) * 100
-                  ) >= 70
-                    ? "Excellent"
-                    : Math.round(
-                        (analysisResult.sentimentAnalysis.positive / analysisResult.sentimentAnalysis.total) * 100
-                      ) >= 50
-                    ? "Good"
-                    : "Fair"}
+                  {sentimentData[0].value >= 70 ? "Excellent" : sentimentData[0].value >= 50 ? "Good" : "Fair"}
                 </Badge>
               </div>
-              <div className="text-4xl font-bold text-green-400 mb-2">
-                {Math.round((analysisResult.sentimentAnalysis.positive / analysisResult.sentimentAnalysis.total) * 100)}
-                %
-              </div>
+              <div className="text-4xl font-bold text-green-400 mb-2">{sentimentData[0].value}%</div>
               <p className="text-sm text-zinc-400">Users expressing satisfaction and praise</p>
             </CardContent>
           </Card>
@@ -107,20 +114,10 @@ export function SentimentView({ analysisResult }: SentimentViewProps) {
                   <h3 className="text-white font-semibold">Neutral Sentiment</h3>
                 </div>
                 <Badge className="bg-yellow-500/20 text-yellow-400">
-                  {Math.round(
-                    (analysisResult.sentimentAnalysis.neutral / analysisResult.sentimentAnalysis.total) * 100
-                  ) >= 40
-                    ? "High"
-                    : Math.round(
-                        (analysisResult.sentimentAnalysis.neutral / analysisResult.sentimentAnalysis.total) * 100
-                      ) >= 20
-                    ? "Balanced"
-                    : "Low"}
+                  {sentimentData[1].value >= 40 ? "High" : sentimentData[1].value >= 20 ? "Balanced" : "Low"}
                 </Badge>
               </div>
-              <div className="text-4xl font-bold text-yellow-400 mb-2">
-                {Math.round((analysisResult.sentimentAnalysis.neutral / analysisResult.sentimentAnalysis.total) * 100)}%
-              </div>
+              <div className="text-4xl font-bold text-yellow-400 mb-2">{sentimentData[1].value}%</div>
               <p className="text-sm text-zinc-400">Factual reviews without strong emotion</p>
             </CardContent>
           </Card>
@@ -133,21 +130,10 @@ export function SentimentView({ analysisResult }: SentimentViewProps) {
                   <h3 className="text-white font-semibold">Negative Sentiment</h3>
                 </div>
                 <Badge className="bg-red-500/20 text-red-400">
-                  {Math.round(
-                    (analysisResult.sentimentAnalysis.negative / analysisResult.sentimentAnalysis.total) * 100
-                  ) >= 30
-                    ? "Critical"
-                    : Math.round(
-                        (analysisResult.sentimentAnalysis.negative / analysisResult.sentimentAnalysis.total) * 100
-                      ) >= 15
-                    ? "Needs Attention"
-                    : "Low"}
+                  {sentimentData[2].value >= 30 ? "Critical" : sentimentData[2].value >= 15 ? "Needs Attention" : "Low"}
                 </Badge>
               </div>
-              <div className="text-4xl font-bold text-red-400 mb-2">
-                {Math.round((analysisResult.sentimentAnalysis.negative / analysisResult.sentimentAnalysis.total) * 100)}
-                %
-              </div>
+              <div className="text-4xl font-bold text-red-400 mb-2">{sentimentData[2].value}%</div>
               <p className="text-sm text-zinc-400">Users expressing frustration or complaints</p>
             </CardContent>
           </Card>

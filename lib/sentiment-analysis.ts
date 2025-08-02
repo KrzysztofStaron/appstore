@@ -1,26 +1,22 @@
-import { HfInference } from "@huggingface/inference";
+import OpenAI from "openai";
 
 export interface SentimentResult {
-  label: "POSITIVE" | "NEGATIVE" | "NEUTRAL";
-  score: number;
-  reviewId: string;
-}
-
-export interface BatchSentimentResult {
-  results: SentimentResult[];
-  totalProcessed: number;
-  errors: number;
+  positive: number;
+  negative: number;
+  neutral: number;
 }
 
 class SentimentAnalyzer {
-  private hf: HfInference;
-  private model = "cardiffnlp/twitter-roberta-base-sentiment-latest";
-  private batchSize = 10;
+  private openai: OpenAI;
+  private model = "meta-llama/llama-4-scout";
   private maxRetries = 3;
   private retryDelay = 1000;
 
   constructor(apiKey?: string) {
-    this.hf = new HfInference(apiKey);
+    this.openai = new OpenAI({
+      apiKey: apiKey || process.env.OPENROUTER_API_KEY,
+      baseURL: "https://openrouter.ai/api/v1",
+    });
   }
 
   private async retryRequest<T>(requestFn: () => Promise<T>, retries: number = this.maxRetries): Promise<T> {
@@ -44,130 +40,132 @@ class SentimentAnalyzer {
     return error?.message?.includes("network") || error?.message?.includes("timeout");
   }
 
-  private async analyzeSingleText(text: string): Promise<{ label: string; score: number }> {
-    try {
-      const result = await this.retryRequest(() =>
-        this.hf.textClassification({
-          model: this.model,
-          inputs: text,
-        })
-      );
+  private createSentimentPrompt(reviews: Array<{ id: string; content: string; title: string }>): string {
+    const reviewsText = reviews
+      .map((review, index) => {
+        const combinedText = `${review.title}. ${review.content}`.trim();
+        return `Review ${index + 1}: "${combinedText}"`;
+      })
+      .join("\n\n");
 
-      // The model returns labels like 'LABEL_0', 'LABEL_1', 'LABEL_2'
-      // We need to map these to our sentiment labels
-      const labelMap: { [key: string]: "POSITIVE" | "NEGATIVE" | "NEUTRAL" } = {
-        LABEL_0: "NEGATIVE",
-        LABEL_1: "NEUTRAL",
-        LABEL_2: "POSITIVE",
-      };
+    return `You are an expert sentiment analysis system. Analyze the following app store reviews and determine the overall sentiment distribution as percentages.
 
-      const topResult = Array.isArray(result) ? result[0] : result;
-      return {
-        label: labelMap[topResult.label] || "NEUTRAL",
-        score: topResult.score,
-      };
-    } catch (error) {
-      console.error("Sentiment analysis error:", error);
-      // Fallback to neutral sentiment
-      return { label: "NEUTRAL", score: 0.5 };
-    }
+Here are the reviews to analyze:
+
+${reviewsText}
+
+Based on these reviews, provide the sentiment distribution as percentages. Consider:
+- POSITIVE: Users expressing satisfaction, praise, recommendation, or positive emotions
+- NEGATIVE: Users expressing dissatisfaction, complaints, frustration, or negative emotions  
+- NEUTRAL: Users providing factual information without clear positive or negative sentiment
+
+Respond ONLY with a JSON object in this exact format:
+{
+  "positive": 65,
+  "negative": 25,
+  "neutral": 10
+}
+
+The percentages must add up to 100. Do not include any other text or explanation.`;
   }
 
-  private async analyzeBatch(texts: string[]): Promise<Array<{ label: string; score: number }>> {
+  private parseLlamaResponse(response: string): SentimentResult {
     try {
-      const results = await this.retryRequest(() =>
-        this.hf.textClassification({
-          model: this.model,
-          inputs: texts,
-        })
-      );
+      console.log("🔍 Parsing Llama response:", response);
 
-      const labelMap: { [key: string]: "POSITIVE" | "NEGATIVE" | "NEUTRAL" } = {
-        LABEL_0: "NEGATIVE",
-        LABEL_1: "NEUTRAL",
-        LABEL_2: "POSITIVE",
-      };
-
-      return (Array.isArray(results) ? results : [results]).map(result => {
-        const topResult = Array.isArray(result) ? result[0] : result;
-        return {
-          label: labelMap[topResult.label] || "NEUTRAL",
-          score: topResult.score,
-        };
-      });
-    } catch (error) {
-      console.error("Batch sentiment analysis error:", error);
-      // Return neutral sentiments for all texts in case of error
-      return texts.map(() => ({ label: "NEUTRAL", score: 0.5 }));
-    }
-  }
-
-  async analyzeReviews(reviews: Array<{ id: string; content: string; title: string }>): Promise<BatchSentimentResult> {
-    const results: SentimentResult[] = [];
-    let errors = 0;
-    let totalProcessed = 0;
-
-    // Process reviews in batches
-    for (let i = 0; i < reviews.length; i += this.batchSize) {
-      const batch = reviews.slice(i, i + this.batchSize);
-
-      try {
-        // Combine title and content for better analysis
-        const texts = batch.map(review => {
-          const combinedText = `${review.title}. ${review.content}`.trim();
-          // Limit text length to avoid API limits
-          return combinedText.length > 500 ? combinedText.substring(0, 500) + "..." : combinedText;
-        });
-
-        const sentimentResults = await this.analyzeBatch(texts);
-
-        batch.forEach((review, index) => {
-          const sentiment = sentimentResults[index];
-          if (sentiment) {
-            results.push({
-              reviewId: review.id,
-              label: sentiment.label as "POSITIVE" | "NEGATIVE" | "NEUTRAL",
-              score: sentiment.score,
-            });
-            totalProcessed++;
-          } else {
-            errors++;
-          }
-        });
-
-        // Add delay between batches to respect rate limits
-        if (i + this.batchSize < reviews.length) {
-          await new Promise(resolve => setTimeout(resolve, 200));
-        }
-      } catch (error) {
-        console.error(`Error processing batch ${i / this.batchSize + 1}:`, error);
-        errors += batch.length;
+      // Clean the response to extract JSON
+      const jsonMatch = response.match(/\{[\s\S]*\}/);
+      if (!jsonMatch) {
+        throw new Error("No JSON object found in response");
       }
-    }
 
-    return {
-      results,
-      totalProcessed,
-      errors,
-    };
+      const parsed = JSON.parse(jsonMatch[0]);
+      console.log("📝 Parsed JSON:", parsed);
+
+      // Validate the response has the required fields
+      if (
+        typeof parsed.positive !== "number" ||
+        typeof parsed.negative !== "number" ||
+        typeof parsed.neutral !== "number"
+      ) {
+        throw new Error("Response missing required percentage fields");
+      }
+
+      // Ensure percentages add up to 100
+      const total = parsed.positive + parsed.negative + parsed.neutral;
+      if (Math.abs(total - 100) > 1) {
+        // Allow 1% tolerance for rounding
+        console.warn(`⚠️ Percentages don't add up to 100: ${total}%, normalizing...`);
+        const factor = 100 / total;
+        parsed.positive = Math.round(parsed.positive * factor);
+        parsed.negative = Math.round(parsed.negative * factor);
+        parsed.neutral = Math.round(parsed.neutral * factor);
+      }
+
+      return {
+        positive: Math.round(parsed.positive),
+        negative: Math.round(parsed.negative),
+        neutral: Math.round(parsed.neutral),
+      };
+    } catch (error) {
+      console.error("❌ Failed to parse Llama response:", error);
+      console.log("Raw response:", response);
+      throw new Error("Invalid JSON response from Llama model");
+    }
   }
 
-  async analyzeSingleReview(review: { id: string; content: string; title: string }): Promise<SentimentResult> {
-    const combinedText = `${review.title}. ${review.content}`.trim();
-    const text = combinedText.length > 500 ? combinedText.substring(0, 500) + "..." : combinedText;
+  async analyzeReviews(reviews: Array<{ id: string; content: string; title: string }>): Promise<SentimentResult> {
+    console.log(`🔍 Starting sentiment analysis for ${reviews.length} reviews`);
 
-    const result = await this.analyzeSingleText(text);
+    try {
+      // Process all reviews in a single prompt to Llama
+      const prompt = this.createSentimentPrompt(reviews);
 
-    return {
-      reviewId: review.id,
-      label: result.label as "POSITIVE" | "NEGATIVE" | "NEUTRAL",
-      score: result.score,
-    };
+      const response = await this.retryRequest(async () => {
+        const completion = await this.openai.chat.completions.create({
+          model: this.model,
+          messages: [
+            {
+              role: "system",
+              content:
+                "You are a sentiment analysis expert. Always respond with valid JSON objects containing percentage distributions.",
+            },
+            {
+              role: "user",
+              content: prompt,
+            },
+          ],
+          temperature: 0.1, // Low temperature for consistent results
+          max_tokens: 200, // Reduced since we only need a simple JSON response
+        });
+
+        return completion.choices[0]?.message?.content || "";
+      });
+
+      console.log(`📝 Llama response received:`, response);
+
+      const result = this.parseLlamaResponse(response);
+
+      console.log(`📈 Sentiment analysis result:`, result);
+
+      // Add delay to respect rate limits
+      await new Promise(resolve => setTimeout(resolve, 500));
+
+      return result;
+    } catch (error) {
+      console.error("Error in sentiment analysis:", error);
+      // Return neutral distribution as fallback
+      return {
+        positive: 33,
+        negative: 33,
+        neutral: 34,
+      };
+    }
   }
 }
 
 // Create singleton instance
-export const sentimentAnalyzer = new SentimentAnalyzer(process.env.HUGGINGFACE_API_KEY);
+export const sentimentAnalyzer = new SentimentAnalyzer(process.env.OPENROUTER_API_KEY);
 
 // Fallback sentiment analysis based on keywords (when API is not available)
 export function analyzeSentimentFallback(text: string): "POSITIVE" | "NEGATIVE" | "NEUTRAL" {

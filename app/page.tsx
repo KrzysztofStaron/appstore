@@ -13,7 +13,6 @@ import { RegionsView } from "@/components/views/RegionsView";
 import { VersionsView } from "@/components/views/VersionsView";
 import { IssuesView } from "@/components/views/IssuesView";
 import { TasksView } from "@/components/views/TasksView";
-import { InsightsView } from "@/components/views/InsightsView";
 import { AppStoreReview, AppMetadata, AnalysisResult, ViewType } from "@/app/types";
 
 export default function AppStoreAnalyzer() {
@@ -249,7 +248,9 @@ export default function AppStoreAnalyzer() {
 
     switch (currentView) {
       case "dashboard":
-        return <DashboardView analysisResult={analysisResult} appMetadata={appMetadata} />;
+        return (
+          <DashboardView analysisResult={analysisResult} appMetadata={appMetadata} onNavigateToView={setCurrentView} />
+        );
       case "sentiment":
         return <SentimentView analysisResult={analysisResult} />;
       case "trends":
@@ -264,10 +265,10 @@ export default function AppStoreAnalyzer() {
         return <IssuesView analysisResult={analysisResult} reviews={reviews} />;
       case "tasks":
         return <TasksView analysisResult={analysisResult} reviews={reviews} />;
-      case "insights":
-        return <InsightsView analysisResult={analysisResult} />;
       default:
-        return <DashboardView analysisResult={analysisResult} appMetadata={appMetadata} />;
+        return (
+          <DashboardView analysisResult={analysisResult} appMetadata={appMetadata} onNavigateToView={setCurrentView} />
+        );
     }
   };
 
