@@ -4,7 +4,18 @@ import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { AlertCircle, Bug, Zap, Monitor, Users, Settings, ArrowLeft, Clock, AlertTriangle } from "lucide-react";
+import {
+  AlertCircle,
+  Bug,
+  Zap,
+  Monitor,
+  Users,
+  Settings,
+  ArrowLeft,
+  Clock,
+  AlertTriangle,
+  RotateCcw,
+} from "lucide-react";
 import { AnalysisResult, AppStoreReview, AppMetadata } from "@/app/types";
 import { filterReviewsByVersion } from "@/lib/utils";
 import { VersionSlider } from "@/components/ui/version-slider";
@@ -313,7 +324,7 @@ export function IssuesView({ analysisResult, reviews, appMetadata }: IssuesViewP
               size="sm"
               className="bg-gradient-to-r from-slate-800 via-gray-800 to-zinc-900 border border-slate-600/50 text-slate-200 hover:from-slate-700 hover:via-gray-700 hover:to-zinc-800 hover:text-white transition-all duration-200 shadow-lg"
             >
-              <AlertCircle className="h-4 w-4 mr-2" />
+              <RotateCcw className="h-4 w-4 mr-2" />
               Regenerate
             </Button>
           </div>
