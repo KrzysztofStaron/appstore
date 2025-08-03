@@ -21,10 +21,7 @@ import {
 import Link from "next/link";
 
 export default function LandingPage() {
-  const stats = [
-    { label: "App Store Regions", value: "175+", icon: Globe, color: "text-blue-400" },
-    { label: "Analysis Views", value: "8+", icon: BarChart3, color: "text-green-400" },
-  ];
+  const stats: Array<{ label: string; value: string; icon: any; color: string }> = [];
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-black to-slate-900">
@@ -44,7 +41,7 @@ export default function LandingPage() {
           <div className="w-10 h-10 bg-gradient-to-br from-zinc-800/50 to-zinc-900/30 border border-zinc-700/50 rounded-xl flex items-center justify-center">
             <BarChart3 className="h-6 w-6 text-zinc-300" />
           </div>
-          <span className="text-xl font-bold text-white">Analytics Hub</span>
+          <span className="text-xl font-bold text-white">ReviewAI</span>
         </div>
 
         <div className="flex items-center gap-4">
@@ -63,7 +60,7 @@ export default function LandingPage() {
               GitHub
             </Button>
           </a>
-          <Link href="/">
+          <Link href="/app">
             <Button className="bg-gradient-to-r from-blue-800/70 to-sky-900/50 border border-slate-600/50 text-slate-200 hover:from-blue-700 hover:via-sky-700 hover:to-sky-800 hover:text-white transition-all duration-200 shadow-lg">
               Try App
             </Button>
@@ -73,8 +70,8 @@ export default function LandingPage() {
 
       {/* Hero Section */}
       <div className="relative z-10 max-w-6xl mx-auto px-6 pt-20 pb-32">
-        <div className="text-center">
-          <h1 className="text-5xl md:text-7xl font-bold mb-8">
+        <div className="text-center flex flex-col items-center justify-center min-h-[60vh]">
+          <h1 className="text-5xl md:text-7xl font-bold mb-8 text-center">
             <span className="text-white">Transform</span>
             <br />
             <span className="bg-gradient-to-r from-blue-500 to-sky-500 bg-clip-text text-transparent">App Reviews</span>
@@ -85,11 +82,12 @@ export default function LandingPage() {
           </h1>
 
           <p className="text-xl text-zinc-400 mb-12 max-w-3xl mx-auto leading-relaxed">
-            Drop your App ID and watch our intelligent system analyze thousands of reviews
+            Drop your App ID and watch ReviewAI analyze thousands of reviews across 175+ regions, delivering instant
+            insights, sentiment analysis, and prioritized action items—all for free!
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-20">
-            <Link href="/">
+            <Link href="/app">
               <Button
                 size="lg"
                 className="bg-gradient-to-r from-blue-800/70 to-sky-900/50 border border-slate-600/50 text-slate-200 hover:from-blue-700 hover:via-sky-700 hover:to-sky-800 hover:text-white transition-all duration-200 shadow-lg px-6 md:px-8 py-4 text-base md:text-lg"
@@ -190,7 +188,7 @@ export default function LandingPage() {
               </div>
             </div>
             <div className="mt-8 flex flex-col sm:flex-row gap-4">
-              <Link href="/">
+              <Link href="/app">
                 <Button
                   size="lg"
                   className="bg-gradient-to-r from-blue-800/70 to-sky-900/50 border border-slate-600/50 text-slate-200 hover:from-blue-700 hover:via-sky-700 hover:to-sky-800 hover:text-white transition-all duration-200 shadow-lg"
@@ -237,7 +235,7 @@ export default function LandingPage() {
         </p>
 
         <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-8">
-          <Link href="/">
+          <Link href="/app">
             <Button
               size="lg"
               className="bg-gradient-to-r from-blue-800/70 to-sky-900/50 border border-slate-600/50 text-slate-200 hover:from-blue-700 hover:via-sky-700 hover:to-sky-800 hover:text-white transition-all duration-200 shadow-lg px-6 md:px-8 py-4 text-base md:text-lg"
@@ -259,6 +257,9 @@ export default function LandingPage() {
 
         <p className="text-xs md:text-sm text-zinc-500">100% Free • Open Source • No Registration Required</p>
       </div>
+
+      {/* Bottom Spacing */}
+      <div className="h-20"></div>
     </div>
   );
 }

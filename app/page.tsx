@@ -1,421 +1,265 @@
 "use client";
 
-import { useState, useTransition } from "react";
-import { ScrollArea } from "@/components/ui/scroll-area";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Search } from "lucide-react";
-import { APP_STORE_REGIONS } from "@/lib/app-store-api";
-import { Sidebar } from "@/components/Sidebar";
-import { AppConfigModal } from "@/components/AppConfigModal";
-import { DashboardView } from "@/components/views/DashboardView";
-import { SentimentView } from "@/components/views/SentimentView";
-import { TrendsView } from "@/components/views/TrendsView";
-import { KeywordsView } from "@/components/views/KeywordsView";
-import { RegionsView } from "@/components/views/RegionsView";
-import { VersionsView } from "@/components/views/VersionsView";
-import { IssuesView } from "@/components/views/IssuesView";
-import { TasksView } from "@/components/views/TasksView";
-import { AppStoreReview, AppMetadata, AnalysisResult, ViewType } from "@/app/types";
+import { Card, CardContent } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import {
+  BarChart3,
+  Globe,
+  Sparkles,
+  Play,
+  ArrowRight,
+  CheckCircle,
+  Github,
+  Brain,
+  Target,
+  Download,
+} from "lucide-react";
 import Link from "next/link";
 
-export default function AppStoreAnalyzer() {
-  const [appId, setAppId] = useState("6670324846");
-  const [selectedRegions, setSelectedRegions] = useState<string[]>(["us", "gb", "ca"]);
-  const [reviews, setReviews] = useState<AppStoreReview[]>([]);
-  const [appMetadata, setAppMetadata] = useState<AppMetadata | null>(null);
-  const [analysisResult, setAnalysisResult] = useState<AnalysisResult | null>(null);
-  const [competitorAnalysis, setCompetitorAnalysis] = useState<any>(null);
-  const [progress, setProgress] = useState(0);
-  const [error, setError] = useState<string | null>(null);
-  const [isPending, startTransition] = useTransition();
-  const [currentView, setCurrentView] = useState<ViewType>("dashboard");
-  const [isAnalyzing, setIsAnalyzing] = useState(false);
-  const [regionProgress, setRegionProgress] = useState<{ current: number; total: number } | null>(null);
-  const [currentStage, setCurrentStage] = useState<string>("");
-  const [progressDetails, setProgressDetails] = useState<string>("");
-  const [isConfigModalOpen, setIsConfigModalOpen] = useState(false);
-
-  const handleAnalyze = () => {
-    if (!appId.trim()) return;
-
-    setError(null);
-    setProgress(0);
-    setRegionProgress(null);
-    setIsAnalyzing(true);
-
-    startTransition(async () => {
-      try {
-        // Handle "all" regions option
-        const regionsToFetch = selectedRegions.includes("all") ? APP_STORE_REGIONS : selectedRegions;
-
-        // Set region progress for "all" regions
-        if (selectedRegions.includes("all")) {
-          setRegionProgress({ current: 0, total: regionsToFetch.length });
-        }
-
-        // Use streaming API for real progress updates
-        const response = await fetch("/api/progress", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            appId,
-            regions: regionsToFetch,
-          }),
-        });
-
-        if (!response.ok) {
-          throw new Error("Failed to start analysis");
-        }
-
-        const reader = response.body?.getReader();
-        if (!reader) {
-          throw new Error("No response body");
-        }
-
-        const decoder = new TextDecoder();
-        let buffer = "";
-
-        while (true) {
-          const { done, value } = await reader.read();
-
-          if (done) break;
-
-          buffer += decoder.decode(value, { stream: true });
-          const lines = buffer.split("\n");
-          buffer = lines.pop() || "";
-
-          for (const line of lines) {
-            if (line.startsWith("data: ")) {
-              try {
-                const data = JSON.parse(line.slice(6));
-
-                if (data.type === "complete") {
-                  // Analysis complete
-                  setProgress(100);
-                  setReviews(data.reviews);
-                  setAppMetadata(data.metadata);
-
-                  // Analyze the reviews using streaming API
-                  if (data.reviews.length > 0) {
-                    console.log("📊 Starting review analysis...");
-                    console.log("Reviews received:", data.reviews.length);
-                    console.log("Sample review:", data.reviews[0]);
-
-                    try {
-                      // Use streaming analysis API to avoid body size limits
-                      const analysisResponse = await fetch("/api/analyze", {
-                        method: "POST",
-                        headers: {
-                          "Content-Type": "application/json",
-                        },
-                        body: JSON.stringify({
-                          reviews: data.reviews,
-                          metadata: data.metadata,
-                        }),
-                      });
-
-                      if (!analysisResponse.ok) {
-                        throw new Error("Failed to start analysis");
-                      }
-
-                      const analysisReader = analysisResponse.body?.getReader();
-                      if (!analysisReader) {
-                        throw new Error("No analysis response body");
-                      }
-
-                      const analysisDecoder = new TextDecoder();
-                      let analysisBuffer = "";
-
-                      while (true) {
-                        const { done, value } = await analysisReader.read();
-
-                        if (done) break;
-
-                        analysisBuffer += analysisDecoder.decode(value, { stream: true });
-                        const analysisLines = analysisBuffer.split("\n");
-                        analysisBuffer = analysisLines.pop() || "";
-
-                        for (const line of analysisLines) {
-                          if (line.startsWith("data: ")) {
-                            try {
-                              const analysisData = JSON.parse(line.slice(6));
-
-                              if (analysisData.type === "complete") {
-                                console.log("Analysis result received:", analysisData.analysis);
-                                console.log("Analysis keys:", Object.keys(analysisData.analysis || {}));
-                                console.log("Keyword analysis length:", analysisData.analysis?.keywordAnalysis?.length);
-                                console.log(
-                                  "Top reviews positive length:",
-                                  analysisData.analysis?.topReviews?.positive?.length
-                                );
-                                console.log(
-                                  "Top reviews negative length:",
-                                  analysisData.analysis?.topReviews?.negative?.length
-                                );
-                                setAnalysisResult(analysisData.analysis);
-                                break;
-                              } else if (analysisData.type === "error") {
-                                throw new Error(analysisData.error);
-                              } else {
-                                // Update analysis progress
-                                setProgress(analysisData.percentage || 0);
-                                setCurrentStage(analysisData.stage || "");
-                              }
-                            } catch (parseError) {
-                              console.error("Error parsing analysis data:", parseError);
-                            }
-                          }
-                        }
-                      }
-                    } catch (analysisError) {
-                      console.error("Analysis failed:", analysisError);
-                      setError("Analysis failed: " + (analysisError as Error).message);
-                    }
-                  } else {
-                    console.warn("No reviews received for analysis");
-                  }
-
-                  break;
-                } else if (data.type === "error") {
-                  setError(data.error);
-                  break;
-                } else {
-                  // Update progress
-                  setProgress(data.percentage || 0);
-                  setRegionProgress({
-                    current: data.current || 0,
-                    total: data.total || regionsToFetch.length,
-                  });
-                  setCurrentStage(data.stage || "");
-                  setProgressDetails(data.details || "");
-                }
-              } catch (parseError) {
-                console.error("Error parsing progress data:", parseError);
-              }
-            }
-          }
-        }
-      } catch (error) {
-        console.error("Error:", error);
-        setError("An unexpected error occurred. Please try again.");
-      } finally {
-        setProgress(0);
-        setRegionProgress(null);
-        setCurrentStage("");
-        setProgressDetails("");
-        setIsAnalyzing(false);
-      }
-    });
-  };
-
-  const exportData = () => {
-    if (!reviews.length) return;
-
-    const csvContent = [
-      "ID,Region,Title,Content,Rating,Version,Date,Author",
-      ...reviews.map(
-        review =>
-          `"${review.id}","${review.region}","${review.title.replace(/"/g, '""')}","${review.content.replace(
-            /"/g,
-            '""'
-          )}",${review.rating},"${review.version}","${review.date}","${review.author}"`
-      ),
-    ].join("\n");
-
-    const blob = new Blob([csvContent], { type: "text/csv" });
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `app-store-reviews-${appId}.csv`;
-    a.click();
-    window.URL.revokeObjectURL(url);
-  };
-
-  const renderMainContent = () => {
-    if (!analysisResult) {
-      return (
-        <div className="flex items-center justify-center min-h-[calc(100vh-2rem)]">
-          <div className="text-center max-w-md">
-            <div className="w-24 h-24 bg-gradient-to-br from-zinc-800/50 to-zinc-900/30 border border-zinc-700/50 rounded-full flex items-center justify-center mx-auto mb-6">
-              <Search className="h-12 w-12 text-zinc-300" />
-            </div>
-            <h3 className="text-2xl font-bold text-white mb-3">Ready to Analyze</h3>
-            <p className="text-zinc-400 mb-6">
-              Configure your app settings in the sidebar and start your first analysis to unlock powerful insights.
-            </p>
-            <Button
-              onClick={() => setIsConfigModalOpen(true)}
-              className="w-full bg-gradient-to-r from-blue-800/70 to-sky-900/50 border border-slate-600/50 text-slate-200 hover:from-blue-700 hover:via-sky-700 hover:to-sky-800 hover:text-white transition-all duration-200 shadow-lg"
-            >
-              Generate
-            </Button>
-          </div>
-        </div>
-      );
-    }
-
-    // Show loading state for all views when analyzing
-    if (isAnalyzing) {
-      return (
-        <div className="space-y-8">
-          {/* Header Skeleton */}
-          <div className="space-y-4">
-            <div className="flex items-center gap-3">
-              <div className="w-12 h-12 bg-gradient-to-br from-zinc-800/50 to-zinc-900/30 border border-zinc-700/50 rounded-xl animate-pulse"></div>
-              <div className="space-y-2">
-                <div className="h-8 w-48 bg-gradient-to-br from-zinc-800/50 to-zinc-900/30 border border-zinc-700/50 rounded animate-pulse"></div>
-                <div className="h-4 w-64 bg-gradient-to-br from-zinc-800/50 to-zinc-900/30 border border-zinc-700/50 rounded animate-pulse"></div>
-              </div>
-            </div>
-          </div>
-
-          {/* Progress Section */}
-          <div className="flex items-center justify-center py-12">
-            <div className="text-center max-w-md">
-              <div className="w-24 h-24 bg-gradient-to-br from-zinc-800/50 to-zinc-900/30 border border-zinc-700/50 rounded-full flex items-center justify-center mx-auto mb-6">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-zinc-400"></div>
-              </div>
-              <h3 className="text-2xl font-bold text-white mb-3">Analyzing Data</h3>
-              <p className="text-zinc-300 mb-4">{currentStage || "Processing reviews..."}</p>
-              <div className="w-64 bg-zinc-800/50 border border-zinc-700/50 rounded-full h-2 mb-2 mx-auto">
-                <div
-                  className="bg-gradient-to-r from-zinc-600 to-zinc-500 h-2 rounded-full transition-all duration-300"
-                  style={{ width: `${progress}%` }}
-                />
-              </div>
-              <p className="text-xs text-zinc-500">{progress}% complete</p>
-              {progressDetails && (
-                <div className="mt-4 p-3 bg-zinc-800/30 border border-zinc-700/30 rounded-lg">
-                  <p className="text-xs text-zinc-400">{progressDetails}</p>
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* Content Skeleton */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            {/* Left Column */}
-            <div className="space-y-6">
-              <div className="bg-gradient-to-br from-zinc-800/50 to-zinc-900/30 border border-zinc-700/50 rounded-lg p-6">
-                <div className="h-6 w-32 bg-gradient-to-br from-zinc-700/50 to-zinc-800/30 rounded mb-4 animate-pulse"></div>
-                <div className="space-y-3">
-                  <div className="h-4 w-full bg-gradient-to-br from-zinc-700/50 to-zinc-800/30 rounded animate-pulse"></div>
-                  <div className="h-4 w-3/4 bg-gradient-to-br from-zinc-700/50 to-zinc-800/30 rounded animate-pulse"></div>
-                  <div className="h-4 w-5/6 bg-gradient-to-br from-zinc-700/50 to-zinc-800/30 rounded animate-pulse"></div>
-                </div>
-              </div>
-
-              <div className="bg-gradient-to-br from-zinc-800/50 to-zinc-900/30 border border-zinc-700/50 rounded-lg p-6">
-                <div className="h-6 w-40 bg-gradient-to-br from-zinc-700/50 to-zinc-800/30 rounded mb-4 animate-pulse"></div>
-                <div className="h-32 w-full bg-gradient-to-br from-zinc-700/50 to-zinc-800/30 rounded animate-pulse"></div>
-              </div>
-            </div>
-
-            {/* Right Column */}
-            <div className="space-y-6">
-              <div className="bg-gradient-to-br from-zinc-800/50 to-zinc-900/30 border border-zinc-700/50 rounded-lg p-6">
-                <div className="h-6 w-28 bg-gradient-to-br from-zinc-700/50 to-zinc-800/30 rounded mb-4 animate-pulse"></div>
-                <div className="space-y-3">
-                  <div className="h-4 w-full bg-gradient-to-br from-zinc-700/50 to-zinc-800/30 rounded animate-pulse"></div>
-                  <div className="h-4 w-2/3 bg-gradient-to-br from-zinc-700/50 to-zinc-800/30 rounded animate-pulse"></div>
-                  <div className="h-4 w-4/5 bg-gradient-to-br from-zinc-700/50 to-zinc-800/30 rounded animate-pulse"></div>
-                </div>
-              </div>
-
-              <div className="bg-gradient-to-br from-zinc-800/50 to-zinc-900/30 border border-zinc-700/50 rounded-lg p-6">
-                <div className="h-6 w-36 bg-gradient-to-br from-zinc-700/50 to-zinc-800/30 rounded mb-4 animate-pulse"></div>
-                <div className="h-24 w-full bg-gradient-to-br from-zinc-700/50 to-zinc-800/30 rounded animate-pulse"></div>
-              </div>
-            </div>
-          </div>
-        </div>
-      );
-    }
-
-    switch (currentView) {
-      case "dashboard":
-        return (
-          <DashboardView analysisResult={analysisResult} appMetadata={appMetadata} onNavigateToView={setCurrentView} />
-        );
-      case "sentiment":
-        return <SentimentView analysisResult={analysisResult} />;
-      case "trends":
-        return <TrendsView analysisResult={analysisResult} />;
-      case "keywords":
-        return <KeywordsView analysisResult={analysisResult} />;
-      case "regions":
-        return <RegionsView analysisResult={analysisResult} />;
-      case "versions":
-        return <VersionsView analysisResult={analysisResult} />;
-      case "issues":
-        return <IssuesView analysisResult={analysisResult} reviews={reviews} appMetadata={appMetadata} />;
-      case "tasks":
-        return (
-          <TasksView
-            analysisResult={analysisResult}
-            reviews={reviews}
-            appMetadata={appMetadata}
-            onAnalysisUpdate={updatedAnalysis => setAnalysisResult(updatedAnalysis)}
-          />
-        );
-      default:
-        return (
-          <DashboardView analysisResult={analysisResult} appMetadata={appMetadata} onNavigateToView={setCurrentView} />
-        );
-    }
-  };
+export default function LandingPage() {
+  const stats: Array<{ label: string; value: string; icon: any; color: string }> = [];
 
   return (
-    <div className="h-screen bg-gradient-to-br from-slate-900 via-black to-slate-900 flex overflow-hidden">
-      {/* Sidebar */}
-      <Sidebar
-        appId={appId}
-        setAppId={setAppId}
-        selectedRegions={selectedRegions}
-        setSelectedRegions={setSelectedRegions}
-        currentView={currentView}
-        setCurrentView={setCurrentView}
-        handleAnalyze={handleAnalyze}
-        exportData={exportData}
-        isPending={isPending}
-        isAnalyzing={isAnalyzing}
-        progress={progress}
-        regionProgress={regionProgress}
-        currentStage={currentStage}
-        progressDetails={progressDetails}
-        error={error}
-        appMetadata={appMetadata}
-        reviews={reviews}
-        isConfigModalOpen={isConfigModalOpen}
-        setIsConfigModalOpen={setIsConfigModalOpen}
-      />
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-black to-slate-900">
+      {/* Background Grid */}
+      <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:50px_50px]"></div>
 
-      {/* Main Content */}
-      <div className="flex-1 flex flex-col overflow-hidden">
-        <ScrollArea className="flex-1">
-          <div className="p-8">{renderMainContent()}</div>
-        </ScrollArea>
+      {/* Floating Elements */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-20 right-20 w-32 h-32 bg-blue-500/10 rounded-full blur-3xl"></div>
+        <div className="absolute bottom-20 left-20 w-40 h-40 bg-purple-500/10 rounded-full blur-3xl"></div>
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-60 h-60 bg-green-500/5 rounded-full blur-3xl"></div>
       </div>
 
-      {/* App Configuration Modal */}
-      <AppConfigModal
-        isOpen={isConfigModalOpen}
-        onClose={() => setIsConfigModalOpen(false)}
-        appId={appId}
-        setAppId={setAppId}
-        selectedRegions={selectedRegions}
-        setSelectedRegions={setSelectedRegions}
-        handleAnalyze={handleAnalyze}
-        isPending={isPending}
-        isAnalyzing={isAnalyzing}
-        progress={progress}
-        regionProgress={regionProgress}
-        currentStage={currentStage}
-        progressDetails={progressDetails}
-        error={error}
-      />
+      {/* Navigation */}
+      <nav className="relative z-10 flex items-center justify-between p-6">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 bg-gradient-to-br from-zinc-800/50 to-zinc-900/30 border border-zinc-700/50 rounded-xl flex items-center justify-center">
+            <BarChart3 className="h-6 w-6 text-zinc-300" />
+          </div>
+          <span className="text-xl font-bold text-white">ReviewAI</span>
+        </div>
+
+        <div className="flex items-center gap-4">
+          <Button
+            variant="ghost"
+            className="bg-gradient-to-r from-slate-800 via-gray-800 to-zinc-900 border border-slate-600/50 text-slate-200 hover:from-slate-700 hover:via-gray-700 hover:to-zinc-800 hover:text-white transition-all duration-200 shadow-lg"
+          >
+            Features
+          </Button>
+          <a href="https://github.com/KrzysztofStaron/appstore" target="_blank" rel="noopener noreferrer">
+            <Button
+              variant="ghost"
+              className="bg-gradient-to-r from-slate-800 via-gray-800 to-zinc-900 border border-slate-600/50 text-slate-200 hover:from-slate-700 hover:via-gray-700 hover:to-zinc-800 hover:text-white transition-all duration-200 shadow-lg"
+            >
+              <Github className="w-4 h-4 mr-2" />
+              GitHub
+            </Button>
+          </a>
+          <Link href="/app">
+            <Button className="bg-gradient-to-r from-blue-800/70 to-sky-900/50 border border-slate-600/50 text-slate-200 hover:from-blue-700 hover:via-sky-700 hover:to-sky-800 hover:text-white transition-all duration-200 shadow-lg">
+              Try App
+            </Button>
+          </Link>
+        </div>
+      </nav>
+
+      {/* Hero Section */}
+      <div className="relative z-10 max-w-6xl mx-auto px-6 pt-20 pb-32">
+        <div className="text-center flex flex-col items-center justify-center min-h-[60vh]">
+          <h1 className="text-5xl md:text-7xl font-bold mb-8 text-center">
+            <span className="text-white">Transform</span>
+            <br />
+            <span className="bg-gradient-to-r from-blue-500 to-sky-500 bg-clip-text text-transparent">App Reviews</span>
+            <br />
+            <span className="text-white">Into </span>
+            <span className="text-white">Actionable</span>
+            <span className="text-white"> Insights</span>
+          </h1>
+
+          <p className="text-xl text-zinc-400 mb-12 max-w-3xl mx-auto leading-relaxed">
+            Drop your App ID and watch ReviewAI analyze thousands of reviews across 175+ regions, delivering instant
+            insights, sentiment analysis, and prioritized action items—all for free!
+          </p>
+
+          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-20">
+            <Link href="/app">
+              <Button
+                size="lg"
+                className="bg-gradient-to-r from-blue-800/70 to-sky-900/50 border border-slate-600/50 text-slate-200 hover:from-blue-700 hover:via-sky-700 hover:to-sky-800 hover:text-white transition-all duration-200 shadow-lg px-6 md:px-8 py-4 text-base md:text-lg"
+              >
+                <Play className="w-4 h-4 md:w-5 md:h-5 mr-2" />
+                Try App
+              </Button>
+            </Link>
+            <a href="https://github.com/KrzysztofStaron/appstore" target="_blank" rel="noopener noreferrer">
+              <Button
+                size="lg"
+                variant="outline"
+                className="bg-gradient-to-r from-slate-800 via-gray-800 to-zinc-900 border border-slate-600/50 text-slate-200 hover:from-slate-700 hover:via-gray-700 hover:to-zinc-800 hover:text-white transition-all duration-200 shadow-lg px-6 md:px-8 py-4 text-base md:text-lg"
+              >
+                <Github className="w-4 h-4 md:w-5 md:h-5 mr-2" />
+                View on GitHub
+              </Button>
+            </a>
+          </div>
+
+          {/* Quick Stats */}
+          <div className="grid grid-cols-2 gap-8 max-w-2xl mx-auto">
+            {stats.map((stat, index) => (
+              <div key={index} className="text-center">
+                <div className="flex items-center justify-center mb-2">
+                  <stat.icon className={`w-6 h-6 ${stat.color} mr-2`} />
+                  <span className="text-2xl font-bold text-white">{stat.value}</span>
+                </div>
+                <p className="text-sm text-zinc-400">{stat.label}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* How It Works Section */}
+      <div className="relative z-10 max-w-6xl mx-auto px-6 py-40">
+        <div className="text-center mb-20">
+          <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">How it works</h2>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12 mb-20">
+          <div className="text-center">
+            <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-sky-500 rounded-full flex items-center justify-center mx-auto mb-6">
+              <span className="text-white font-bold text-xl">1</span>
+            </div>
+            <h3 className="text-xl font-semibold text-white mb-3">Enter App ID</h3>
+            <p className="text-zinc-400 leading-relaxed">
+              Paste your App ID or search by name—we'll automatically fetch the app details.
+            </p>
+          </div>
+
+          <div className="text-center">
+            <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-blue-500 rounded-full flex items-center justify-center mx-auto mb-6">
+              <span className="text-white font-bold text-xl">2</span>
+            </div>
+            <h3 className="text-xl font-semibold text-white mb-3">AI Analysis</h3>
+            <p className="text-zinc-400 leading-relaxed">
+              Our AI analyzes thousands of reviews, extracting sentiment, keywords, and insights.
+            </p>
+          </div>
+
+          <div className="text-center">
+            <div className="w-16 h-16 bg-gradient-to-br from-green-500 to-cyan-500 rounded-full flex items-center justify-center mx-auto mb-6">
+              <span className="text-white font-bold text-xl">3</span>
+            </div>
+            <h3 className="text-xl font-semibold text-white mb-3">Get Insights</h3>
+            <p className="text-zinc-400 leading-relaxed">
+              Receive actionable recommendations, trend analysis, and prioritized improvement suggestions.
+            </p>
+          </div>
+        </div>
+
+        {/* Open Source Section */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center pt-20">
+          <div>
+            <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">Open Source & Free</h2>
+            <p className="text-lg md:text-xl text-zinc-400 mb-8 leading-relaxed">
+              This project is completely free and open source. Clone the repository, set up your environment, and start
+              analyzing App Store reviews in minutes.
+            </p>
+            <div className="space-y-4 md:space-y-5">
+              <div className="flex items-center gap-3">
+                <CheckCircle className="w-5 h-5 text-green-400 flex-shrink-0" />
+                <span className="text-zinc-300 text-sm md:text-base">Real-time analysis across 175+ regions</span>
+              </div>
+              <div className="flex items-center gap-3">
+                <CheckCircle className="w-5 h-5 text-green-400 flex-shrink-0" />
+                <span className="text-zinc-300 text-sm md:text-base">AI-powered sentiment and keyword extraction</span>
+              </div>
+              <div className="flex items-center gap-3">
+                <CheckCircle className="w-5 h-5 text-green-400 flex-shrink-0" />
+                <span className="text-zinc-300 text-sm md:text-base">Prioritized actionable insights</span>
+              </div>
+              <div className="flex items-center gap-3">
+                <CheckCircle className="w-5 h-5 text-green-400 flex-shrink-0" />
+                <span className="text-zinc-300 text-sm md:text-base">Export reports and share insights</span>
+              </div>
+            </div>
+            <div className="mt-8 flex flex-col sm:flex-row gap-4">
+              <Link href="/app">
+                <Button
+                  size="lg"
+                  className="bg-gradient-to-r from-blue-800/70 to-sky-900/50 border border-slate-600/50 text-slate-200 hover:from-blue-700 hover:via-sky-700 hover:to-sky-800 hover:text-white transition-all duration-200 shadow-lg"
+                >
+                  Try App
+                </Button>
+              </Link>
+              <a href="https://github.com/KrzysztofStaron/appstore" target="_blank" rel="noopener noreferrer">
+                <Button
+                  size="lg"
+                  variant="outline"
+                  className="bg-gradient-to-r from-slate-800 via-gray-800 to-zinc-900 border border-slate-600/50 text-slate-200 hover:from-slate-700 hover:via-gray-700 hover:to-zinc-800 hover:text-white transition-all duration-200 shadow-lg"
+                >
+                  <Github className="w-4 h-4 mr-2" />
+                  View Source
+                </Button>
+              </a>
+            </div>
+          </div>
+
+          <div className="relative">
+            <div className="bg-gradient-to-br from-zinc-800/50 to-zinc-900/30 border border-zinc-700/50 rounded-2xl p-8">
+              <div className="flex items-center gap-3 mb-6">
+                <div className="w-3 h-3 bg-red-500 rounded-full"></div>
+                <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
+                <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+              </div>
+              <div className="space-y-4">
+                <div className="h-4 bg-zinc-700/50 rounded animate-pulse"></div>
+                <div className="h-4 bg-zinc-700/50 rounded w-3/4 animate-pulse"></div>
+                <div className="h-4 bg-zinc-700/50 rounded w-1/2 animate-pulse"></div>
+                <div className="h-32 bg-zinc-700/30 rounded-lg mt-6"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* CTA Section */}
+      <div className="relative z-10 max-w-4xl mx-auto px-6 py-40 text-center">
+        <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">Ready to Transform Your App Reviews?</h2>
+        <p className="text-lg md:text-xl text-zinc-400 mb-8">
+          Start analyzing your app reviews with AI-powered insights today.
+        </p>
+
+        <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-8">
+          <Link href="/app">
+            <Button
+              size="lg"
+              className="bg-gradient-to-r from-blue-800/70 to-sky-900/50 border border-slate-600/50 text-slate-200 hover:from-blue-700 hover:via-sky-700 hover:to-sky-800 hover:text-white transition-all duration-200 shadow-lg px-6 md:px-8 py-4 text-base md:text-lg"
+            >
+              Try App Now
+            </Button>
+          </Link>
+          <a href="https://github.com/KrzysztofStaron/appstore" target="_blank" rel="noopener noreferrer">
+            <Button
+              size="lg"
+              variant="outline"
+              className="bg-gradient-to-r from-slate-800 via-gray-800 to-zinc-900 border border-slate-600/50 text-slate-200 hover:from-slate-700 hover:via-gray-700 hover:to-zinc-800 hover:text-white transition-all duration-200 shadow-lg px-6 md:px-8 py-4 text-base md:text-lg"
+            >
+              <Github className="w-4 h-4 md:w-5 md:h-5 mr-2" />
+              View on GitHub
+            </Button>
+          </a>
+        </div>
+
+        <p className="text-xs md:text-sm text-zinc-500">100% Free • Open Source • No Registration Required</p>
+      </div>
+
+      {/* Bottom Spacing */}
+      <div className="h-20"></div>
     </div>
   );
 }
