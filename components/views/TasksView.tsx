@@ -3,11 +3,10 @@
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Slider } from "@/components/ui/slider";
-import { Label } from "@/components/ui/label";
-import { Target, Users, Activity, AlertCircle, CheckCircle, Sparkles, RefreshCw } from "lucide-react";
+import { Target, Users, Activity, AlertCircle, CheckCircle, Sparkles } from "lucide-react";
 import { AnalysisResult, AppStoreReview, AppMetadata } from "@/app/types";
-import { getSortedVersions, getDefaultMinVersion, filterReviewsByVersion } from "@/lib/utils";
+import { filterReviewsByVersion } from "@/lib/utils";
+import { VersionSlider } from "@/components/ui/version-slider";
 
 interface TasksViewProps {
   analysisResult: AnalysisResult;
@@ -24,27 +23,6 @@ export function TasksView({ analysisResult, reviews, appMetadata, onAnalysisUpda
   const [minVersion, setMinVersion] = useState<string>("0.0");
   const [filteredSteps, setFilteredSteps] = useState(actionableSteps);
   const [isRegenerating, setIsRegenerating] = useState(false);
-  const [availableVersions, setAvailableVersions] = useState<string[]>([]);
-  const [selectedVersionIndex, setSelectedVersionIndex] = useState(0);
-
-  // Initialize versions and default filter
-  useEffect(() => {
-    const versions = getSortedVersions(reviews);
-    setAvailableVersions(versions);
-
-    if (versions.length > 0) {
-      // Get the newest version from metadata if available, otherwise use the latest from reviews
-      const newestVersion = appMetadata?.version || versions[versions.length - 1];
-
-      // Find the index of the newest version in our available versions
-      const newestIndex = versions.findIndex(v => v === newestVersion);
-
-      // Set default to halfway between the oldest and newest version
-      const defaultIndex = newestIndex >= 0 ? Math.floor(newestIndex / 2) : Math.floor(versions.length / 2);
-      setSelectedVersionIndex(defaultIndex);
-      setMinVersion(versions[defaultIndex]);
-    }
-  }, [reviews, appMetadata]);
 
   // Update filtered steps when actionable steps change
   useEffect(() => {
@@ -127,13 +105,6 @@ export function TasksView({ analysisResult, reviews, appMetadata, onAnalysisUpda
     }
   };
 
-  // Handle version slider change
-  const handleVersionChange = (value: number[]) => {
-    const index = value[0];
-    setSelectedVersionIndex(index);
-    setMinVersion(availableVersions[index] || "0.0");
-  };
-
   const getPriorityColor = (priority: string) => {
     switch (priority) {
       case "critical":
@@ -179,55 +150,13 @@ export function TasksView({ analysisResult, reviews, appMetadata, onAnalysisUpda
       </div>
 
       {/* Version Filter */}
-      {availableVersions.length > 0 && (
-        <Card className="bg-black/30 border-zinc-800/50 backdrop-blur-sm mb-6">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between mb-4">
-              <div>
-                <h3 className="text-lg font-semibold text-white mb-1">Version Filter</h3>
-                <p className="text-sm text-zinc-400">
-                  {minVersion === availableVersions[0]
-                    ? "Analyze all reviews from all versions"
-                    : `Include reviews from version ${minVersion} and newer`}
-                </p>
-              </div>
-              <button
-                onClick={regenerateActionableSteps}
-                disabled={isRegenerating}
-                className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-800 text-white rounded-lg transition-colors"
-              >
-                <RefreshCw className={`h-4 w-4 ${isRegenerating ? "animate-spin" : ""}`} />
-                {isRegenerating ? "Regenerating..." : "Apply Filter"}
-              </button>
-            </div>
-
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <Label className="text-sm text-zinc-300">Minimum Version</Label>
-                <span className="text-sm font-mono text-blue-400">{minVersion}</span>
-              </div>
-
-              <Slider
-                value={[selectedVersionIndex]}
-                onValueChange={handleVersionChange}
-                max={availableVersions.length - 1}
-                min={0}
-                step={1}
-                className="w-full"
-              />
-
-              <div className="flex justify-between text-xs text-zinc-500">
-                <span>{availableVersions[0] || "0.0"}</span>
-                <span>{availableVersions[availableVersions.length - 1] || "0.0"}</span>
-              </div>
-
-              <div className="text-xs text-zinc-400">
-                <span className="font-medium">Available versions:</span> {availableVersions.join(", ")}
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      )}
+      <VersionSlider
+        reviews={reviews}
+        appMetadata={appMetadata}
+        onVersionChange={setMinVersion}
+        onRegenerate={regenerateActionableSteps}
+        isRegenerating={isRegenerating}
+      />
 
       {/* Actionable Steps */}
       <div className="space-y-6">
