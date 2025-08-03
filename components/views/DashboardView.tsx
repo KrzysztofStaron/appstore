@@ -37,7 +37,7 @@ export function DashboardView({ analysisResult, appMetadata, onNavigateToView }:
       {/* Hero Stats */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         <Card className="bg-gradient-to-br from-green-500/10 to-green-600/5 border-green-500/20 backdrop-blur-sm">
-          <CardContent className="p-6">
+          <CardContent className="py-2 px-6">
             <div className="flex items-center justify-between mb-4">
               <div className="p-2 bg-green-500/20 rounded-lg">
                 <MessageSquare className="h-5 w-5 text-green-400" />
@@ -69,7 +69,7 @@ export function DashboardView({ analysisResult, appMetadata, onNavigateToView }:
         </Card>
 
         <Card className="bg-gradient-to-br from-purple-500/10 to-purple-600/5 border-purple-500/20 backdrop-blur-sm">
-          <CardContent className="p-6">
+          <CardContent className="py-2 px-6">
             <div className="flex items-center justify-between mb-4">
               <div className="p-2 bg-purple-500/20 rounded-lg">
                 <Brain className="h-5 w-5 text-purple-400" />
@@ -102,7 +102,7 @@ export function DashboardView({ analysisResult, appMetadata, onNavigateToView }:
         </Card>
 
         <Card className="bg-gradient-to-br from-orange-500/10 to-orange-600/5 border-orange-500/20 backdrop-blur-sm">
-          <CardContent className="p-6">
+          <CardContent className="py-2 px-6">
             <div className="flex items-center justify-between mb-4">
               <div className="p-2 bg-orange-500/20 rounded-lg">
                 <Shield className="h-5 w-5 text-orange-400" />
@@ -134,7 +134,7 @@ export function DashboardView({ analysisResult, appMetadata, onNavigateToView }:
         </Card>
 
         <Card className="bg-gradient-to-br from-blue-500/10 to-blue-600/5 border-blue-500/20 backdrop-blur-sm">
-          <CardContent className="p-6">
+          <CardContent className="py-2 px-6">
             <div className="flex items-center justify-between mb-4">
               <div className="p-2 bg-blue-500/20 rounded-lg">
                 <TrendingUp className="h-5 w-5 text-blue-400" />
@@ -228,7 +228,7 @@ export function DashboardView({ analysisResult, appMetadata, onNavigateToView }:
 
             return (
               <Card className="bg-black/30 border-zinc-800/50 backdrop-blur-sm hover:border-zinc-700/50 transition-all">
-                <CardContent className="p-6">
+                <CardContent className="py-2 px-6">
                   <div className="flex items-start justify-between mb-4">
                     <div className="flex-1">
                       <div className="flex items-center gap-3 mb-3">
@@ -274,99 +274,113 @@ export function DashboardView({ analysisResult, appMetadata, onNavigateToView }:
       )}
 
       {/* Charts Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        <Card className="bg-black/30 border-zinc-800/50 backdrop-blur-sm">
-          <CardHeader>
-            <CardTitle className="text-white flex items-center gap-2">
-              <PieChartIcon className="h-5 w-5 text-blue-400" />
-              Rating Distribution
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="h-64 mb-4">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart
-                  data={Object.entries(analysisResult.basicStats.ratingDistribution).map(([rating, count]) => ({
-                    rating: `${rating}★`,
-                    count: count as number,
-                  }))}
-                >
-                  <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-                  <XAxis dataKey="rating" stroke="#9CA3AF" />
-                  <YAxis stroke="#9CA3AF" />
-                  <Tooltip
-                    contentStyle={{
-                      backgroundColor: "#1F2937",
-                      border: "1px solid #374151",
-                      borderRadius: "8px",
-                      color: "#F9FAFB",
-                    }}
-                  />
-                  <Bar dataKey="count" fill="#6366F1" radius={[4, 4, 0, 0]} />
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-            <Button
-              variant="ghost"
-              size="sm"
-              className="w-full text-xs text-zinc-400/70 hover:text-zinc-300 hover:bg-zinc-800/50 h-8"
-              onClick={() => onNavigateToView?.("versions")}
-            >
-              <GitBranch className="h-3 w-3 mr-1" />
-              View by Version
-            </Button>
-          </CardContent>
-        </Card>
+      <div className="space-y-6">
+        <div className="flex items-center gap-3 mb-6">
+          <div className="p-3 bg-blue-500/20 rounded-xl">
+            <BarChart3 className="h-6 w-6 text-blue-400" />
+          </div>
+          <div>
+            <h2 className="text-2xl font-bold text-white">Analytics Overview</h2>
+            <p className="text-zinc-400">
+              Visual insights from {analysisResult.basicStats.totalReviews.toLocaleString()} reviews
+            </p>
+          </div>
+        </div>
 
-        <Card className="bg-black/30 border-zinc-800/50 backdrop-blur-sm">
-          <CardHeader>
-            <CardTitle className="text-white flex items-center gap-2">
-              <TrendingUp className="h-5 w-5 text-green-400" />
-              Trend Analysis
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="h-64 mb-4">
-              <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={analysisResult.trendData}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-                  <XAxis dataKey="date" stroke="#9CA3AF" />
-                  <YAxis domain={[1, 5]} stroke="#9CA3AF" />
-                  <Tooltip
-                    contentStyle={{
-                      backgroundColor: "#1F2937",
-                      border: "1px solid #374151",
-                      borderRadius: "8px",
-                      color: "#F9FAFB",
-                    }}
-                  />
-                  <Area
-                    type="monotone"
-                    dataKey="averageRating"
-                    stroke="#10B981"
-                    fill="url(#colorGradient)"
-                    strokeWidth={2}
-                  />
-                  <defs>
-                    <linearGradient id="colorGradient" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#10B981" stopOpacity={0.3} />
-                      <stop offset="95%" stopColor="#10B981" stopOpacity={0} />
-                    </linearGradient>
-                  </defs>
-                </AreaChart>
-              </ResponsiveContainer>
-            </div>
-            <Button
-              variant="ghost"
-              size="sm"
-              className="w-full text-xs text-zinc-400/70 hover:text-zinc-300 hover:bg-zinc-800/50 h-8"
-              onClick={() => onNavigateToView?.("trends")}
-            >
-              <BarChart3 className="h-3 w-3 mr-1" />
-              Detailed Trends
-            </Button>
-          </CardContent>
-        </Card>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          <Card className="bg-black/30 border-zinc-800/50 backdrop-blur-sm">
+            <CardHeader>
+              <CardTitle className="text-white flex items-center gap-2">
+                <PieChartIcon className="h-5 w-5 text-blue-400" />
+                Rating Distribution
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="h-64 mb-4">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart
+                    data={Object.entries(analysisResult.basicStats.ratingDistribution).map(([rating, count]) => ({
+                      rating: `${rating}★`,
+                      count: count as number,
+                    }))}
+                  >
+                    <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
+                    <XAxis dataKey="rating" stroke="#9CA3AF" />
+                    <YAxis stroke="#9CA3AF" />
+                    <Tooltip
+                      contentStyle={{
+                        backgroundColor: "#1F2937",
+                        border: "1px solid #374151",
+                        borderRadius: "8px",
+                        color: "#F9FAFB",
+                      }}
+                    />
+                    <Bar dataKey="count" fill="#6366F1" radius={[4, 4, 0, 0]} />
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="w-full text-xs text-zinc-400/70 hover:text-zinc-300 hover:bg-zinc-800/50 h-8"
+                onClick={() => onNavigateToView?.("versions")}
+              >
+                <GitBranch className="h-3 w-3 mr-1" />
+                View by Version
+              </Button>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-black/30 border-zinc-800/50 backdrop-blur-sm">
+            <CardHeader>
+              <CardTitle className="text-white flex items-center gap-2">
+                <TrendingUp className="h-5 w-5 text-green-400" />
+                Trend Analysis
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="h-64 mb-4">
+                <ResponsiveContainer width="100%" height="100%">
+                  <AreaChart data={analysisResult.trendData}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
+                    <XAxis dataKey="date" stroke="#9CA3AF" />
+                    <YAxis domain={[1, 5]} stroke="#9CA3AF" />
+                    <Tooltip
+                      contentStyle={{
+                        backgroundColor: "#1F2937",
+                        border: "1px solid #374151",
+                        borderRadius: "8px",
+                        color: "#F9FAFB",
+                      }}
+                    />
+                    <Area
+                      type="monotone"
+                      dataKey="averageRating"
+                      stroke="#10B981"
+                      fill="url(#colorGradient)"
+                      strokeWidth={2}
+                    />
+                    <defs>
+                      <linearGradient id="colorGradient" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="#10B981" stopOpacity={0.3} />
+                        <stop offset="95%" stopColor="#10B981" stopOpacity={0} />
+                      </linearGradient>
+                    </defs>
+                  </AreaChart>
+                </ResponsiveContainer>
+              </div>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="w-full text-xs text-zinc-400/70 hover:text-zinc-300 hover:bg-zinc-800/50 h-8"
+                onClick={() => onNavigateToView?.("trends")}
+              >
+                <BarChart3 className="h-3 w-3 mr-1" />
+                Detailed Trends
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
       </div>
     </div>
   );
