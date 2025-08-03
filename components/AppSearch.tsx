@@ -151,9 +151,9 @@ export function AppSearch({ onAppSelect, currentAppId }: AppSearchProps) {
         </div>
       )}
 
-             {/* Search results dropdown */}
-       {isOpen && results.length > 0 && !isLoading && (
-         <div className="absolute top-full left-0 right-0 mt-1 bg-zinc-900/95 border border-zinc-700/50 rounded-lg max-h-96 overflow-y-auto z-50 max-w-full">
+      {/* Search results dropdown */}
+      {isOpen && results.length > 0 && !isLoading && (
+        <div className="absolute top-full left-0 right-0 mt-1 bg-zinc-900/95 border border-zinc-700/50 rounded-lg max-h-96 overflow-y-auto z-50 max-w-full">
           {results.map((app, index) => (
             <div
               key={app.trackId}
@@ -172,27 +172,27 @@ export function AppSearch({ onAppSelect, currentAppId }: AppSearchProps) {
                     target.style.display = "none";
                   }}
                 />
-                                 <div className="flex-1 min-w-0 overflow-hidden">
-                   <div className="flex items-center gap-2 mb-1">
-                     <h4 className="text-sm font-medium text-white truncate flex-1">{app.trackName}</h4>
-                     {app.trackId.toString() === currentAppId && (
-                       <Badge variant="secondary" className="text-xs bg-blue-900/50 text-blue-300 flex-shrink-0">
-                         Current
-                       </Badge>
-                     )}
-                   </div>
-                   <p className="text-xs text-zinc-400 mb-1 truncate">{app.sellerName}</p>
-                                     <div className="flex items-center gap-3 text-xs text-zinc-500 overflow-hidden">
-                     <span className="flex items-center gap-1 flex-shrink-0">
-                       <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
-                       {app.averageUserRating.toFixed(1)}
-                     </span>
-                     <span className="flex items-center gap-1 flex-shrink-0">
-                       <Download className="h-3 w-3" />
-                       {(app.userRatingCount / 1000).toFixed(1)}K
-                     </span>
-                     <span className="truncate">{app.primaryGenreName}</span>
-                   </div>
+                <div className="flex-1 min-w-0 overflow-hidden">
+                  <div className="flex items-center gap-2 mb-1">
+                    <h4 className="text-sm font-medium text-white truncate flex-1">{app.trackName}</h4>
+                    {app.trackId.toString() === currentAppId && (
+                      <Badge variant="secondary" className="text-xs bg-blue-900/50 text-blue-300 flex-shrink-0">
+                        Current
+                      </Badge>
+                    )}
+                  </div>
+                  <p className="text-xs text-zinc-400 mb-1 truncate">{app.sellerName}</p>
+                  <div className="flex items-center gap-3 text-xs text-zinc-500 overflow-hidden">
+                    <span className="flex items-center gap-1 flex-shrink-0">
+                      <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
+                      {app.averageUserRating.toFixed(2)}
+                    </span>
+                    <span className="flex items-center gap-1 flex-shrink-0">
+                      <Download className="h-3 w-3" />
+                      {(app.userRatingCount / 1000).toFixed(2)}K
+                    </span>
+                    <span className="truncate">{app.primaryGenreName}</span>
+                  </div>
                 </div>
               </div>
             </div>

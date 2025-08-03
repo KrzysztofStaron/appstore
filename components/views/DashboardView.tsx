@@ -113,7 +113,7 @@ export function DashboardView({ analysisResult, appMetadata, onNavigateToView }:
             </div>
             <div className="space-y-1 mb-4">
               <div className="text-3xl font-bold text-white">
-                {analysisResult.filteredAnalysis.informativePercentage.toFixed(1)}%
+                {analysisResult.filteredAnalysis.informativePercentage.toFixed(2)}%
               </div>
               <div className="text-sm text-zinc-400">Quality Score</div>
               <div className="flex items-center gap-1 text-xs text-orange-400">
@@ -144,7 +144,7 @@ export function DashboardView({ analysisResult, appMetadata, onNavigateToView }:
               </Badge>
             </div>
             <div className="space-y-1 mb-4">
-              <div className="text-3xl font-bold text-white">{analysisResult.basicStats.averageRating.toFixed(1)}</div>
+              <div className="text-3xl font-bold text-white">{analysisResult.basicStats.averageRating.toFixed(2)}</div>
               <div className="text-sm text-zinc-400">Average Rating</div>
               <div className="flex items-center gap-1 text-xs text-blue-400">
                 <Star className="h-3 w-3" />

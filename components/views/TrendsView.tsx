@@ -52,6 +52,8 @@ export function TrendsView({ analysisResult }: TrendsViewProps) {
                     borderRadius: "8px",
                     color: "#F9FAFB",
                   }}
+                  formatter={(value: any) => [Number(value).toFixed(2), "Average Rating"]}
+                  labelFormatter={(label: any) => `Date: ${label}`}
                 />
                 <Area
                   type="monotone"
@@ -78,7 +80,7 @@ export function TrendsView({ analysisResult }: TrendsViewProps) {
             <TrendingUp className="h-8 w-8 text-green-400 mx-auto mb-3" />
             <div className="text-2xl font-bold text-green-400 mb-1">
               {analysisResult.dynamicMetrics?.ratingTrend?.monthlyChange > 0 ? "+" : ""}
-              {analysisResult.dynamicMetrics?.ratingTrend?.monthlyChange?.toFixed(1) || "0.0"}
+              {analysisResult.dynamicMetrics?.ratingTrend?.monthlyChange?.toFixed(2) || "0.00"}
             </div>
             <div className="text-sm text-zinc-400">Rating Change</div>
             <div className="text-xs text-green-400 mt-2">Last 30 days</div>
@@ -89,7 +91,7 @@ export function TrendsView({ analysisResult }: TrendsViewProps) {
           <CardContent className="p-6 text-center">
             <Activity className="h-8 w-8 text-blue-400 mx-auto mb-3" />
             <div className="text-2xl font-bold text-blue-400 mb-1">
-              {analysisResult.basicStats.averageRating.toFixed(1)}
+              {analysisResult.basicStats.averageRating.toFixed(2)}
             </div>
             <div className="text-sm text-zinc-400">Current Rating</div>
             <div className="text-xs text-blue-400 mt-2">

@@ -57,7 +57,7 @@ export function KeywordsView({ analysisResult }: KeywordsViewProps) {
                 </div>
                 <div className="flex justify-between">
                   <span className="text-sm text-zinc-400">Avg Rating</span>
-                  <span className="text-sm font-semibold text-white">{keyword.averageRating.toFixed(1)}★</span>
+                  <span className="text-sm font-semibold text-white">{keyword.averageRating.toFixed(2)}★</span>
                 </div>
               </div>
             </CardContent>

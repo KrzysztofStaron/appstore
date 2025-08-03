@@ -224,11 +224,11 @@ export function Sidebar({
 
           <div className="grid grid-cols-2 gap-3">
             <div className="bg-zinc-900/30 rounded-lg p-3">
-              <div className="text-lg font-bold text-yellow-400">{appMetadata.averageUserRating.toFixed(1)}</div>
+              <div className="text-lg font-bold text-yellow-400">{appMetadata.averageUserRating.toFixed(2)}</div>
               <div className="text-xs text-zinc-400">Rating</div>
             </div>
             <div className="bg-zinc-900/30 rounded-lg p-3">
-              <div className="text-lg font-bold text-blue-400">{(appMetadata.userRatingCount / 1000).toFixed(1)}K</div>
+              <div className="text-lg font-bold text-blue-400">{(appMetadata.userRatingCount / 1000).toFixed(2)}K</div>
               <div className="text-xs text-zinc-400">Reviews</div>
             </div>
           </div>
