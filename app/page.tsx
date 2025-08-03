@@ -246,6 +246,29 @@ export default function AppStoreAnalyzer() {
       );
     }
 
+    // Show loading state for all views when analyzing
+    if (isAnalyzing) {
+      return (
+        <div className="flex items-center justify-center min-h-[calc(100vh-2rem)]">
+          <div className="text-center max-w-md">
+            <div className="w-24 h-24 bg-gradient-to-br from-zinc-800/50 to-zinc-900/30 rounded-full flex items-center justify-center mx-auto mb-6 border border-zinc-700/50">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-zinc-400"></div>
+            </div>
+            <h3 className="text-2xl font-bold text-white mb-3">Analyzing Data</h3>
+            <p className="text-zinc-300 mb-4">{currentStage || "Processing reviews..."}</p>
+            <div className="w-64 bg-zinc-800/50 rounded-full h-2 mb-2 mx-auto border border-zinc-700/50">
+              <div
+                className="bg-gradient-to-r from-zinc-600 to-zinc-500 h-2 rounded-full transition-all duration-300"
+                style={{ width: `${progress}%` }}
+              />
+            </div>
+            <p className="text-sm text-zinc-400">{Math.round(progress)}% complete</p>
+            {progressDetails && <p className="text-xs text-zinc-500 mt-2">{progressDetails}</p>}
+          </div>
+        </div>
+      );
+    }
+
     switch (currentView) {
       case "dashboard":
         return (

@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -15,6 +16,7 @@ import {
   Play,
   Pause,
   ChevronRight,
+  ChevronDown,
   Brain,
   TrendingUp,
   Zap,
@@ -75,6 +77,7 @@ export function Sidebar({
   appMetadata,
   reviews,
 }: SidebarProps) {
+  const [isConfigOpen, setIsConfigOpen] = useState(true);
   return (
     <div className="w-80 bg-black/50 backdrop-blur-xl border-r border-zinc-800/50 flex flex-col">
       {/* Header */}
@@ -91,82 +94,94 @@ export function Sidebar({
 
         {/* App Configuration */}
         <div className="space-y-4">
-          <div>
-            <Label className="text-sm text-zinc-300 mb-2 block">App Store ID</Label>
-            <Input
-              value={appId}
-              onChange={e => setAppId(e.target.value)}
-              placeholder="Enter App ID"
-              className="bg-zinc-900/50 border-zinc-700 text-white text-sm h-9"
-            />
-          </div>
-
-          <div>
-            <Label className="text-sm text-zinc-300 mb-2 block">Regions</Label>
-            <Select value={selectedRegions.join(",")} onValueChange={value => setSelectedRegions(value.split(","))}>
-              <SelectTrigger className="bg-zinc-900/50 border-zinc-700 text-white text-sm h-9">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent className="bg-zinc-900 border-zinc-700">
-                <SelectItem value="all">🌐 Global (175 regions)</SelectItem>
-                <SelectItem value="us,gb,ca">🌍 Major Markets</SelectItem>
-                <SelectItem value="us">🇺🇸 US Only</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          {selectedRegions.includes("all") && (
-            <div className="bg-yellow-900/20 border border-yellow-600/50 rounded-lg p-3">
-              <div className="flex items-center gap-2">
-                <AlertCircle className="h-4 w-4 text-yellow-400" />
-                <span className="text-sm font-medium text-yellow-300">All Regions Selected</span>
-              </div>
-              <p className="text-sm text-yellow-200 mt-1">
-                This will fetch reviews from all 175 App Store regions. This may take several minutes.
-              </p>
-            </div>
-          )}
-
-          <Button
-            onClick={handleAnalyze}
-            disabled={isPending || !appId.trim()}
-            className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white h-9 text-sm"
+          <button
+            onClick={() => setIsConfigOpen(!isConfigOpen)}
+            className="flex items-center justify-between w-full text-left text-sm font-medium text-zinc-300 hover:text-white transition-colors"
           >
-            {isAnalyzing ? (
-              <>
-                <Pause className="h-4 w-4 mr-2" />
-                Analyzing...
-              </>
-            ) : (
-              <>
-                <Play className="h-4 w-4 mr-2" />
-                Start Analysis
-              </>
-            )}
-          </Button>
+            <span>App Configuration</span>
+            {isConfigOpen ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
+          </button>
 
-          {isAnalyzing && (
-            <div className="space-y-2">
-              <div className="flex justify-between text-xs text-zinc-400">
-                <span>{currentStage || "Processing reviews..."}</span>
-                <span>{Math.round(progress)}%</span>
+          {isConfigOpen && (
+            <div className="space-y-4">
+              <div>
+                <Label className="text-sm text-zinc-300 mb-2 block">App Store ID</Label>
+                <Input
+                  value={appId}
+                  onChange={e => setAppId(e.target.value)}
+                  placeholder="Enter App ID"
+                  className="bg-zinc-900/50 border-zinc-700 text-white text-sm h-9"
+                />
               </div>
-              <Progress value={progress} className="h-1 bg-zinc-800" />
-              {progressDetails && <div className="text-xs text-zinc-500">{progressDetails}</div>}
-              {regionProgress && !progressDetails && (
-                <div className="text-xs text-zinc-500">
-                  Region {regionProgress.current} of {regionProgress.total} (
-                  {Math.round((regionProgress.current / regionProgress.total) * 100)}%)
+
+              <div>
+                <Label className="text-sm text-zinc-300 mb-2 block">Regions</Label>
+                <Select value={selectedRegions.join(",")} onValueChange={value => setSelectedRegions(value.split(","))}>
+                  <SelectTrigger className="bg-zinc-900/50 border-zinc-700 text-white text-sm h-9">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent className="bg-zinc-900 border-zinc-700 text-white">
+                    <SelectItem value="all">🌐 Global (175 regions)</SelectItem>
+                    <SelectItem value="us,gb,ca">🌍 Major Markets</SelectItem>
+                    <SelectItem value="us">🇺🇸 US Only</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {selectedRegions.includes("all") && (
+                <div className="bg-yellow-900/20 border border-yellow-600/50 rounded-lg p-3">
+                  <div className="flex items-center gap-2">
+                    <AlertCircle className="h-4 w-4 text-yellow-400" />
+                    <span className="text-sm font-medium text-yellow-300">All Regions Selected</span>
+                  </div>
+                  <p className="text-sm text-yellow-200 mt-1">
+                    This will fetch reviews from all 175 App Store regions. This may take several minutes.
+                  </p>
                 </div>
               )}
-            </div>
-          )}
 
-          {error && (
-            <Alert className="bg-red-900/20 border-red-600/50 text-red-200 p-3">
-              <AlertCircle className="h-4 w-4" />
-              <AlertDescription className="text-xs">{error}</AlertDescription>
-            </Alert>
+              <Button
+                onClick={handleAnalyze}
+                disabled={isPending || isAnalyzing || !appId.trim()}
+                className="w-full bg-gradient-to-r from-zinc-800/50 to-zinc-900/30 border border-zinc-700/50 text-white h-9 text-sm disabled:opacity-50 disabled:cursor-not-allowed hover:from-zinc-700/50 hover:to-zinc-800/30 transition-all"
+              >
+                {isAnalyzing ? (
+                  <>
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2" />
+                    Analyzing...
+                  </>
+                ) : (
+                  <>
+                    <Play className="h-4 w-4 mr-2" />
+                    Start Analysis
+                  </>
+                )}
+              </Button>
+
+              {isAnalyzing && (
+                <div className="space-y-2">
+                  <div className="flex justify-between text-xs text-zinc-400">
+                    <span>{currentStage || "Processing reviews..."}</span>
+                    <span>{Math.round(progress)}%</span>
+                  </div>
+                  <Progress value={progress} className="h-1 bg-zinc-800" />
+                  {progressDetails && <div className="text-xs text-zinc-500">{progressDetails}</div>}
+                  {regionProgress && !progressDetails && (
+                    <div className="text-xs text-zinc-500">
+                      Region {regionProgress.current} of {regionProgress.total} (
+                      {Math.round((regionProgress.current / regionProgress.total) * 100)}%)
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {error && (
+                <Alert className="bg-red-900/20 border-red-600/50 text-red-200 p-3">
+                  <AlertCircle className="h-4 w-4" />
+                  <AlertDescription className="text-xs">{error}</AlertDescription>
+                </Alert>
+              )}
+            </div>
           )}
         </div>
       </div>
@@ -224,13 +239,17 @@ export function Sidebar({
               <button
                 key={item.id}
                 onClick={() => setCurrentView(item.id as ViewType)}
-                className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium ${
+                disabled={isAnalyzing}
+                className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
                   isActive ? "bg-zinc-800/50 text-white border border-zinc-700/50" : "text-zinc-400"
-                }`}
+                } ${isAnalyzing ? "opacity-50 cursor-not-allowed" : "hover:text-white"}`}
               >
                 <Icon className={`h-4 w-4 ${isActive ? item.color : ""}`} />
                 <span className="flex-1 text-left">{item.label}</span>
                 {isActive && <ChevronRight className="h-4 w-4" />}
+                {isAnalyzing && isActive && (
+                  <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-white" />
+                )}
               </button>
             );
           })}

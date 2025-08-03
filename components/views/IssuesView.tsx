@@ -291,7 +291,7 @@ export function IssuesView({ analysisResult, reviews, appMetadata }: IssuesViewP
   }
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 mb-8">
       <div className="flex items-center gap-3 mb-6">
         <div className="p-3 bg-red-500/20 rounded-xl">
           <AlertCircle className="h-6 w-6 text-red-400" />
