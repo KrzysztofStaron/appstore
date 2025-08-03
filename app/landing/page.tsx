@@ -6,7 +6,18 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { BarChart3, Globe, Sparkles, Play, ArrowRight, CheckCircle, Github } from "lucide-react";
+import {
+  BarChart3,
+  Globe,
+  Sparkles,
+  Play,
+  ArrowRight,
+  CheckCircle,
+  Github,
+  Brain,
+  Target,
+  Download,
+} from "lucide-react";
 import Link from "next/link";
 
 export default function LandingPage() {
@@ -74,17 +85,16 @@ export default function LandingPage() {
           </h1>
 
           <p className="text-xl text-zinc-400 mb-12 max-w-3xl mx-auto leading-relaxed">
-            Drop your app ID and watch AI analyze thousands of reviews across 175+ regions. Get instant insights,
-            sentiment analysis, and prioritized action items. Completely free and open source.
+            Drop your App ID and watch our intelligent system analyze thousands of reviews
           </p>
 
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-16">
+          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-20">
             <Link href="/">
               <Button
                 size="lg"
-                className="bg-gradient-to-r from-blue-800/70 to-sky-900/50 border border-slate-600/50 text-slate-200 hover:from-blue-700 hover:via-sky-700 hover:to-sky-800 hover:text-white transition-all duration-200 shadow-lg px-8 py-4 text-lg"
+                className="bg-gradient-to-r from-blue-800/70 to-sky-900/50 border border-slate-600/50 text-slate-200 hover:from-blue-700 hover:via-sky-700 hover:to-sky-800 hover:text-white transition-all duration-200 shadow-lg px-6 md:px-8 py-4 text-base md:text-lg"
               >
-                <Play className="w-5 h-5 mr-2" />
+                <Play className="w-4 h-4 md:w-5 md:h-5 mr-2" />
                 Try App
               </Button>
             </Link>
@@ -92,9 +102,9 @@ export default function LandingPage() {
               <Button
                 size="lg"
                 variant="outline"
-                className="bg-gradient-to-r from-slate-800 via-gray-800 to-zinc-900 border border-slate-600/50 text-slate-200 hover:from-slate-700 hover:via-gray-700 hover:to-zinc-800 hover:text-white transition-all duration-200 shadow-lg px-8 py-4 text-lg"
+                className="bg-gradient-to-r from-slate-800 via-gray-800 to-zinc-900 border border-slate-600/50 text-slate-200 hover:from-slate-700 hover:via-gray-700 hover:to-zinc-800 hover:text-white transition-all duration-200 shadow-lg px-6 md:px-8 py-4 text-base md:text-lg"
               >
-                <Github className="w-5 h-5 mr-2" />
+                <Github className="w-4 h-4 md:w-5 md:h-5 mr-2" />
                 View on GitHub
               </Button>
             </a>
@@ -116,22 +126,19 @@ export default function LandingPage() {
       </div>
 
       {/* How It Works Section */}
-      <div className="relative z-10 max-w-6xl mx-auto px-6 py-32">
-        <div className="text-center mb-16">
-          <h2 className="text-4xl font-bold text-white mb-4">How It Works</h2>
-          <p className="text-xl text-zinc-400 max-w-2xl mx-auto">
-            Get started in minutes with our simple 3-step process
-          </p>
+      <div className="relative z-10 max-w-6xl mx-auto px-6 py-40">
+        <div className="text-center mb-20">
+          <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">How it works</h2>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12 mb-20">
           <div className="text-center">
-            <div className="w-16 h-16 bg-gradient-to-br from-slate-800/50 to-zinc-900/30 border border-slate-600/50 rounded-full flex items-center justify-center mx-auto mb-6">
+            <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-sky-500 rounded-full flex items-center justify-center mx-auto mb-6">
               <span className="text-white font-bold text-xl">1</span>
             </div>
             <h3 className="text-xl font-semibold text-white mb-3">Enter App ID</h3>
             <p className="text-zinc-400 leading-relaxed">
-              Simply paste your App Store ID or search for your app by name. We'll automatically fetch the app details.
+              Paste your App ID or search by name—we'll automatically fetch the app details.
             </p>
           </div>
 
@@ -141,7 +148,7 @@ export default function LandingPage() {
             </div>
             <h3 className="text-xl font-semibold text-white mb-3">AI Analysis</h3>
             <p className="text-zinc-400 leading-relaxed">
-              Our AI analyzes thousands of reviews across 175+ regions, extracting sentiment, keywords, and insights.
+              Our AI analyzes thousands of reviews, extracting sentiment, keywords, and insights.
             </p>
           </div>
 
@@ -155,36 +162,34 @@ export default function LandingPage() {
             </p>
           </div>
         </div>
-      </div>
 
-      {/* Demo Section */}
-      <div className="relative z-10 max-w-6xl mx-auto px-6 py-32">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+        {/* Open Source Section */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center pt-20">
           <div>
-            <h2 className="text-4xl font-bold text-white mb-6">Open Source & Free</h2>
-            <p className="text-xl text-zinc-400 mb-8 leading-relaxed">
+            <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">Open Source & Free</h2>
+            <p className="text-lg md:text-xl text-zinc-400 mb-8 leading-relaxed">
               This project is completely free and open source. Clone the repository, set up your environment, and start
               analyzing App Store reviews in minutes.
             </p>
-            <div className="space-y-4">
+            <div className="space-y-4 md:space-y-5">
               <div className="flex items-center gap-3">
-                <CheckCircle className="w-5 h-5 text-green-400" />
-                <span className="text-zinc-300">Real-time analysis across 175+ regions</span>
+                <CheckCircle className="w-5 h-5 text-green-400 flex-shrink-0" />
+                <span className="text-zinc-300 text-sm md:text-base">Real-time analysis across 175+ regions</span>
               </div>
               <div className="flex items-center gap-3">
-                <CheckCircle className="w-5 h-5 text-green-400" />
-                <span className="text-zinc-300">AI-powered sentiment and keyword extraction</span>
+                <CheckCircle className="w-5 h-5 text-green-400 flex-shrink-0" />
+                <span className="text-zinc-300 text-sm md:text-base">AI-powered sentiment and keyword extraction</span>
               </div>
               <div className="flex items-center gap-3">
-                <CheckCircle className="w-5 h-5 text-green-400" />
-                <span className="text-zinc-300">Prioritized actionable insights</span>
+                <CheckCircle className="w-5 h-5 text-green-400 flex-shrink-0" />
+                <span className="text-zinc-300 text-sm md:text-base">Prioritized actionable insights</span>
               </div>
               <div className="flex items-center gap-3">
-                <CheckCircle className="w-5 h-5 text-green-400" />
-                <span className="text-zinc-300">Export reports and share insights</span>
+                <CheckCircle className="w-5 h-5 text-green-400 flex-shrink-0" />
+                <span className="text-zinc-300 text-sm md:text-base">Export reports and share insights</span>
               </div>
             </div>
-            <div className="mt-8 flex gap-4">
+            <div className="mt-8 flex flex-col sm:flex-row gap-4">
               <Link href="/">
                 <Button
                   size="lg"
@@ -225,15 +230,17 @@ export default function LandingPage() {
       </div>
 
       {/* CTA Section */}
-      <div className="relative z-10 max-w-4xl mx-auto px-6 py-32 text-center">
-        <h2 className="text-4xl font-bold text-white mb-6">Ready to Transform Your App Reviews?</h2>
-        <p className="text-xl text-zinc-400 mb-8">Start analyzing your app reviews with AI-powered insights today.</p>
+      <div className="relative z-10 max-w-4xl mx-auto px-6 py-40 text-center">
+        <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">Ready to Transform Your App Reviews?</h2>
+        <p className="text-lg md:text-xl text-zinc-400 mb-8">
+          Start analyzing your app reviews with AI-powered insights today.
+        </p>
 
         <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-8">
           <Link href="/">
             <Button
               size="lg"
-              className="bg-gradient-to-r from-blue-800/70 to-sky-900/50 border border-slate-600/50 text-slate-200 hover:from-blue-700 hover:via-sky-700 hover:to-sky-800 hover:text-white transition-all duration-200 shadow-lg px-8 py-4 text-lg"
+              className="bg-gradient-to-r from-blue-800/70 to-sky-900/50 border border-slate-600/50 text-slate-200 hover:from-blue-700 hover:via-sky-700 hover:to-sky-800 hover:text-white transition-all duration-200 shadow-lg px-6 md:px-8 py-4 text-base md:text-lg"
             >
               Try App Now
             </Button>
@@ -242,15 +249,15 @@ export default function LandingPage() {
             <Button
               size="lg"
               variant="outline"
-              className="bg-gradient-to-r from-slate-800 via-gray-800 to-zinc-900 border border-slate-600/50 text-slate-200 hover:from-slate-700 hover:via-gray-700 hover:to-zinc-800 hover:text-white transition-all duration-200 shadow-lg px-8 py-4 text-lg"
+              className="bg-gradient-to-r from-slate-800 via-gray-800 to-zinc-900 border border-slate-600/50 text-slate-200 hover:from-slate-700 hover:via-gray-700 hover:to-zinc-800 hover:text-white transition-all duration-200 shadow-lg px-6 md:px-8 py-4 text-base md:text-lg"
             >
-              <Github className="w-5 h-5 mr-2" />
+              <Github className="w-4 h-4 md:w-5 md:h-5 mr-2" />
               View on GitHub
             </Button>
           </a>
         </div>
 
-        <p className="text-sm text-zinc-500">100% Free • Open Source • No Registration Required</p>
+        <p className="text-xs md:text-sm text-zinc-500">100% Free • Open Source • No Registration Required</p>
       </div>
     </div>
   );

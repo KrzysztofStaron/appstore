@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -44,6 +44,17 @@ export function AppConfigModal({
   progressDetails,
   error,
 }: AppConfigModalProps) {
+  // Close modal when analysis is complete
+  React.useEffect(() => {
+    if (isOpen && !isAnalyzing && progress >= 95 && !error) {
+      // Small delay to show completion before closing
+      const timer = setTimeout(() => {
+        onClose();
+      }, 1500);
+      return () => clearTimeout(timer);
+    }
+  }, [isOpen, isAnalyzing, progress, error, onClose]);
+
   if (!isOpen) return null;
 
   return (

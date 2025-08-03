@@ -302,10 +302,6 @@ export class ReviewAnalyzer {
     // Final fallback: if somehow we have no reviews, return the original reviews
     const finalReviews = reviewsToUse.length > 0 ? reviewsToUse : this.reviews;
 
-    console.log(
-      `📊 Analyzing ${finalReviews.length} reviews (${this.filteredReviews.length} filtered, ${this.reviews.length} total)`
-    );
-
     if (finalReviews.length === 0) {
       console.warn("⚠️ No reviews available for analysis!");
     }

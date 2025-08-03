@@ -182,14 +182,6 @@ export function Sidebar({
             <Download className="h-3 w-3 mr-1" />
             Export
           </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            className="flex-1 bg-transparent border-zinc-700 text-zinc-300 h-8 text-xs"
-          >
-            <Settings className="h-3 w-3 mr-1" />
-            Settings
-          </Button>
         </div>
       </div>
     </div>
