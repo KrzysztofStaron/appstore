@@ -83,12 +83,22 @@ export function AppConfigModal({
 
   // Close modal when analysis is complete
   React.useEffect(() => {
-    if (isOpen && !isAnalyzing && progress >= 95 && !error) {
-      // Small delay to show completion before closing
-      const timer = setTimeout(() => {
-        onClose();
-      }, 1500);
-      return () => clearTimeout(timer);
+    // Close modal when analysis is complete
+    if (isOpen && !isAnalyzing && !error) {
+      // If progress is 100%, close immediately
+      if (progress === 100) {
+        const timer = setTimeout(() => {
+          onClose();
+        }, 1000);
+        return () => clearTimeout(timer);
+      }
+      // If progress is >= 95%, close with delay
+      else if (progress >= 95) {
+        const timer = setTimeout(() => {
+          onClose();
+        }, 1500);
+        return () => clearTimeout(timer);
+      }
     }
   }, [isOpen, isAnalyzing, progress, error, onClose]);
 

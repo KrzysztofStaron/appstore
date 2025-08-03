@@ -20,7 +20,6 @@ export function AppSelectorDemo() {
         const app = data.apps?.find((app: any) => app.trackId.toString() === appId);
         if (app) {
           setSelectedApp({
-            trackId: app.trackId,
             trackName: app.trackName,
             sellerName: app.sellerName,
             primaryGenreName: app.primaryGenreName,
@@ -29,11 +28,6 @@ export function AppSelectorDemo() {
             artworkUrl100: app.artworkUrl100,
             artworkUrl512: app.artworkUrl512,
             version: app.version,
-            releaseDate: app.releaseDate,
-            currentVersionReleaseDate: app.currentVersionReleaseDate,
-            description: app.description,
-            price: app.price,
-            currency: app.currency,
           });
         }
       }
@@ -51,16 +45,17 @@ export function AppSelectorDemo() {
         <CardContent className="space-y-4">
           <div className="space-y-2">
             <label className="text-sm font-medium text-zinc-300">Select an App</label>
-            <AppSelector onAppSelect={handleAppSelect} currentAppId={selectedAppId} selectedApp={selectedApp} />
+            <AppSelector
+              onAppSelect={handleAppSelect}
+              currentAppId={selectedAppId}
+              selectedApp={selectedApp || undefined}
+            />
           </div>
 
           {selectedApp && (
             <div className="mt-6 p-4 bg-zinc-800/30 border border-zinc-700/30 rounded-lg">
               <h3 className="text-sm font-medium text-zinc-300 mb-2">Selected App Details:</h3>
               <div className="text-xs text-zinc-400 space-y-1">
-                <p>
-                  <strong>ID:</strong> {selectedApp.trackId}
-                </p>
                 <p>
                   <strong>Name:</strong> {selectedApp.trackName}
                 </p>
