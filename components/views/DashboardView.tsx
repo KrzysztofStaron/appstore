@@ -37,7 +37,7 @@ export function DashboardView({ analysisResult, appMetadata, onNavigateToView }:
       {/* Hero Stats */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         <Card className="bg-gradient-to-br from-green-500/10 to-green-600/5 border-green-500/20 backdrop-blur-sm">
-          <CardContent className="py-2 px-6">
+          <CardContent className="px-6">
             <div className="flex items-center justify-between mb-4">
               <div className="p-2 bg-green-500/20 rounded-lg">
                 <MessageSquare className="h-5 w-5 text-green-400" />
@@ -69,7 +69,7 @@ export function DashboardView({ analysisResult, appMetadata, onNavigateToView }:
         </Card>
 
         <Card className="bg-gradient-to-br from-purple-500/10 to-purple-600/5 border-purple-500/20 backdrop-blur-sm">
-          <CardContent className="py-2 px-6">
+          <CardContent className="px-6">
             <div className="flex items-center justify-between mb-4">
               <div className="p-2 bg-purple-500/20 rounded-lg">
                 <Brain className="h-5 w-5 text-purple-400" />
@@ -102,7 +102,7 @@ export function DashboardView({ analysisResult, appMetadata, onNavigateToView }:
         </Card>
 
         <Card className="bg-gradient-to-br from-orange-500/10 to-orange-600/5 border-orange-500/20 backdrop-blur-sm">
-          <CardContent className="py-2 px-6">
+          <CardContent className="px-6">
             <div className="flex items-center justify-between mb-4">
               <div className="p-2 bg-orange-500/20 rounded-lg">
                 <Shield className="h-5 w-5 text-orange-400" />
@@ -134,7 +134,7 @@ export function DashboardView({ analysisResult, appMetadata, onNavigateToView }:
         </Card>
 
         <Card className="bg-gradient-to-br from-blue-500/10 to-blue-600/5 border-blue-500/20 backdrop-blur-sm">
-          <CardContent className="py-2 px-6">
+          <CardContent className="px-6">
             <div className="flex items-center justify-between mb-4">
               <div className="p-2 bg-blue-500/20 rounded-lg">
                 <TrendingUp className="h-5 w-5 text-blue-400" />
@@ -228,7 +228,7 @@ export function DashboardView({ analysisResult, appMetadata, onNavigateToView }:
 
             return (
               <Card className="bg-black/30 border-zinc-800/50 backdrop-blur-sm hover:border-zinc-700/50 transition-all">
-                <CardContent className="py-2 px-6">
+                <CardContent className="px-6">
                   <div className="flex items-start justify-between mb-4">
                     <div className="flex-1">
                       <div className="flex items-center gap-3 mb-3">
