@@ -1,0 +1,261 @@
+# Development Workflow and Best Practices
+
+## Project Setup
+
+### Package Management
+
+- Use `pnpm` instead of `npm` for package management
+- Install dependencies with `pnpm install`
+- Add new packages with `pnpm add <package-name>`
+- Use `pnpm dev` for development (but don't run it automatically)
+
+### Environment Configuration
+
+- Set up environment variables in `.env.local`
+- Required variables:
+  - `OPENAI_API_KEY` - OpenAI API key for AI analysis
+  - `HUGGINGFACE_API_KEY` - Hugging Face API key for sentiment analysis
+- Use `process.env.VARIABLE_NAME` for environment variable access
+
+## Code Organization
+
+### File Structure
+
+Follow the established project structure:
+
+```
+appstore/
+├── app/                    # Next.js App Router
+│   ├── api/               # API routes
+│   ├── page.tsx           # Main page component
+│   ├── types.ts           # TypeScript interfaces
+│   └── layout.tsx         # Root layout
+├── components/            # React components
+│   ├── ui/               # shadcn/ui components
+│   ├── views/            # View components
+│   └── Sidebar.tsx       # Main navigation
+├── lib/                  # Utility functions
+└── public/               # Static assets
+```
+
+### Import Organization
+
+Organize imports in this order:
+
+1. React and Next.js imports
+2. Third-party library imports
+3. Local component imports
+4. Utility function imports
+5. Type imports
+
+```typescript
+// React and Next.js
+import { useState, useTransition } from "react";
+import { NextRequest, NextResponse } from "next/server";
+
+// Third-party libraries
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { BarChart3, Brain } from "lucide-react";
+
+// Local components
+import { Sidebar } from "@/components/Sidebar";
+import { DashboardView } from "@/components/views/DashboardView";
+
+// Utilities
+import { APP_STORE_REGIONS } from "@/lib/app-store-api";
+
+// Types
+import { AppStoreReview, AnalysisResult } from "@/app/types";
+```
+
+## Component Development
+
+### Component Patterns
+
+- Use functional components with hooks
+- Prefer server components when possible
+- Add `"use client"` directive only when necessary
+- Use TypeScript interfaces for props
+
+### State Management
+
+- Use `useState` for local component state
+- Use `useTransition` for expensive operations
+- Keep state as close to where it's used as possible
+- Lift state up when needed by multiple components
+
+### Error Handling
+
+- Implement proper error boundaries
+- Use try-catch blocks for async operations
+- Provide meaningful error messages
+- Log errors for debugging
+
+## API Development
+
+### API Route Patterns
+
+- Place API routes in `app/api/` directory
+- Use descriptive route names
+- Implement proper HTTP status codes
+- Add request validation
+- Use streaming responses for long operations
+
+### Error Responses
+
+```typescript
+// Success response
+return NextResponse.json({ success: true, data: result });
+
+// Error response
+return NextResponse.json({ success: false, error: "Error message" }, { status: 400 });
+```
+
+## Testing Strategy
+
+### Unit Testing
+
+- Test utility functions in `lib/` directory
+- Test component logic with React Testing Library
+- Mock external API calls
+- Test error scenarios
+
+### Integration Testing
+
+- Test API routes end-to-end
+- Test data flow between components
+- Test user interactions
+
+### Manual Testing
+
+- Test with different app IDs
+- Test with various region combinations
+- Test error scenarios (network failures, API limits)
+- Test responsive design on different screen sizes
+
+## Performance Optimization
+
+### Code Splitting
+
+- Use dynamic imports for heavy components
+- Implement lazy loading for non-critical features
+- Split large components into smaller ones
+
+### Caching Strategy
+
+- Use the Cache class for API responses
+- Implement proper cache invalidation
+- Cache analysis results to avoid reprocessing
+
+### Bundle Optimization
+
+- Monitor bundle size with `pnpm build`
+- Remove unused dependencies
+- Use tree shaking effectively
+
+## Debugging
+
+### Console Logging
+
+- Use descriptive console messages
+- Log important state changes
+- Log API responses for debugging
+- Remove console logs before production
+
+### Error Tracking
+
+- Implement proper error boundaries
+- Log errors with context
+- Use structured logging for better debugging
+
+### Development Tools
+
+- Use React Developer Tools for component debugging
+- Use Network tab for API debugging
+- Use Performance tab for performance analysis
+
+## Code Quality
+
+### TypeScript
+
+- Use strict TypeScript configuration
+- Define proper interfaces for all data structures
+- Avoid `any` type when possible
+- Use type guards for runtime type checking
+
+### Code Style
+
+- Follow consistent naming conventions
+- Use descriptive variable and function names
+- Keep functions small and focused
+- Add JSDoc comments for complex functions
+
+### Code Review
+
+- Review code for:
+  - Type safety
+  - Error handling
+  - Performance implications
+  - Security considerations
+  - Accessibility
+
+## Deployment
+
+### Build Process
+
+- Run `pnpm build` to create production build
+- Check for build errors and warnings
+- Optimize bundle size
+- Test production build locally
+
+### Environment Variables
+
+- Set up production environment variables
+- Use different API keys for production
+- Configure proper CORS settings
+- Set up monitoring and logging
+
+### Monitoring
+
+- Monitor API usage and costs
+- Track application performance
+- Monitor error rates
+- Set up alerts for critical issues
+
+## Security Considerations
+
+### API Security
+
+- Validate all API inputs
+- Implement rate limiting
+- Use HTTPS in production
+- Sanitize user inputs
+
+### Data Privacy
+
+- Don't log sensitive user data
+- Implement proper data retention policies
+- Follow GDPR compliance if applicable
+- Secure API keys and secrets
+
+## Documentation
+
+### Code Documentation
+
+- Document complex functions with JSDoc
+- Add inline comments for complex logic
+- Document API endpoints
+- Keep README.md updated
+
+### User Documentation
+
+- Document feature usage
+- Provide troubleshooting guides
+- Keep setup instructions current
+- Document API limitations and rate limits
+  description:
+  globs:
+  alwaysApply: false
+
+---

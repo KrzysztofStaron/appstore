@@ -2,9 +2,11 @@
 
 import { useState, useTransition } from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Button } from "@/components/ui/button";
 import { Search } from "lucide-react";
 import { APP_STORE_REGIONS } from "@/lib/app-store-api";
 import { Sidebar } from "@/components/Sidebar";
+import { AppConfigModal } from "@/components/AppConfigModal";
 import { DashboardView } from "@/components/views/DashboardView";
 import { SentimentView } from "@/components/views/SentimentView";
 import { TrendsView } from "@/components/views/TrendsView";
@@ -14,6 +16,7 @@ import { VersionsView } from "@/components/views/VersionsView";
 import { IssuesView } from "@/components/views/IssuesView";
 import { TasksView } from "@/components/views/TasksView";
 import { AppStoreReview, AppMetadata, AnalysisResult, ViewType } from "@/app/types";
+import Link from "next/link";
 
 export default function AppStoreAnalyzer() {
   const [appId, setAppId] = useState("6670324846");
@@ -30,6 +33,7 @@ export default function AppStoreAnalyzer() {
   const [regionProgress, setRegionProgress] = useState<{ current: number; total: number } | null>(null);
   const [currentStage, setCurrentStage] = useState<string>("");
   const [progressDetails, setProgressDetails] = useState<string>("");
+  const [isConfigModalOpen, setIsConfigModalOpen] = useState(false);
 
   const handleAnalyze = () => {
     if (!appId.trim()) return;
@@ -241,6 +245,12 @@ export default function AppStoreAnalyzer() {
             <p className="text-zinc-400 mb-6">
               Configure your app settings in the sidebar and start your first analysis to unlock powerful insights.
             </p>
+            <Button
+              onClick={() => setIsConfigModalOpen(true)}
+              className="w-full bg-gradient-to-r from-slate-800/50 to-zinc-900/30 border border-slate-600/50 text-slate-200 hover:from-slate-700 hover:via-gray-700 hover:to-zinc-800 hover:text-white transition-all duration-200 shadow-lg"
+            >
+              Generate
+            </Button>
           </div>
         </div>
       );
@@ -378,6 +388,8 @@ export default function AppStoreAnalyzer() {
         error={error}
         appMetadata={appMetadata}
         reviews={reviews}
+        isConfigModalOpen={isConfigModalOpen}
+        setIsConfigModalOpen={setIsConfigModalOpen}
       />
 
       {/* Main Content */}
@@ -386,6 +398,24 @@ export default function AppStoreAnalyzer() {
           <div className="p-8">{renderMainContent()}</div>
         </ScrollArea>
       </div>
+
+      {/* App Configuration Modal */}
+      <AppConfigModal
+        isOpen={isConfigModalOpen}
+        onClose={() => setIsConfigModalOpen(false)}
+        appId={appId}
+        setAppId={setAppId}
+        selectedRegions={selectedRegions}
+        setSelectedRegions={setSelectedRegions}
+        handleAnalyze={handleAnalyze}
+        isPending={isPending}
+        isAnalyzing={isAnalyzing}
+        progress={progress}
+        regionProgress={regionProgress}
+        currentStage={currentStage}
+        progressDetails={progressDetails}
+        error={error}
+      />
     </div>
   );
 }

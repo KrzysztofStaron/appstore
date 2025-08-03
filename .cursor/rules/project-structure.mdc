@@ -1,0 +1,53 @@
+# App Store Review Analysis Tool - Project Structure
+
+## Core Architecture
+
+This is a Next.js 15 App Router application for analyzing App Store reviews with AI-powered insights. The main entry point is [app/page.tsx](mdc:app/page.tsx) which serves as the client-side orchestrator.
+
+### Key Files and Directories
+
+**App Router Structure:**
+
+- [app/page.tsx](mdc:app/page.tsx) - Main client component with state management
+- [app/layout.tsx](mdc:app/layout.tsx) - Root layout component
+- [app/types.ts](mdc:app/types.ts) - TypeScript interfaces and types
+- [app/actions.ts](mdc:app/actions.ts) - Server actions
+- [app/api/](mdc:app/api/) - API routes for data processing
+
+**Components:**
+
+- [components/Sidebar.tsx](mdc:components/Sidebar.tsx) - Main navigation and configuration
+- [components/AppSearch.tsx](mdc:components/AppSearch.tsx) - App search functionality
+- [components/views/](mdc:components/views/) - View components for different analysis sections
+- [components/ui/](mdc:components/ui/) - shadcn/ui components
+
+**Library Functions:**
+
+- [lib/app-store-api.ts](mdc:lib/app-store-api.ts) - App Store API integration
+- [lib/analysis.ts](mdc:lib/analysis.ts) - Review analysis logic
+- [lib/sentiment-analysis.ts](mdc:lib/sentiment-analysis.ts) - Sentiment analysis
+- [lib/actionable-steps.ts](mdc:lib/actionable-steps.ts) - Actionable insights generation
+
+### Data Flow
+
+1. User configures app ID and regions in [components/Sidebar.tsx](mdc:components/Sidebar.tsx)
+2. Analysis triggered from [app/page.tsx](mdc:app/page.tsx) via [app/api/progress/route.ts](mdc:app/api/progress/route.ts)
+3. Data fetched using [lib/app-store-api.ts](mdc:lib/app-store-api.ts)
+4. Analysis performed via [app/api/analyze/route.ts](mdc:app/api/analyze/route.ts)
+5. Results displayed in view components from [components/views/](mdc:components/views/)
+
+### State Management
+
+The application uses React state management with the following key state variables in [app/page.tsx](mdc:app/page.tsx):
+
+- `appId` - Target app identifier
+- `selectedRegions` - Array of region codes
+- `reviews` - Fetched review data
+- `analysisResult` - Processed analysis results
+- `currentView` - Active view type
+- `isAnalyzing` - Analysis progress state
+  description:
+  globs:
+  alwaysApply: false
+
+---

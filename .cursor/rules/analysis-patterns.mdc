@@ -1,0 +1,364 @@
+# Analysis and AI Integration Patterns
+
+## Analysis Architecture
+
+### Core Analysis Functions
+
+The analysis system is built around these key files:
+
+- [lib/analysis.ts](mdc:lib/analysis.ts) - Main analysis orchestration
+- [lib/sentiment-analysis.ts](mdc:lib/sentiment-analysis.ts) - Sentiment analysis
+- [lib/actionable-steps.ts](mdc:lib/actionable-steps.ts) - Actionable insights generation
+- [app/api/analyze/route.ts](mdc:app/api/analyze/route.ts) - Analysis API endpoint
+
+### Analysis Result Structure
+
+Follow the `AnalysisResult` interface from [app/types.ts](mdc:app/types.ts):
+
+```typescript
+interface AnalysisResult {
+  basicStats: {
+    averageRating: number;
+    totalReviews: number;
+    ratingDistribution: Record<string, number>;
+  };
+  sentimentAnalysis: {
+    positive: number;
+    neutral: number;
+    negative: number;
+    total: number;
+  };
+  filteredAnalysis: {
+    informativeReviews: number;
+    nonInformativeReviews: number;
+    informativePercentage: number;
+    totalReviews: number;
+    categoryBreakdown: Record<string, number>;
+  };
+  keywordAnalysis: Array<{
+    keyword: string;
+    count: number;
+    sentiment: string;
+    averageRating: number;
+  }>;
+  topReviews: {
+    positive: AppStoreReview[];
+    negative: AppStoreReview[];
+  };
+  // ... other analysis components
+}
+```
+
+## AI Integration
+
+### OpenAI Integration
+
+Use OpenAI for advanced analysis:
+
+```typescript
+import OpenAI from "openai";
+
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY,
+});
+
+// Use gpt-4.1-nano-2025-04-14 for cost efficiency
+const response = await openai.chat.completions.create({
+  model: "gpt-4.1-nano-2025-04-14",
+  messages: [
+    {
+      role: "system",
+      content: "You are an expert app review analyst...",
+    },
+    {
+      role: "user",
+      content: analysisPrompt,
+    },
+  ],
+  temperature: 0.3,
+  max_tokens: 2000,
+});
+```
+
+### Hugging Face Integration
+
+Use Hugging Face for sentiment analysis:
+
+```typescript
+import { HfInference } from "@huggingface/inference";
+
+const hf = new HfInference(process.env.HUGGINGFACE_API_KEY);
+
+const result = await hf.textClassification({
+  model: "cardiffnlp/twitter-roberta-base-sentiment-latest",
+  inputs: reviewText,
+});
+```
+
+## Review Filtering
+
+### Informative Review Detection
+
+Use [lib/review-filter.ts](mdc:lib/review-filter.ts) for filtering:
+
+```typescript
+interface ReviewFilterResult {
+  isInformative: boolean;
+  confidence: number;
+  reason: string;
+  category?: "bug" | "feature" | "performance" | "ui" | "general" | "non-informative";
+}
+
+// Filter out non-informative reviews
+const informativeReviews = reviews.filter(review => {
+  const filterResult = analyzeReviewContent(review.content);
+  return filterResult.isInformative;
+});
+```
+
+### Content Analysis
+
+Analyze review content for meaningful insights:
+
+```typescript
+function analyzeReviewContent(content: string): ReviewFilterResult {
+  const words = content.toLowerCase().split(/\s+/);
+  const wordCount = words.length;
+
+  // Check for minimum content requirements
+  if (wordCount < 3 || content.length < 10) {
+    return {
+      isInformative: false,
+      confidence: 0.9,
+      reason: "Too short",
+      category: "non-informative",
+    };
+  }
+
+  // Check for generic terms
+  const genericTerms = ["cool", "ok", "good", "bad", "nice"];
+  const hasGenericTerms = genericTerms.some(term => words.includes(term));
+
+  if (hasGenericTerms && wordCount < 5) {
+    return {
+      isInformative: false,
+      confidence: 0.7,
+      reason: "Generic content",
+      category: "non-informative",
+    };
+  }
+
+  return {
+    isInformative: true,
+    confidence: 0.8,
+    reason: "Informative content",
+    category: "general",
+  };
+}
+```
+
+## Sentiment Analysis
+
+### Multi-Model Approach
+
+Use multiple models for robust sentiment analysis:
+
+```typescript
+async function analyzeSentiment(reviewText: string): Promise<SentimentResult> {
+  try {
+    // Primary: Hugging Face model
+    const hfResult = await analyzeWithHuggingFace(reviewText);
+
+    // Fallback: OpenAI for complex cases
+    if (hfResult.confidence < 0.7) {
+      const openaiResult = await analyzeWithOpenAI(reviewText);
+      return openaiResult;
+    }
+
+    return hfResult;
+  } catch (error) {
+    // Fallback to rule-based analysis
+    return analyzeWithRules(reviewText);
+  }
+}
+```
+
+### Sentiment Classification
+
+Classify sentiment into positive, neutral, negative:
+
+```typescript
+function classifySentiment(score: number): "positive" | "neutral" | "negative" {
+  if (score >= 0.6) return "positive";
+  if (score <= 0.4) return "negative";
+  return "neutral";
+}
+```
+
+## Keyword Analysis
+
+### Keyword Extraction
+
+Extract meaningful keywords from reviews:
+
+```typescript
+async function extractKeywords(reviews: AppStoreReview[]): Promise<KeywordAnalysis[]> {
+  const allText = reviews.map(r => r.content).join(" ");
+
+  // Use OpenAI for keyword extraction
+  const prompt = `Extract the most important keywords from these app reviews. 
+  Focus on technical terms, features, issues, and user experience aspects.
+  Return as JSON array with keyword, count, and sentiment.`;
+
+  const response = await openai.chat.completions.create({
+    model: "gpt-4.1-nano-2025-04-14",
+    messages: [
+      { role: "system", content: "You are a keyword extraction expert." },
+      { role: "user", content: prompt + "\n\nReviews: " + allText },
+    ],
+    temperature: 0.1,
+  });
+
+  return JSON.parse(response.choices[0].message.content || "[]");
+}
+```
+
+## Actionable Insights
+
+### Insight Generation
+
+Generate actionable insights using [lib/actionable-steps.ts](mdc:lib/actionable-steps.ts):
+
+```typescript
+async function generateActionableSteps(
+  reviews: AppStoreReview[],
+  analysis: AnalysisResult
+): Promise<ActionableStepsResult> {
+  const prompt = `Based on these app reviews and analysis, generate actionable steps for improvement.
+  Focus on:
+  - Critical bugs and issues
+  - Performance problems
+  - User experience improvements
+  - Feature requests
+  
+  Return as structured JSON with priority levels and impact estimates.`;
+
+  const response = await openai.chat.completions.create({
+    model: "gpt-4.1-nano-2025-04-14",
+    messages: [
+      { role: "system", content: "You are an expert product manager and developer." },
+      { role: "user", content: prompt },
+    ],
+    temperature: 0.2,
+  });
+
+  return JSON.parse(response.choices[0].message.content || "{}");
+}
+```
+
+### Priority Classification
+
+Classify insights by priority:
+
+```typescript
+function classifyPriority(
+  impact: number,
+  affectedUsers: number,
+  urgency: string
+): "critical" | "high" | "medium" | "low" {
+  if (impact > 0.8 && affectedUsers > 100) return "critical";
+  if (impact > 0.6 && affectedUsers > 50) return "high";
+  if (impact > 0.4 && affectedUsers > 20) return "medium";
+  return "low";
+}
+```
+
+## Performance Optimization
+
+### Batch Processing
+
+Process reviews in batches to manage memory and API limits:
+
+```typescript
+async function processReviewsInBatches(reviews: AppStoreReview[], batchSize: number = 50): Promise<AnalysisResult> {
+  const results: AnalysisResult[] = [];
+
+  for (let i = 0; i < reviews.length; i += batchSize) {
+    const batch = reviews.slice(i, i + batchSize);
+    const batchResult = await analyzeBatch(batch);
+    results.push(batchResult);
+
+    // Add delay between batches
+    await delay(1000);
+  }
+
+  return mergeAnalysisResults(results);
+}
+```
+
+### Caching Analysis Results
+
+Cache analysis results to avoid reprocessing:
+
+```typescript
+const analysisCache = new Cache<AnalysisResult>(60); // 1 hour TTL
+
+async function getCachedAnalysis(reviews: AppStoreReview[]): Promise<AnalysisResult> {
+  const cacheKey = generateCacheKey(reviews);
+  const cached = analysisCache.get(cacheKey);
+
+  if (cached) {
+    return cached;
+  }
+
+  const result = await performAnalysis(reviews);
+  analysisCache.set(cacheKey, result);
+  return result;
+}
+```
+
+## Error Handling
+
+### AI Service Failures
+
+Handle AI service failures gracefully:
+
+```typescript
+async function safeAIAnalysis(text: string): Promise<AnalysisResult> {
+  try {
+    return await performAIAnalysis(text);
+  } catch (error) {
+    console.error("AI analysis failed:", error);
+
+    // Fallback to rule-based analysis
+    return performRuleBasedAnalysis(text);
+  }
+}
+```
+
+### Rate Limiting
+
+Handle API rate limits:
+
+```typescript
+async function rateLimitedRequest<T>(requestFn: () => Promise<T>, maxRetries: number = 3): Promise<T> {
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    try {
+      return await requestFn();
+    } catch (error: any) {
+      if (error.status === 429 && attempt < maxRetries) {
+        await delay(Math.pow(2, attempt) * 1000); // Exponential backoff
+        continue;
+      }
+      throw error;
+    }
+  }
+  throw new Error("Max retries exceeded");
+}
+```
+
+description:
+globs:
+alwaysApply: false
+
+---

@@ -1,330 +1,153 @@
-# UI Component Development Patterns
+# UI Component Patterns and shadcn/ui Usage
+
+## Component Structure
+
+### File Organization
+
+- Place UI components in [components/ui/](mdc:components/ui/) for shadcn/ui components
+- Place view components in [components/views/](mdc:components/views/) for page-specific views
+- Use PascalCase for component file names (e.g., `DashboardView.tsx`, `Sidebar.tsx`)
+
+### Component Naming
+
+- Prefix components with their type: `ButtonAccount.tsx`, `CardAnalyticsMain.tsx`
+- Use descriptive names that indicate the component's purpose
+- Follow the pattern: `{Type}{Purpose}.tsx`
 
 ## shadcn/ui Integration
 
-### Component Structure
+### Available Components
 
-Follow the established pattern for view components:
+The project uses shadcn/ui components from [components/ui/](mdc:components/ui/):
+
+- `Button` - Interactive buttons with variants
+- `Card` - Content containers with headers
+- `Input` - Form input fields
+- `Select` - Dropdown selections
+- `Progress` - Progress indicators
+- `Alert` - Status messages
+- `Tabs` - Tabbed interfaces
+- `ScrollArea` - Scrollable content areas
+
+### Usage Patterns
 
 ```typescript
-// components/views/ExampleView.tsx
+// Import from local ui directory
+import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 
-interface ExampleViewProps {
-  data: any;
-  isLoading?: boolean;
-}
-
-export default function ExampleView({ data, isLoading }: ExampleViewProps) {
-  if (isLoading) {
-    return <div>Loading...</div>;
-  }
-
-  return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Example View</CardTitle>
-      </CardHeader>
-      <CardContent>{/* Content here */}</CardContent>
-    </Card>
-  );
-}
+// Use with proper variants
+<Button variant="default" size="sm">Action</Button>
+<Card className="bg-gradient-to-br from-zinc-800/50 to-zinc-900/30 border border-zinc-700/50">
+  <CardHeader>
+    <CardTitle>Title</CardTitle>
+  </CardHeader>
+  <CardContent>Content</CardContent>
+</Card>
 ```
-
-### Available UI Components
-
-Use these shadcn/ui components from [components/ui/](mdc:components/ui/):
-
-- `Card` - For content containers
-- `Badge` - For status indicators and labels
-- `Button` - For actions and interactions
-- `Progress` - For loading states and progress indicators
-- `Tabs` - For tabbed interfaces
-- `Select` - For dropdown selections
-- `Input` - For form inputs
-- `Label` - For form labels
-- `Alert` - For notifications and warnings
-- `ScrollArea` - For scrollable content areas
 
 ## Styling Patterns
 
 ### Tailwind CSS Classes
 
-Use Tailwind CSS for styling with consistent patterns:
+- Use the established dark theme with zinc/slate colors
+- Follow the gradient pattern: `bg-gradient-to-br from-zinc-800/50 to-zinc-900/30`
+- Use border styling: `border border-zinc-700/50`
+- Apply backdrop blur: `backdrop-blur-xl`
+
+### Responsive Design
+
+- Use mobile-first approach with Tailwind breakpoints
+- Implement responsive grids: `grid grid-cols-1 lg:grid-cols-2 gap-8`
+- Use responsive spacing: `p-4 md:p-6 lg:p-8`
+
+### Animation and Transitions
+
+- Use Tailwind's `animate-pulse` for loading states
+- Apply smooth transitions: `transition-all duration-300`
+- Use `animate-spin` for loading indicators
+
+## Layout Patterns
+
+### Sidebar Layout
+
+Reference [components/Sidebar.tsx](mdc:components/Sidebar.tsx) for the main navigation pattern:
+
+- Fixed width sidebar with `w-80`
+- Dark background with backdrop blur
+- Border separation with `border-r border-zinc-800/50`
+
+### Main Content Area
+
+- Use `flex-1` for expanding content
+- Implement `ScrollArea` for scrollable content
+- Apply consistent padding: `p-8`
+
+### Card Grid Layout
 
 ```typescript
-// Layout patterns
-<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-<div className="flex flex-col space-y-4">
-<div className="flex items-center justify-between">
-
-// Spacing patterns
-<div className="p-4 md:p-6">
-<div className="space-y-4">
-<div className="gap-4">
-
-// Responsive patterns
-<div className="text-sm md:text-base lg:text-lg">
-<div className="hidden md:block">
-<div className="md:hidden">
-```
-
-### Color Schemes
-
-Use consistent color patterns for different states:
-
-```typescript
-// Success/Positive
-className = "text-green-600 bg-green-50 border-green-200";
-
-// Error/Negative
-className = "text-red-600 bg-red-50 border-red-200";
-
-// Warning
-className = "text-yellow-600 bg-yellow-50 border-yellow-200";
-
-// Info/Neutral
-className = "text-blue-600 bg-blue-50 border-blue-200";
-
-// Loading states
-className = "text-gray-500 bg-gray-50 border-gray-200";
-```
-
-## Data Visualization
-
-### Chart Components
-
-Use Recharts for data visualization:
-
-```typescript
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
-
-export function TrendChart({ data }: { data: TrendData[] }) {
-  return (
-    <ResponsiveContainer width="100%" height={300}>
-      <LineChart data={data}>
-        <CartesianGrid strokeDasharray="3 3" />
-        <XAxis dataKey="date" />
-        <YAxis />
-        <Tooltip />
-        <Line type="monotone" dataKey="averageRating" stroke="#10B981" />
-      </LineChart>
-    </ResponsiveContainer>
-  );
-}
-```
-
-### Loading States
-
-Implement proper loading states:
-
-```typescript
-export function DataCard({ data, isLoading }: { data: any; isLoading: boolean }) {
-  if (isLoading) {
-    return (
-      <Card>
-        <CardHeader>
-          <div className="h-4 bg-gray-200 rounded animate-pulse" />
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-2">
-            <div className="h-3 bg-gray-200 rounded animate-pulse" />
-            <div className="h-3 bg-gray-200 rounded animate-pulse w-2/3" />
-          </div>
-        </CardContent>
-      </Card>
-    );
-  }
-
-  return (
-    <Card>
-      <CardHeader>
-        <CardTitle>{data.title}</CardTitle>
-      </CardHeader>
-      <CardContent>{data.content}</CardContent>
-    </Card>
-  );
-}
-```
-
-## Form Patterns
-
-### Form Components
-
-Use consistent form patterns:
-
-```typescript
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Button } from "@/components/ui/button";
-
-export function SearchForm({ onSubmit }: { onSubmit: (query: string) => void }) {
-  const [query, setQuery] = useState("");
-
-  return (
-    <form
-      onSubmit={e => {
-        e.preventDefault();
-        onSubmit(query);
-      }}
-    >
-      <div className="space-y-4">
-        <div>
-          <Label htmlFor="search">Search</Label>
-          <Input
-            id="search"
-            value={query}
-            onChange={e => setQuery(e.target.value)}
-            placeholder="Enter search term..."
-          />
-        </div>
-        <Button type="submit">Search</Button>
-      </div>
-    </form>
-  );
-}
-```
-
-## Navigation Patterns
-
-### Sidebar Navigation
-
-Follow the pattern established in [components/Sidebar.tsx](mdc:components/Sidebar.tsx):
-
-```typescript
-import { cn } from "@/lib/utils";
-
-interface NavItemProps {
-  href: string;
-  icon: React.ReactNode;
-  children: React.ReactNode;
-  isActive?: boolean;
-}
-
-export function NavItem({ href, icon, children, isActive }: NavItemProps) {
-  return (
-    <Link
-      href={href}
-      className={cn(
-        "flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium",
-        isActive ? "bg-gray-100 text-gray-900" : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
-      )}
-    >
-      {icon}
-      <span>{children}</span>
-    </Link>
-  );
-}
-```
-
-## Error States
-
-### Error Boundaries
-
-Implement error boundaries for component error handling:
-
-```typescript
-export function ErrorBoundary({ children }: { children: React.ReactNode }) {
-  return (
-    <ErrorBoundary
-      fallback={
-        <Card>
-          <CardContent className="p-6">
-            <div className="text-center">
-              <div className="text-red-600 mb-2">Something went wrong</div>
-              <Button onClick={() => window.location.reload()}>Try again</Button>
-            </div>
-          </CardContent>
-        </Card>
-      }
-    >
-      {children}
-    </ErrorBoundary>
-  );
-}
-```
-
-### Error Messages
-
-Use consistent error message patterns:
-
-```typescript
-export function ErrorMessage({ error }: { error: Error }) {
-  return (
-    <Alert variant="destructive">
-      <AlertCircle className="h-4 w-4" />
-      <AlertTitle>Error</AlertTitle>
-      <AlertDescription>{error.message || "An unexpected error occurred"}</AlertDescription>
-    </Alert>
-  );
-}
-```
-
-## Accessibility
-
-### ARIA Labels
-
-Always include proper ARIA labels:
-
-```typescript
-<Button aria-label="Refresh data">
-  <RefreshCw className="h-4 w-4" />
-</Button>
-
-<Input aria-label="Search reviews" placeholder="Search..." />
-
-<Card role="region" aria-label="Review statistics">
-  {/* Content */}
-</Card>
-```
-
-### Keyboard Navigation
-
-Ensure keyboard navigation works:
-
-```typescript
-<div
-  role="button"
-  tabIndex={0}
-  onKeyDown={e => {
-    if (e.key === "Enter" || e.key === " ") {
-      e.preventDefault();
-      onClick();
-    }
-  }}
-  onClick={onClick}
->
-  {/* Content */}
+<div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+  <Card className="bg-gradient-to-br from-zinc-800/50 to-zinc-900/30 border border-zinc-700/50">
+    {/* Card content */}
+  </Card>
 </div>
 ```
 
-## Performance Optimization
+## Icon Usage
 
-### Lazy Loading
+### Lucide React Icons
 
-Use dynamic imports for heavy components:
+- Import icons from `lucide-react`
+- Use consistent icon sizing: `h-6 w-6` for standard, `h-4 w-4` for small
+- Apply color classes: `text-zinc-300`, `text-blue-400`
 
-```typescript
-const HeavyChart = dynamic(() => import("./HeavyChart"), {
-  loading: () => <div>Loading chart...</div>,
-  ssr: false,
-});
-```
-
-### Memoization
-
-Use React.memo for expensive components:
+### Icon Patterns
 
 ```typescript
-export const ExpensiveComponent = React.memo(({ data }: { data: any[] }) => {
-  // Expensive rendering logic
-  return <div>{/* Rendered content */}</div>;
-});
+import { BarChart3, Brain, TrendingUp, Zap, Globe } from "lucide-react";
+
+// Use in navigation items
+{ id: "dashboard", label: "Overview", icon: BarChart3, color: "text-blue-400" }
 ```
 
-description:
-globs:
-alwaysApply: false
+## Form Components
 
----
+### Input Patterns
+
+- Use `Label` component for accessibility
+- Apply consistent styling with dark theme
+- Implement proper validation states
+
+### Select Patterns
+
+- Use `Select` component for dropdowns
+- Implement proper value handling
+- Apply consistent styling
+
+## Loading States
+
+### Skeleton Loading
+
+- Use `animate-pulse` for skeleton elements
+- Match the actual content structure
+- Apply consistent background colors
+
+### Progress Indicators
+
+- Use `Progress` component for determinate progress
+- Implement custom progress for complex operations
+- Show meaningful progress details
+
+## Error States
+
+### Alert Components
+
+- Use `Alert` component for error messages
+- Apply appropriate alert variants
+- Include actionable error information
+
+### Error Boundaries
+
+- Implement proper error boundaries
+- Provide fallback UI for component errors
+- Log errors for debugging

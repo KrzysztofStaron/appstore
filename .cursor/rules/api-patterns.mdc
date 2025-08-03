@@ -1,0 +1,263 @@
+# API Patterns and Data Fetching
+
+## App Store API Integration
+
+### Core API Class
+
+The main API integration is handled by [lib/app-store-api.ts](mdc:lib/app-store-api.ts) which provides:
+
+- `fetchReviews()` - Fetch reviews from multiple regions
+- `fetchAppMetadata()` - Get app information
+- `searchApps()` - Search for apps by keyword
+- `findCompetitors()` - Find competitor apps
+
+### API Configuration
+
+```typescript
+// Use the established configuration
+const APP_STORE_REGIONS = ["us", "gb", "ca", ...]; // 175 regions total
+const MAX_PAGES = 10; // App Store limit
+const RETRY_DELAY = 1000; // 1 second between requests
+```
+
+### Error Handling Patterns
+
+```typescript
+// Implement retry logic with exponential backoff
+private async retryRequest<T>(
+  requestFn: (baseURL: string) => Promise<T>,
+  retries: number = this.maxRetries
+): Promise<T> {
+  for (let attempt = 1; attempt <= retries; attempt++) {
+    try {
+      return await requestFn(this.baseURL);
+    } catch (error) {
+      if (attempt === retries || !this.isNetworkError(error)) {
+        throw error;
+      }
+      await this.delay(this.retryDelay * attempt);
+    }
+  }
+  throw new Error("Max retries exceeded");
+}
+```
+
+## API Routes Structure
+
+### Progress API
+
+[app/api/progress/route.ts](mdc:app/api/progress/route.ts) handles:
+
+- Streaming progress updates
+- Region-by-region data fetching
+- Real-time progress reporting
+
+### Analysis API
+
+[app/api/analyze/route.ts](mdc:app/api/analyze/route.ts) handles:
+
+- Review analysis with AI
+- Sentiment analysis
+- Keyword extraction
+- Actionable insights generation
+
+### Search API
+
+[app/api/search/route.ts](mdc:app/api/search/route.ts) handles:
+
+- App search functionality
+- Competitor discovery
+
+## Data Fetching Patterns
+
+### Streaming Responses
+
+Use streaming for long-running operations:
+
+```typescript
+export async function POST(request: Request) {
+  const encoder = new TextEncoder();
+  const stream = new ReadableStream({
+    async start(controller) {
+      // Send progress updates
+      controller.enqueue(encoder.encode(`data: ${JSON.stringify({ type: "progress", percentage: 50 })}\n\n`));
+
+      // Send final result
+      controller.enqueue(encoder.encode(`data: ${JSON.stringify({ type: "complete", data: result })}\n\n`));
+      controller.close();
+    },
+  });
+
+  return new Response(stream, {
+    headers: {
+      "Content-Type": "text/plain; charset=utf-8",
+      "Cache-Control": "no-cache",
+      Connection: "keep-alive",
+    },
+  });
+}
+```
+
+### Batch Processing
+
+Process data in batches to avoid memory issues:
+
+```typescript
+const batchSize = 50;
+for (let i = 0; i < reviews.length; i += batchSize) {
+  const batch = reviews.slice(i, i + batchSize);
+  await processBatch(batch);
+
+  // Send progress update
+  const percentage = Math.round(((i + batchSize) / reviews.length) * 100);
+  controller.enqueue(encoder.encode(`data: ${JSON.stringify({ type: "progress", percentage })}\n\n`));
+}
+```
+
+## Caching Strategy
+
+### Memory Cache
+
+Use the Cache class from [lib/cache.ts](mdc:lib/cache.ts):
+
+```typescript
+private metadataCache = new Cache<any>(30); // 30 minutes TTL
+private reviewsCache = new Cache<any>(15); // 15 minutes TTL
+```
+
+### Cache Keys
+
+Use consistent cache key patterns:
+
+```typescript
+const cacheKey = `reviews_${appId}_${region}_${page}`;
+const metadataKey = `metadata_${appId}_${region}`;
+```
+
+## Performance Optimization
+
+### Request Deduplication
+
+Use the request deduplicator from [lib/performance.ts](mdc:lib/performance.ts):
+
+```typescript
+const deduplicatedRequest = requestDeduplicator.wrap(async (key: string) => {
+  return await this.fetchReviews(appId, regions);
+});
+```
+
+### Benchmarking
+
+Use the benchmark system for performance tracking:
+
+```typescript
+return benchmark.measure(
+  "fetchReviews",
+  async () => {
+    return await this.fetchReviews(appId, regions);
+  },
+  { appId, regions }
+);
+```
+
+## Error Handling
+
+### Network Errors
+
+Handle different types of errors appropriately:
+
+```typescript
+private isNetworkError(error: any): boolean {
+  return (
+    error.code === "ECONNRESET" ||
+    error.code === "ENOTFOUND" ||
+    error.code === "ETIMEDOUT" ||
+    error.message?.includes("timeout") ||
+    error.message?.includes("network")
+  );
+}
+```
+
+### API Rate Limiting
+
+Implement proper rate limiting:
+
+```typescript
+// Add delay between requests
+await this.delay(this.retryDelay);
+
+// Handle 429 responses
+if (error.response?.status === 429) {
+  await this.delay(this.retryDelay * 2);
+  continue;
+}
+```
+
+## Data Validation
+
+### Input Validation
+
+Validate API inputs:
+
+```typescript
+if (!appId || typeof appId !== "string") {
+  throw new Error("Invalid app ID");
+}
+
+if (!Array.isArray(regions) || regions.length === 0) {
+  throw new Error("Invalid regions array");
+}
+```
+
+### Response Validation
+
+Validate API responses:
+
+```typescript
+if (!response.data?.feed?.entry) {
+  throw new Error("Invalid response format");
+}
+
+const reviews = response.data.feed.entry.map((entry: any) => ({
+  id: entry.id?.label,
+  region,
+  title: entry.title?.label,
+  content: entry.content?.label,
+  rating: parseInt(entry["im:rating"]?.label || "0"),
+  version: entry["im:version"]?.label,
+  date: entry.updated?.label,
+  author: entry.author?.name?.label,
+}));
+```
+
+## Environment Configuration
+
+### API Configuration
+
+Use environment variables for configuration:
+
+```typescript
+const config = {
+  maxRetries: parseInt(process.env.MAX_RETRIES || "3", 10),
+  retryDelay: parseInt(process.env.RETRY_DELAY || "1000", 10),
+  timeout: parseInt(process.env.API_TIMEOUT || "5000", 10),
+};
+```
+
+### Fallback URLs
+
+Implement fallback URLs for reliability:
+
+```typescript
+private fallbackURLs = [
+  "https://itunes.apple.com",
+  "https://itunes.apple.com",
+  "https://itunes.apple.com"
+];
+```
+
+description:
+globs:
+alwaysApply: false
+
+---
