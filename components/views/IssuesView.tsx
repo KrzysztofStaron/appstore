@@ -35,7 +35,17 @@ export function IssuesView({ analysisResult, reviews, appMetadata }: IssuesViewP
   // Version filter state
   const [minVersion, setMinVersion] = useState<string>("0.0");
 
+  // Auto-generate issues when component mounts or analysis result changes
+  useEffect(() => {
+    if (analysisResult && reviews.length > 0) {
+      generateIssueAnalysis();
+    }
+  }, [analysisResult, reviews, minVersion]);
+
   const generateIssueAnalysis = async () => {
+    // Don't regenerate if already generating
+    if (isGenerating) return;
+
     setIsGenerating(true);
     setGenerationProgress(0);
 
@@ -46,6 +56,8 @@ export function IssuesView({ analysisResult, reviews, appMetadata }: IssuesViewP
 
       if (negativeReviews.length === 0) {
         setIssueCategories([]);
+        setIsGenerating(false);
+        setGenerationProgress(0);
         return;
       }
 
@@ -293,31 +305,29 @@ export function IssuesView({ analysisResult, reviews, appMetadata }: IssuesViewP
       {/* Version Filter */}
       <VersionSlider reviews={reviews} appMetadata={appMetadata} onVersionChange={setMinVersion} />
 
-      {issueCategories.length === 0 && !isGenerating && (
+      {issueCategories.length === 0 && !isGenerating && !analysisResult && (
+        <Card className="bg-black/30 border-zinc-800/50 backdrop-blur-sm">
+          <CardContent className="p-8 text-center">
+            <div className="w-16 h-16 bg-gradient-to-br from-red-500 to-orange-600 rounded-full flex items-center justify-center mx-auto mb-4">
+              <AlertCircle className="h-8 w-8 text-white" />
+            </div>
+            <h3 className="text-lg font-semibold text-white mb-2">Ready to Analyze Issues</h3>
+            <p className="text-zinc-400 mb-6">
+              Run an analysis first to automatically generate issue categories from negative reviews.
+            </p>
+          </CardContent>
+        </Card>
+      )}
+
+      {issueCategories.length === 0 && !isGenerating && analysisResult && (
         <Card className="bg-black/30 border-zinc-800/50 backdrop-blur-sm">
           <CardContent className="p-8 text-center">
             <AlertCircle className="h-12 w-12 text-zinc-500 mx-auto mb-4" />
-            <h3 className="text-lg font-semibold text-white mb-2">No Issue Analysis Generated</h3>
+            <h3 className="text-lg font-semibold text-white mb-2">No Issues Found</h3>
             <p className="text-zinc-400 mb-6">
-              Click the button below to analyze negative reviews and categorize them by issue type.
+              No negative reviews found in the current dataset. Try adjusting the version filter or run analysis with
+              more regions.
             </p>
-            <Button
-              onClick={generateIssueAnalysis}
-              disabled={isGenerating}
-              className="bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-700 hover:to-orange-700 text-white"
-            >
-              {isGenerating ? (
-                <>
-                  <Clock className="h-4 w-4 mr-2 animate-spin" />
-                  Analyzing Issues... {generationProgress}%
-                </>
-              ) : (
-                <>
-                  <AlertCircle className="h-4 w-4 mr-2" />
-                  Generate Issue Analysis
-                </>
-              )}
-            </Button>
           </CardContent>
         </Card>
       )}
@@ -354,7 +364,7 @@ export function IssuesView({ analysisResult, reviews, appMetadata }: IssuesViewP
               onClick={generateIssueAnalysis}
               variant="outline"
               size="sm"
-              className="border-zinc-700 text-zinc-300 hover:bg-zinc-800"
+              className="border-zinc-700 text-zinc-300"
             >
               <AlertCircle className="h-4 w-4 mr-2" />
               Regenerate
@@ -365,7 +375,7 @@ export function IssuesView({ analysisResult, reviews, appMetadata }: IssuesViewP
             {issueCategories.map(category => (
               <Card
                 key={category.id}
-                className="bg-black/30 border-zinc-800/50 backdrop-blur-sm hover:border-zinc-700/50 transition-all cursor-pointer group"
+                className="bg-black/30 border-zinc-800/50 backdrop-blur-sm cursor-pointer group"
                 onClick={() => setSelectedCategory(category)}
               >
                 <CardContent className="p-6">
@@ -380,9 +390,7 @@ export function IssuesView({ analysisResult, reviews, appMetadata }: IssuesViewP
                     </Badge>
                   </div>
 
-                  <h4 className="font-semibold text-white mb-2 group-hover:text-blue-400 transition-colors">
-                    {category.name}
-                  </h4>
+                  <h4 className="font-semibold text-white mb-2">{category.name}</h4>
                   <p className="text-zinc-400 text-sm mb-4">{category.description}</p>
 
                   <div className="flex items-center justify-between">
