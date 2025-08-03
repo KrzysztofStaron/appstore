@@ -3,7 +3,7 @@
 import { useState, useTransition } from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
-import { Search } from "lucide-react";
+import { Search, Menu, X, BarChart3 } from "lucide-react";
 import { APP_STORE_REGIONS } from "@/lib/app-store-api";
 import { Sidebar } from "@/components/Sidebar";
 import { AppConfigModal } from "@/components/AppConfigModal";
@@ -34,6 +34,7 @@ export default function AppStoreAnalyzer() {
   const [currentStage, setCurrentStage] = useState<string>("");
   const [progressDetails, setProgressDetails] = useState<string>("");
   const [isConfigModalOpen, setIsConfigModalOpen] = useState(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   const handleAnalyze = () => {
     if (!appId.trim()) return;
@@ -237,12 +238,12 @@ export default function AppStoreAnalyzer() {
     if (!analysisResult) {
       return (
         <div className="flex items-center justify-center min-h-[calc(100vh-2rem)]">
-          <div className="text-center max-w-md">
-            <div className="w-24 h-24 bg-gradient-to-br from-zinc-800/50 to-zinc-900/30 border border-zinc-700/50 rounded-full flex items-center justify-center mx-auto mb-6">
-              <Search className="h-12 w-12 text-zinc-300" />
+          <div className="text-center max-w-md px-4">
+            <div className="w-20 h-20 md:w-24 md:h-24 bg-gradient-to-br from-zinc-800/50 to-zinc-900/30 border border-zinc-700/50 rounded-full flex items-center justify-center mx-auto mb-4 md:mb-6">
+              <Search className="h-10 w-10 md:h-12 md:w-12 text-zinc-300" />
             </div>
-            <h3 className="text-2xl font-bold text-white mb-3">Ready to Analyze</h3>
-            <p className="text-zinc-400 mb-6">
+            <h3 className="text-xl md:text-2xl font-bold text-white mb-2 md:mb-3">Ready to Analyze</h3>
+            <p className="text-sm md:text-base text-zinc-400 mb-4 md:mb-6">
               Configure your app settings in the sidebar and start your first analysis to unlock powerful insights.
             </p>
             <Button
@@ -259,27 +260,29 @@ export default function AppStoreAnalyzer() {
     // Show loading state for all views when analyzing
     if (isAnalyzing) {
       return (
-        <div className="space-y-8">
+        <div className="space-y-6 md:space-y-8">
           {/* Header Skeleton */}
-          <div className="space-y-4">
+          <div className="space-y-3 md:space-y-4">
             <div className="flex items-center gap-3">
-              <div className="w-12 h-12 bg-gradient-to-br from-zinc-800/50 to-zinc-900/30 border border-zinc-700/50 rounded-xl animate-pulse"></div>
+              <div className="w-10 h-10 md:w-12 md:h-12 bg-gradient-to-br from-zinc-800/50 to-zinc-900/30 border border-zinc-700/50 rounded-xl animate-pulse"></div>
               <div className="space-y-2">
-                <div className="h-8 w-48 bg-gradient-to-br from-zinc-800/50 to-zinc-900/30 border border-zinc-700/50 rounded animate-pulse"></div>
-                <div className="h-4 w-64 bg-gradient-to-br from-zinc-800/50 to-zinc-900/30 border border-zinc-700/50 rounded animate-pulse"></div>
+                <div className="h-6 md:h-8 w-36 md:w-48 bg-gradient-to-br from-zinc-800/50 to-zinc-900/30 border border-zinc-700/50 rounded animate-pulse"></div>
+                <div className="h-3 md:h-4 w-48 md:w-64 bg-gradient-to-br from-zinc-800/50 to-zinc-900/30 border border-zinc-700/50 rounded animate-pulse"></div>
               </div>
             </div>
           </div>
 
           {/* Progress Section */}
-          <div className="flex items-center justify-center py-12">
-            <div className="text-center max-w-md">
-              <div className="w-24 h-24 bg-gradient-to-br from-zinc-800/50 to-zinc-900/30 border border-zinc-700/50 rounded-full flex items-center justify-center mx-auto mb-6">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-zinc-400"></div>
+          <div className="flex items-center justify-center py-8 md:py-12">
+            <div className="text-center max-w-md px-4">
+              <div className="w-20 h-20 md:w-24 md:h-24 bg-gradient-to-br from-zinc-800/50 to-zinc-900/30 border border-zinc-700/50 rounded-full flex items-center justify-center mx-auto mb-4 md:mb-6">
+                <div className="animate-spin rounded-full h-8 w-8 md:h-12 md:w-12 border-b-2 border-zinc-400"></div>
               </div>
-              <h3 className="text-2xl font-bold text-white mb-3">Analyzing Data</h3>
-              <p className="text-zinc-300 mb-4">{currentStage || "Processing reviews..."}</p>
-              <div className="w-64 bg-zinc-800/50 border border-zinc-700/50 rounded-full h-2 mb-2 mx-auto">
+              <h3 className="text-xl md:text-2xl font-bold text-white mb-2 md:mb-3">Analyzing Data</h3>
+              <p className="text-sm md:text-base text-zinc-300 mb-3 md:mb-4">
+                {currentStage || "Processing reviews..."}
+              </p>
+              <div className="w-56 md:w-64 bg-zinc-800/50 border border-zinc-700/50 rounded-full h-2 mb-2 mx-auto">
                 <div
                   className="bg-gradient-to-r from-zinc-600 to-zinc-500 h-2 rounded-full transition-all duration-300"
                   style={{ width: `${progress}%` }}
@@ -287,7 +290,7 @@ export default function AppStoreAnalyzer() {
               </div>
               <p className="text-xs text-zinc-500">{progress}% complete</p>
               {progressDetails && (
-                <div className="mt-4 p-3 bg-zinc-800/30 border border-zinc-700/30 rounded-lg">
+                <div className="mt-3 md:mt-4 p-3 bg-zinc-800/30 border border-zinc-700/30 rounded-lg">
                   <p className="text-xs text-zinc-400">{progressDetails}</p>
                 </div>
               )}
@@ -295,38 +298,38 @@ export default function AppStoreAnalyzer() {
           </div>
 
           {/* Content Skeleton */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8">
             {/* Left Column */}
-            <div className="space-y-6">
-              <div className="bg-gradient-to-br from-zinc-800/50 to-zinc-900/30 border border-zinc-700/50 rounded-lg p-6">
-                <div className="h-6 w-32 bg-gradient-to-br from-zinc-700/50 to-zinc-800/30 rounded mb-4 animate-pulse"></div>
-                <div className="space-y-3">
-                  <div className="h-4 w-full bg-gradient-to-br from-zinc-700/50 to-zinc-800/30 rounded animate-pulse"></div>
-                  <div className="h-4 w-3/4 bg-gradient-to-br from-zinc-700/50 to-zinc-800/30 rounded animate-pulse"></div>
-                  <div className="h-4 w-5/6 bg-gradient-to-br from-zinc-700/50 to-zinc-800/30 rounded animate-pulse"></div>
+            <div className="space-y-4 md:space-y-6">
+              <div className="bg-gradient-to-br from-zinc-800/50 to-zinc-900/30 border border-zinc-700/50 rounded-lg p-4 md:p-6">
+                <div className="h-5 md:h-6 w-24 md:w-32 bg-gradient-to-br from-zinc-700/50 to-zinc-800/30 rounded mb-3 md:mb-4 animate-pulse"></div>
+                <div className="space-y-2 md:space-y-3">
+                  <div className="h-3 md:h-4 w-full bg-gradient-to-br from-zinc-700/50 to-zinc-800/30 rounded animate-pulse"></div>
+                  <div className="h-3 md:h-4 w-3/4 bg-gradient-to-br from-zinc-700/50 to-zinc-800/30 rounded animate-pulse"></div>
+                  <div className="h-3 md:h-4 w-5/6 bg-gradient-to-br from-zinc-700/50 to-zinc-800/30 rounded animate-pulse"></div>
                 </div>
               </div>
 
-              <div className="bg-gradient-to-br from-zinc-800/50 to-zinc-900/30 border border-zinc-700/50 rounded-lg p-6">
-                <div className="h-6 w-40 bg-gradient-to-br from-zinc-700/50 to-zinc-800/30 rounded mb-4 animate-pulse"></div>
-                <div className="h-32 w-full bg-gradient-to-br from-zinc-700/50 to-zinc-800/30 rounded animate-pulse"></div>
+              <div className="bg-gradient-to-br from-zinc-800/50 to-zinc-900/30 border border-zinc-700/50 rounded-lg p-4 md:p-6">
+                <div className="h-5 md:h-6 w-32 md:w-40 bg-gradient-to-br from-zinc-700/50 to-zinc-800/30 rounded mb-3 md:mb-4 animate-pulse"></div>
+                <div className="h-24 md:h-32 w-full bg-gradient-to-br from-zinc-700/50 to-zinc-800/30 rounded animate-pulse"></div>
               </div>
             </div>
 
             {/* Right Column */}
-            <div className="space-y-6">
-              <div className="bg-gradient-to-br from-zinc-800/50 to-zinc-900/30 border border-zinc-700/50 rounded-lg p-6">
-                <div className="h-6 w-28 bg-gradient-to-br from-zinc-700/50 to-zinc-800/30 rounded mb-4 animate-pulse"></div>
-                <div className="space-y-3">
-                  <div className="h-4 w-full bg-gradient-to-br from-zinc-700/50 to-zinc-800/30 rounded animate-pulse"></div>
-                  <div className="h-4 w-2/3 bg-gradient-to-br from-zinc-700/50 to-zinc-800/30 rounded animate-pulse"></div>
-                  <div className="h-4 w-4/5 bg-gradient-to-br from-zinc-700/50 to-zinc-800/30 rounded animate-pulse"></div>
+            <div className="space-y-4 md:space-y-6">
+              <div className="bg-gradient-to-br from-zinc-800/50 to-zinc-900/30 border border-zinc-700/50 rounded-lg p-4 md:p-6">
+                <div className="h-5 md:h-6 w-20 md:w-28 bg-gradient-to-br from-zinc-700/50 to-zinc-800/30 rounded mb-3 md:mb-4 animate-pulse"></div>
+                <div className="space-y-2 md:space-y-3">
+                  <div className="h-3 md:h-4 w-full bg-gradient-to-br from-zinc-700/50 to-zinc-800/30 rounded animate-pulse"></div>
+                  <div className="h-3 md:h-4 w-2/3 bg-gradient-to-br from-zinc-700/50 to-zinc-800/30 rounded animate-pulse"></div>
+                  <div className="h-3 md:h-4 w-4/5 bg-gradient-to-br from-zinc-700/50 to-zinc-800/30 rounded animate-pulse"></div>
                 </div>
               </div>
 
-              <div className="bg-gradient-to-br from-zinc-800/50 to-zinc-900/30 border border-zinc-700/50 rounded-lg p-6">
-                <div className="h-6 w-36 bg-gradient-to-br from-zinc-700/50 to-zinc-800/30 rounded mb-4 animate-pulse"></div>
-                <div className="h-24 w-full bg-gradient-to-br from-zinc-700/50 to-zinc-800/30 rounded animate-pulse"></div>
+              <div className="bg-gradient-to-br from-zinc-800/50 to-zinc-900/30 border border-zinc-700/50 rounded-lg p-4 md:p-6">
+                <div className="h-5 md:h-6 w-28 md:w-36 bg-gradient-to-br from-zinc-700/50 to-zinc-800/30 rounded mb-3 md:mb-4 animate-pulse"></div>
+                <div className="h-20 md:h-24 w-full bg-gradient-to-br from-zinc-700/50 to-zinc-800/30 rounded animate-pulse"></div>
               </div>
             </div>
           </div>
@@ -369,33 +372,63 @@ export default function AppStoreAnalyzer() {
 
   return (
     <div className="h-screen bg-gradient-to-br from-slate-900 via-black to-slate-900 flex overflow-hidden">
+      {/* Mobile Header */}
+      <div className="md:hidden fixed top-0 left-0 right-0 z-50 bg-black/80 backdrop-blur-xl border-b border-zinc-800/50 p-4">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 bg-gradient-to-br from-zinc-800/50 to-zinc-900/30 border border-zinc-700/50 rounded-xl flex items-center justify-center">
+              <BarChart3 className="h-4 w-4 text-zinc-300" />
+            </div>
+            <span className="text-lg font-bold text-white">ReviewAI</span>
+          </div>
+          <button
+            onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+            className="p-2 rounded-lg bg-gradient-to-r from-slate-800/50 to-zinc-900/30 border border-slate-600/50 text-slate-200"
+          >
+            {isSidebarOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+          </button>
+        </div>
+      </div>
+
       {/* Sidebar */}
-      <Sidebar
-        appId={appId}
-        setAppId={setAppId}
-        selectedRegions={selectedRegions}
-        setSelectedRegions={setSelectedRegions}
-        currentView={currentView}
-        setCurrentView={setCurrentView}
-        handleAnalyze={handleAnalyze}
-        exportData={exportData}
-        isPending={isPending}
-        isAnalyzing={isAnalyzing}
-        progress={progress}
-        regionProgress={regionProgress}
-        currentStage={currentStage}
-        progressDetails={progressDetails}
-        error={error}
-        appMetadata={appMetadata}
-        reviews={reviews}
-        isConfigModalOpen={isConfigModalOpen}
-        setIsConfigModalOpen={setIsConfigModalOpen}
-      />
+      <div
+        className={`${
+          isSidebarOpen ? "translate-x-0" : "-translate-x-full"
+        } md:translate-x-0 fixed md:relative inset-y-0 left-0 z-40 transition-transform duration-300 ease-in-out`}
+      >
+        <Sidebar
+          appId={appId}
+          setAppId={setAppId}
+          selectedRegions={selectedRegions}
+          setSelectedRegions={setSelectedRegions}
+          currentView={currentView}
+          setCurrentView={setCurrentView}
+          handleAnalyze={handleAnalyze}
+          exportData={exportData}
+          isPending={isPending}
+          isAnalyzing={isAnalyzing}
+          progress={progress}
+          regionProgress={regionProgress}
+          currentStage={currentStage}
+          progressDetails={progressDetails}
+          error={error}
+          appMetadata={appMetadata}
+          reviews={reviews}
+          isConfigModalOpen={isConfigModalOpen}
+          setIsConfigModalOpen={setIsConfigModalOpen}
+          onCloseMobile={() => setIsSidebarOpen(false)}
+        />
+      </div>
+
+      {/* Mobile Overlay */}
+      {isSidebarOpen && (
+        <div className="md:hidden fixed inset-0 bg-black/50 z-30" onClick={() => setIsSidebarOpen(false)} />
+      )}
 
       {/* Main Content */}
       <div className="flex-1 flex flex-col overflow-hidden">
         <ScrollArea className="flex-1">
-          <div className="p-8">{renderMainContent()}</div>
+          <div className="p-4 md:p-8 pt-20 md:pt-8">{renderMainContent()}</div>
         </ScrollArea>
       </div>
 

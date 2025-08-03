@@ -129,7 +129,7 @@ export function AppSearch({ onAppSelect, currentAppId }: AppSearchProps) {
           onChange={e => setQuery(e.target.value)}
           onKeyDown={handleKeyDown}
           placeholder="Search for an app by name..."
-          className="pl-10 pr-10 bg-zinc-900/50 border-zinc-700 text-white text-sm h-9"
+          className="pl-10 pr-10 bg-zinc-900/50 border-zinc-700 text-white text-sm h-9 md:h-10"
         />
         {query && (
           <Button
@@ -145,15 +145,15 @@ export function AppSearch({ onAppSelect, currentAppId }: AppSearchProps) {
 
       {/* Loading indicator */}
       {isLoading && (
-        <div className="absolute top-full left-0 right-0 mt-1 bg-zinc-900/95 border border-zinc-700/50 rounded-lg p-4 text-center">
-          <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-zinc-400 mx-auto"></div>
-          <p className="text-sm text-zinc-400 mt-2">Searching apps...</p>
+        <div className="absolute top-full left-0 right-0 mt-1 bg-zinc-900/95 border border-zinc-700/50 rounded-lg p-3 md:p-4 text-center z-50">
+          <div className="animate-spin rounded-full h-5 w-5 md:h-6 md:w-6 border-b-2 border-zinc-400 mx-auto"></div>
+          <p className="text-xs md:text-sm text-zinc-400 mt-2">Searching apps...</p>
         </div>
       )}
 
       {/* Search results dropdown */}
       {isOpen && results.length > 0 && !isLoading && (
-        <div className="absolute top-full left-0 right-0 mt-1 bg-zinc-900/95 border border-zinc-700/50 rounded-lg max-h-96 overflow-y-auto z-50 max-w-full">
+        <div className="absolute top-full left-0 right-0 mt-1 bg-zinc-900/95 border border-zinc-700/50 rounded-lg max-h-80 md:max-h-96 overflow-y-auto z-50 max-w-full">
           {results.map((app, index) => (
             <div
               key={app.trackId}
@@ -162,11 +162,11 @@ export function AppSearch({ onAppSelect, currentAppId }: AppSearchProps) {
                 index === selectedIndex ? "bg-zinc-800/50 border-l-2 border-zinc-600" : "hover:bg-zinc-800/30"
               } ${app.trackId.toString() === currentAppId ? "bg-blue-900/20 border-l-2 border-blue-500" : ""}`}
             >
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-2 md:gap-3">
                 <img
                   src={app.artworkUrl100}
                   alt={app.trackName}
-                  className="w-12 h-12 rounded-lg object-cover"
+                  className="w-10 h-10 md:w-12 md:h-12 rounded-lg object-cover flex-shrink-0"
                   onError={e => {
                     const target = e.target as HTMLImageElement;
                     target.style.display = "none";
@@ -174,7 +174,7 @@ export function AppSearch({ onAppSelect, currentAppId }: AppSearchProps) {
                 />
                 <div className="flex-1 min-w-0 overflow-hidden">
                   <div className="flex items-center gap-2 mb-1">
-                    <h4 className="text-sm font-medium text-white truncate flex-1">{app.trackName}</h4>
+                    <h4 className="text-xs md:text-sm font-medium text-white truncate flex-1">{app.trackName}</h4>
                     {app.trackId.toString() === currentAppId && (
                       <Badge variant="secondary" className="text-xs bg-blue-900/50 text-blue-300 flex-shrink-0">
                         Current
@@ -182,7 +182,7 @@ export function AppSearch({ onAppSelect, currentAppId }: AppSearchProps) {
                     )}
                   </div>
                   <p className="text-xs text-zinc-400 mb-1 truncate">{app.sellerName}</p>
-                  <div className="flex items-center gap-3 text-xs text-zinc-500 overflow-hidden">
+                  <div className="flex items-center gap-2 md:gap-3 text-xs text-zinc-500 overflow-hidden">
                     <span className="flex items-center gap-1 flex-shrink-0">
                       <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
                       {app.averageUserRating.toFixed(2)}
@@ -191,7 +191,7 @@ export function AppSearch({ onAppSelect, currentAppId }: AppSearchProps) {
                       <Download className="h-3 w-3" />
                       {(app.userRatingCount / 1000).toFixed(2)}K
                     </span>
-                    <span className="truncate">{app.primaryGenreName}</span>
+                    <span className="truncate hidden sm:block">{app.primaryGenreName}</span>
                   </div>
                 </div>
               </div>
@@ -202,8 +202,8 @@ export function AppSearch({ onAppSelect, currentAppId }: AppSearchProps) {
 
       {/* No results */}
       {isOpen && results.length === 0 && !isLoading && query.length >= 2 && (
-        <div className="absolute top-full left-0 right-0 mt-1 bg-zinc-900/95 border border-zinc-700/50 rounded-lg p-4 text-center">
-          <p className="text-sm text-zinc-400">No apps found for "{query}"</p>
+        <div className="absolute top-full left-0 right-0 mt-1 bg-zinc-900/95 border border-zinc-700/50 rounded-lg p-3 md:p-4 text-center z-50">
+          <p className="text-xs md:text-sm text-zinc-400">No apps found for "{query}"</p>
           <p className="text-xs text-zinc-500 mt-1">Try a different search term</p>
         </div>
       )}

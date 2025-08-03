@@ -59,44 +59,44 @@ export function AppConfigModal({
 
   return (
     <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <div className="bg-gradient-to-br from-zinc-900/95 to-black/95 border border-zinc-800/50 rounded-2xl p-6 w-full max-w-md max-h-[90vh] overflow-y-auto">
+      <div className="bg-gradient-to-br from-zinc-900/95 to-black/95 border border-zinc-800/50 rounded-2xl p-4 md:p-6 w-full max-w-sm md:max-w-md max-h-[90vh] overflow-y-auto">
         {/* Header */}
-        <div className="flex items-center justify-between mb-6">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-gradient-to-br from-zinc-800/50 to-zinc-900/30 border border-zinc-700/50 rounded-xl flex items-center justify-center">
-              <Settings className="h-6 w-6 text-zinc-300" />
+        <div className="flex items-center justify-between mb-4 md:mb-6">
+          <div className="flex items-center gap-2 md:gap-3">
+            <div className="w-8 h-8 md:w-10 md:h-10 bg-gradient-to-br from-zinc-800/50 to-zinc-900/30 border border-zinc-700/50 rounded-xl flex items-center justify-center">
+              <Settings className="h-4 w-4 md:h-6 md:w-6 text-zinc-300" />
             </div>
             <div>
-              <h2 className="text-xl font-bold text-white">App Configuration</h2>
-              <p className="text-sm text-zinc-400">Configure your analysis settings</p>
+              <h2 className="text-lg md:text-xl font-bold text-white">App Configuration</h2>
+              <p className="text-xs md:text-sm text-zinc-400">Configure your analysis settings</p>
             </div>
           </div>
           <Button onClick={onClose} variant="ghost" size="sm" className="text-zinc-400 hover:text-white">
-            <X className="h-5 w-5" />
+            <X className="h-4 w-4 md:h-5 md:w-5" />
           </Button>
         </div>
 
         {/* Configuration Form */}
-        <div className="space-y-6">
+        <div className="space-y-4 md:space-y-6">
           <div>
-            <Label className="text-sm text-zinc-300 mb-2 block">Search App</Label>
+            <Label className="text-xs md:text-sm text-zinc-300 mb-2 block">Search App</Label>
             <AppSearch onAppSelect={setAppId} currentAppId={appId} />
           </div>
 
           <div>
-            <Label className="text-sm text-zinc-300 mb-2 block">App Store ID</Label>
+            <Label className="text-xs md:text-sm text-zinc-300 mb-2 block">App Store ID</Label>
             <Input
               value={appId}
               onChange={e => setAppId(e.target.value)}
               placeholder="Enter App ID manually"
-              className="bg-zinc-900/50 border-zinc-700 text-white text-sm h-10"
+              className="bg-zinc-900/50 border-zinc-700 text-white text-sm h-9 md:h-10"
             />
           </div>
 
           <div>
-            <Label className="text-sm text-zinc-300 mb-2 block">Regions</Label>
+            <Label className="text-xs md:text-sm text-zinc-300 mb-2 block">Regions</Label>
             <Select value={selectedRegions.join(",")} onValueChange={value => setSelectedRegions(value.split(","))}>
-              <SelectTrigger className="bg-zinc-900/50 border-zinc-700 text-white text-sm h-10">
+              <SelectTrigger className="bg-zinc-900/50 border-zinc-700 text-white text-sm h-9 md:h-10">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent className="bg-zinc-900 border-zinc-700 text-white">
@@ -110,7 +110,7 @@ export function AppConfigModal({
           {selectedRegions.includes("all") && (
             <Alert className="bg-yellow-900/20 border-yellow-600/50 text-yellow-200">
               <AlertCircle className="h-4 w-4" />
-              <AlertDescription className="text-sm">
+              <AlertDescription className="text-xs md:text-sm">
                 <span className="font-medium">All Regions Selected</span>
                 <br />
                 This will fetch reviews from all 175 App Store regions. This may take several minutes.
@@ -121,31 +121,31 @@ export function AppConfigModal({
           <Button
             onClick={handleAnalyze}
             disabled={isPending || isAnalyzing || !appId.trim()}
-            className="w-full bg-gradient-to-r from-blue-800/70 to-sky-900/50 border border-slate-600/50 text-slate-200 hover:from-blue-700 hover:via-sky-700 hover:to-sky-800 hover:text-white transition-all duration-200 shadow-lg h-10 text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full bg-gradient-to-r from-blue-800/70 to-sky-900/50 border border-slate-600/50 text-slate-200 hover:from-blue-700 hover:via-sky-700 hover:to-sky-800 hover:text-white transition-all duration-200 shadow-lg h-9 md:h-10 text-sm disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isAnalyzing ? (
               <>
-                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2" />
+                <div className="animate-spin rounded-full h-3 w-3 md:h-4 md:w-4 border-b-2 border-white mr-2" />
                 Analyzing...
               </>
             ) : (
               <>
-                <Play className="h-4 w-4 mr-2" />
+                <Play className="h-3 w-3 md:h-4 md:w-4 mr-2" />
                 Start Analysis
               </>
             )}
           </Button>
 
           {isAnalyzing && (
-            <div className="space-y-3">
-              <div className="flex justify-between text-sm text-zinc-400">
+            <div className="space-y-2 md:space-y-3">
+              <div className="flex justify-between text-xs md:text-sm text-zinc-400">
                 <span>{currentStage || "Processing reviews..."}</span>
                 <span>{Math.round(progress)}%</span>
               </div>
               <Progress value={progress} className="h-2 bg-zinc-800" />
-              {progressDetails && <div className="text-sm text-zinc-500">{progressDetails}</div>}
+              {progressDetails && <div className="text-xs md:text-sm text-zinc-500">{progressDetails}</div>}
               {regionProgress && !progressDetails && (
-                <div className="text-sm text-zinc-500">
+                <div className="text-xs md:text-sm text-zinc-500">
                   Region {regionProgress.current} of {regionProgress.total} (
                   {Math.round((regionProgress.current / regionProgress.total) * 100)}%)
                 </div>
@@ -156,7 +156,7 @@ export function AppConfigModal({
           {error && (
             <Alert className="bg-red-900/20 border-red-600/50 text-red-200">
               <AlertCircle className="h-4 w-4" />
-              <AlertDescription className="text-sm">{error}</AlertDescription>
+              <AlertDescription className="text-xs md:text-sm">{error}</AlertDescription>
             </Alert>
           )}
         </div>

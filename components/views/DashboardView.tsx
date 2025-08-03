@@ -33,24 +33,24 @@ interface DashboardViewProps {
 
 export function DashboardView({ analysisResult, appMetadata, onNavigateToView }: DashboardViewProps) {
   return (
-    <div className="space-y-8">
+    <div className="space-y-6 md:space-y-8">
       {/* Hero Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
         <Card className="bg-gradient-to-br from-green-500/10 to-green-600/5 border-green-500/20 backdrop-blur-sm">
-          <CardContent className="px-6">
-            <div className="flex items-center justify-between mb-4">
+          <CardContent className="px-4 md:px-6">
+            <div className="flex items-center justify-between mb-3 md:mb-4">
               <div className="p-2 bg-green-500/20 rounded-lg">
-                <MessageSquare className="h-5 w-5 text-green-400" />
+                <MessageSquare className="h-4 w-4 md:h-5 md:w-5 text-green-400" />
               </div>
-              <Badge variant="outline" className="text-green-400 border-green-400/30">
+              <Badge variant="outline" className="text-green-400 border-green-400/30 text-xs">
                 AI Filtered
               </Badge>
             </div>
-            <div className="space-y-1 mb-4">
-              <div className="text-3xl font-bold text-white">
+            <div className="space-y-1 mb-3 md:mb-4">
+              <div className="text-2xl md:text-3xl font-bold text-white">
                 {analysisResult.basicStats.totalReviews.toLocaleString()}
               </div>
-              <div className="text-sm text-zinc-400">Relevant Reviews Analyzed</div>
+              <div className="text-xs md:text-sm text-zinc-400">Relevant Reviews Analyzed</div>
               <div className="flex items-center gap-1 text-xs text-green-400">
                 <Sparkles className="h-3 w-3" />
                 <span>AI-powered filtering applied</span>
@@ -59,7 +59,7 @@ export function DashboardView({ analysisResult, appMetadata, onNavigateToView }:
             <Button
               variant="ghost"
               size="sm"
-              className="w-full text-xs text-green-400/70 hover:text-green-400 hover:bg-green-500/5 h-8"
+              className="w-full text-xs text-green-400/70 hover:text-green-400 hover:bg-green-500/5 h-7 md:h-8"
               onClick={() => onNavigateToView?.("regions")}
             >
               <MapPin className="h-3 w-3 mr-1" />
@@ -69,21 +69,21 @@ export function DashboardView({ analysisResult, appMetadata, onNavigateToView }:
         </Card>
 
         <Card className="bg-gradient-to-br from-purple-500/10 to-purple-600/5 border-purple-500/20 backdrop-blur-sm">
-          <CardContent className="px-6">
-            <div className="flex items-center justify-between mb-4">
+          <CardContent className="px-4 md:px-6">
+            <div className="flex items-center justify-between mb-3 md:mb-4">
               <div className="p-2 bg-purple-500/20 rounded-lg">
-                <Brain className="h-5 w-5 text-purple-400" />
+                <Brain className="h-4 w-4 md:h-5 md:w-5 text-purple-400" />
               </div>
-              <Badge variant="outline" className="text-purple-400 border-purple-400/30">
+              <Badge variant="outline" className="text-purple-400 border-purple-400/30 text-xs">
                 AI
               </Badge>
             </div>
-            <div className="space-y-1 mb-4">
-              <div className="text-3xl font-bold text-white">
+            <div className="space-y-1 mb-3 md:mb-4">
+              <div className="text-2xl md:text-3xl font-bold text-white">
                 {Math.round((analysisResult.sentimentAnalysis.positive / analysisResult.sentimentAnalysis.total) * 100)}
                 %
               </div>
-              <div className="text-sm text-zinc-400">Positive Sentiment</div>
+              <div className="text-xs md:text-sm text-zinc-400">Positive Sentiment</div>
               <div className="flex items-center gap-1 text-xs text-purple-400">
                 <Sparkles className="h-3 w-3" />
                 <span>AI analyzed</span>
@@ -92,7 +92,7 @@ export function DashboardView({ analysisResult, appMetadata, onNavigateToView }:
             <Button
               variant="ghost"
               size="sm"
-              className="w-full text-xs text-purple-400/70 hover:text-purple-400 hover:bg-purple-500/5 h-8"
+              className="w-full text-xs text-purple-400/70 hover:text-purple-400 hover:bg-purple-500/5 h-7 md:h-8"
               onClick={() => onNavigateToView?.("sentiment")}
             >
               <Brain className="h-3 w-3 mr-1" />
@@ -102,20 +102,20 @@ export function DashboardView({ analysisResult, appMetadata, onNavigateToView }:
         </Card>
 
         <Card className="bg-gradient-to-br from-orange-500/10 to-orange-600/5 border-orange-500/20 backdrop-blur-sm">
-          <CardContent className="px-6">
-            <div className="flex items-center justify-between mb-4">
+          <CardContent className="px-4 md:px-6">
+            <div className="flex items-center justify-between mb-3 md:mb-4">
               <div className="p-2 bg-orange-500/20 rounded-lg">
-                <Shield className="h-5 w-5 text-orange-400" />
+                <Shield className="h-4 w-4 md:h-5 md:w-5 text-orange-400" />
               </div>
-              <Badge variant="outline" className="text-orange-400 border-orange-400/30">
+              <Badge variant="outline" className="text-orange-400 border-orange-400/30 text-xs">
                 {analysisResult.dynamicMetrics?.userComplaints?.totalIssues || 0} Issues
               </Badge>
             </div>
-            <div className="space-y-1 mb-4">
-              <div className="text-3xl font-bold text-white">
+            <div className="space-y-1 mb-3 md:mb-4">
+              <div className="text-2xl md:text-3xl font-bold text-white">
                 {analysisResult.filteredAnalysis.informativePercentage.toFixed(2)}%
               </div>
-              <div className="text-sm text-zinc-400">Quality Score</div>
+              <div className="text-xs md:text-sm text-zinc-400">Quality Score</div>
               <div className="flex items-center gap-1 text-xs text-orange-400">
                 <CheckCircle className="h-3 w-3" />
                 <span>{analysisResult.dynamicMetrics?.impactAssessment?.criticalIssues || 0} critical issues</span>
@@ -124,7 +124,7 @@ export function DashboardView({ analysisResult, appMetadata, onNavigateToView }:
             <Button
               variant="ghost"
               size="sm"
-              className="w-full text-xs text-orange-400/70 hover:text-orange-400 hover:bg-orange-500/5 h-8"
+              className="w-full text-xs text-orange-400/70 hover:text-orange-400 hover:bg-orange-500/5 h-7 md:h-8"
               onClick={() => onNavigateToView?.("issues")}
             >
               <AlertTriangle className="h-3 w-3 mr-1" />
@@ -134,18 +134,20 @@ export function DashboardView({ analysisResult, appMetadata, onNavigateToView }:
         </Card>
 
         <Card className="bg-gradient-to-br from-blue-500/10 to-blue-600/5 border-blue-500/20 backdrop-blur-sm">
-          <CardContent className="px-6">
-            <div className="flex items-center justify-between mb-4">
+          <CardContent className="px-4 md:px-6">
+            <div className="flex items-center justify-between mb-3 md:mb-4">
               <div className="p-2 bg-blue-500/20 rounded-lg">
-                <TrendingUp className="h-5 w-5 text-blue-400" />
+                <TrendingUp className="h-4 w-4 md:h-5 md:w-5 text-blue-400" />
               </div>
-              <Badge variant="outline" className="text-blue-400 border-blue-400/30">
+              <Badge variant="outline" className="text-blue-400 border-blue-400/30 text-xs">
                 {analysisResult.dynamicMetrics?.ratingTrend?.trendDirection || "stable"}
               </Badge>
             </div>
-            <div className="space-y-1 mb-4">
-              <div className="text-3xl font-bold text-white">{analysisResult.basicStats.averageRating.toFixed(2)}</div>
-              <div className="text-sm text-zinc-400">Average Rating</div>
+            <div className="space-y-1 mb-3 md:mb-4">
+              <div className="text-2xl md:text-3xl font-bold text-white">
+                {analysisResult.basicStats.averageRating.toFixed(2)}
+              </div>
+              <div className="text-xs md:text-sm text-zinc-400">Average Rating</div>
               <div className="flex items-center gap-1 text-xs text-blue-400">
                 <Star className="h-3 w-3" />
                 <span>Overall score</span>
@@ -154,7 +156,7 @@ export function DashboardView({ analysisResult, appMetadata, onNavigateToView }:
             <Button
               variant="ghost"
               size="sm"
-              className="w-full text-xs text-blue-400/70 hover:text-blue-400 hover:bg-blue-500/5 h-8"
+              className="w-full text-xs text-blue-400/70 hover:text-blue-400 hover:bg-blue-500/5 h-7 md:h-8"
               onClick={() => onNavigateToView?.("trends")}
             >
               <TrendingUp className="h-3 w-3 mr-1" />
@@ -166,14 +168,14 @@ export function DashboardView({ analysisResult, appMetadata, onNavigateToView }:
 
       {/* Most Relevant Actionable Step */}
       {analysisResult.actionableSteps?.steps?.length > 0 && (
-        <div className="space-y-6">
-          <div className="flex items-center gap-3 mb-6">
-            <div className="p-3 bg-red-500/20 rounded-xl">
-              <Target className="h-6 w-6 text-red-400" />
+        <div className="space-y-4 md:space-y-6">
+          <div className="flex items-center gap-2 md:gap-3 mb-4 md:mb-6">
+            <div className="p-2 md:p-3 bg-red-500/20 rounded-xl">
+              <Target className="h-5 w-5 md:h-6 md:w-6 text-red-400" />
             </div>
             <div>
-              <h2 className="text-2xl font-bold text-white">Most Relevant Action</h2>
-              <p className="text-zinc-400">
+              <h2 className="text-xl md:text-2xl font-bold text-white">Most Relevant Action</h2>
+              <p className="text-xs md:text-sm text-zinc-400">
                 Based on AI analysis of {analysisResult.basicStats.totalReviews.toLocaleString()} reviews
               </p>
             </div>
@@ -228,29 +230,31 @@ export function DashboardView({ analysisResult, appMetadata, onNavigateToView }:
 
             return (
               <Card className="bg-black/30 border-zinc-800/50 backdrop-blur-sm hover:border-zinc-700/50 transition-all">
-                <CardContent className="px-6">
-                  <div className="flex items-start justify-between mb-4">
+                <CardContent className="px-4 md:px-6">
+                  <div className="flex items-start justify-between mb-3 md:mb-4">
                     <div className="flex-1">
-                      <div className="flex items-center gap-3 mb-3">
-                        <span className="text-2xl">{getCategoryIcon(topStep.category)}</span>
-                        <h3 className="text-xl font-semibold text-white">{topStep.title}</h3>
-                        <Badge variant="outline" className={getPriorityColor(topStep.priority)}>
+                      <div className="flex flex-col sm:flex-row sm:items-center gap-2 md:gap-3 mb-3">
+                        <span className="text-xl md:text-2xl">{getCategoryIcon(topStep.category)}</span>
+                        <h3 className="text-lg md:text-xl font-semibold text-white">{topStep.title}</h3>
+                        <Badge variant="outline" className={`${getPriorityColor(topStep.priority)} text-xs`}>
                           {topStep.priority} priority
                         </Badge>
                       </div>
-                      <p className="text-zinc-300 mb-4 leading-relaxed">{topStep.description}</p>
+                      <p className="text-sm md:text-base text-zinc-300 mb-3 md:mb-4 leading-relaxed">
+                        {topStep.description}
+                      </p>
 
-                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-                        <div className="flex items-center gap-2 text-sm text-zinc-400">
-                          <Target className="h-4 w-4" />
+                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4 mb-3 md:mb-4">
+                        <div className="flex items-center gap-2 text-xs md:text-sm text-zinc-400">
+                          <Target className="h-3 w-3 md:h-4 md:w-4" />
                           <span>Confidence: {Math.round((topStep.confidence || 0) * 100)}%</span>
                         </div>
-                        <div className="flex items-center gap-2 text-sm text-zinc-400">
-                          <Activity className="h-4 w-4" />
+                        <div className="flex items-center gap-2 text-xs md:text-sm text-zinc-400">
+                          <Activity className="h-3 w-3 md:h-4 md:w-4" />
                           <span className="capitalize">{topStep.timeframe}</span>
                         </div>
-                        <div className="flex items-center gap-2 text-sm text-zinc-400">
-                          <span className="text-2xl">{getCategoryIcon(topStep.category)}</span>
+                        <div className="flex items-center gap-2 text-xs md:text-sm text-zinc-400 sm:col-span-2 lg:col-span-1">
+                          <span className="text-xl md:text-2xl">{getCategoryIcon(topStep.category)}</span>
                           <span className="capitalize">{topStep.category}</span>
                         </div>
                       </div>
@@ -274,29 +278,29 @@ export function DashboardView({ analysisResult, appMetadata, onNavigateToView }:
       )}
 
       {/* Charts Grid */}
-      <div className="space-y-6">
-        <div className="flex items-center gap-3 mb-6">
-          <div className="p-3 bg-blue-500/20 rounded-xl">
-            <BarChart3 className="h-6 w-6 text-blue-400" />
+      <div className="space-y-4 md:space-y-6">
+        <div className="flex items-center gap-2 md:gap-3 mb-4 md:mb-6">
+          <div className="p-2 md:p-3 bg-blue-500/20 rounded-xl">
+            <BarChart3 className="h-5 w-5 md:h-6 md:w-6 text-blue-400" />
           </div>
           <div>
-            <h2 className="text-2xl font-bold text-white">Analytics Overview</h2>
-            <p className="text-zinc-400">
+            <h2 className="text-xl md:text-2xl font-bold text-white">Analytics Overview</h2>
+            <p className="text-xs md:text-sm text-zinc-400">
               Visual insights from {analysisResult.basicStats.totalReviews.toLocaleString()} reviews
             </p>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8">
           <Card className="bg-black/30 border-zinc-800/50 backdrop-blur-sm">
-            <CardHeader>
-              <CardTitle className="text-white flex items-center gap-2">
-                <PieChartIcon className="h-5 w-5 text-blue-400" />
+            <CardHeader className="pb-3 md:pb-4">
+              <CardTitle className="text-white flex items-center gap-2 text-base md:text-lg">
+                <PieChartIcon className="h-4 w-4 md:h-5 md:w-5 text-blue-400" />
                 Rating Distribution
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="h-64 mb-4">
+              <div className="h-48 md:h-64 mb-3 md:mb-4">
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart
                     data={Object.entries(analysisResult.basicStats.ratingDistribution).map(([rating, count]) => ({
@@ -322,7 +326,7 @@ export function DashboardView({ analysisResult, appMetadata, onNavigateToView }:
               <Button
                 variant="ghost"
                 size="sm"
-                className="w-full text-xs text-zinc-400/70 hover:text-zinc-300 hover:bg-zinc-800/50 h-8"
+                className="w-full text-xs text-zinc-400/70 hover:text-zinc-300 hover:bg-zinc-800/50 h-7 md:h-8"
                 onClick={() => onNavigateToView?.("versions")}
               >
                 <GitBranch className="h-3 w-3 mr-1" />
@@ -332,14 +336,14 @@ export function DashboardView({ analysisResult, appMetadata, onNavigateToView }:
           </Card>
 
           <Card className="bg-black/30 border-zinc-800/50 backdrop-blur-sm">
-            <CardHeader>
-              <CardTitle className="text-white flex items-center gap-2">
-                <TrendingUp className="h-5 w-5 text-green-400" />
+            <CardHeader className="pb-3 md:pb-4">
+              <CardTitle className="text-white flex items-center gap-2 text-base md:text-lg">
+                <TrendingUp className="h-4 w-4 md:h-5 md:w-5 text-green-400" />
                 Trend Analysis
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="h-64 mb-4">
+              <div className="h-48 md:h-64 mb-3 md:mb-4">
                 <ResponsiveContainer width="100%" height="100%">
                   <AreaChart data={analysisResult.trendData}>
                     <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
@@ -372,7 +376,7 @@ export function DashboardView({ analysisResult, appMetadata, onNavigateToView }:
               <Button
                 variant="ghost"
                 size="sm"
-                className="w-full text-xs text-zinc-400/70 hover:text-zinc-300 hover:bg-zinc-800/50 h-8"
+                className="w-full text-xs text-zinc-400/70 hover:text-zinc-300 hover:bg-zinc-800/50 h-7 md:h-8"
                 onClick={() => onNavigateToView?.("trends")}
               >
                 <BarChart3 className="h-3 w-3 mr-1" />
