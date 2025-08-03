@@ -26,6 +26,7 @@ import {
   Sparkles,
 } from "lucide-react";
 import { ViewType, AppMetadata } from "@/app/types";
+import { AppSearch } from "@/components/AppSearch";
 
 interface SidebarProps {
   appId: string;
@@ -105,11 +106,16 @@ export function Sidebar({
           {isConfigOpen && (
             <div className="space-y-4">
               <div>
+                <Label className="text-sm text-zinc-300 mb-2 block">Search App</Label>
+                <AppSearch onAppSelect={setAppId} currentAppId={appId} />
+              </div>
+
+              <div>
                 <Label className="text-sm text-zinc-300 mb-2 block">App Store ID</Label>
                 <Input
                   value={appId}
                   onChange={e => setAppId(e.target.value)}
-                  placeholder="Enter App ID"
+                  placeholder="Enter App ID manually"
                   className="bg-zinc-900/50 border-zinc-700 text-white text-sm h-9"
                 />
               </div>

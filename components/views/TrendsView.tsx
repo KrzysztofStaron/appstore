@@ -43,6 +43,7 @@ export function TrendsView({ analysisResult }: TrendsViewProps) {
                 <YAxis
                   domain={[Math.min(...analysisResult.trendData.map(item => item.averageRating)) / 2, 5]}
                   stroke="#9CA3AF"
+                  tickFormatter={value => Math.ceil(value).toString()}
                 />
                 <Tooltip
                   contentStyle={{
