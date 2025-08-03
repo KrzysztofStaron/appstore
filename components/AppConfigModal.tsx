@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -9,7 +9,8 @@ import { Progress } from "@/components/ui/progress";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Card, CardContent } from "@/components/ui/card";
 import { X, Play, AlertCircle, Settings } from "lucide-react";
-import { AppSearch } from "@/components/AppSearch";
+import { AppSelector } from "@/components/AppSelector";
+import { AppMetadata } from "@/app/types";
 
 interface AppConfigModalProps {
   isOpen: boolean;
@@ -44,6 +45,42 @@ export function AppConfigModal({
   progressDetails,
   error,
 }: AppConfigModalProps) {
+  const [selectedApp, setSelectedApp] = useState<AppMetadata | null>(null);
+
+  // Fetch app metadata when appId changes
+  useEffect(() => {
+    if (appId && appId.trim()) {
+      fetchAppMetadata(appId);
+    } else {
+      setSelectedApp(null);
+    }
+  }, [appId]);
+
+  const fetchAppMetadata = async (appId: string) => {
+    try {
+      const response = await fetch(`/api/search?q=${appId}`);
+      if (response.ok) {
+        const data = await response.json();
+        const app = data.apps?.find((app: any) => app.trackId.toString() === appId);
+        if (app) {
+          setSelectedApp({
+            trackName: app.trackName,
+            sellerName: app.sellerName,
+            primaryGenreName: app.primaryGenreName,
+            averageUserRating: app.averageUserRating,
+            userRatingCount: app.userRatingCount,
+            artworkUrl100: app.artworkUrl100,
+            artworkUrl512: app.artworkUrl512,
+            version: app.version,
+          });
+        }
+      }
+    } catch (error) {
+      console.error("Error fetching app metadata:", error);
+      setSelectedApp(null);
+    }
+  };
+
   // Close modal when analysis is complete
   React.useEffect(() => {
     if (isOpen && !isAnalyzing && progress >= 95 && !error) {
@@ -80,7 +117,7 @@ export function AppConfigModal({
         <div className="space-y-4 md:space-y-6">
           <div>
             <Label className="text-xs md:text-sm text-zinc-300 mb-2 block">Search App</Label>
-            <AppSearch onAppSelect={setAppId} currentAppId={appId} />
+            <AppSelector onAppSelect={setAppId} currentAppId={appId} selectedApp={selectedApp || undefined} />
           </div>
 
           <div>
