@@ -29,181 +29,147 @@ interface IssuesViewProps {
 export function IssuesView({ analysisResult, reviews, appMetadata }: IssuesViewProps) {
   const [issueCategories, setIssueCategories] = useState<IssueCategory[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<IssueCategory | null>(null);
-  const [isGenerating, setIsGenerating] = useState(false);
-  const [generationProgress, setGenerationProgress] = useState(0);
 
   // Version filter state
   const [minVersion, setMinVersion] = useState<string>("0.0");
 
-  // Auto-generate issues when component mounts or analysis result changes
+  // Generate issues from stored analysis results
   useEffect(() => {
     if (analysisResult && reviews.length > 0) {
       generateIssueAnalysis();
     }
   }, [analysisResult, reviews, minVersion]);
 
-  const generateIssueAnalysis = async () => {
-    // Don't regenerate if already generating
-    if (isGenerating) return;
+  const generateIssueAnalysis = () => {
+    // Filter reviews by version first, then get negative reviews (rating 1-2)
+    const filteredReviews = filterReviewsByVersion(reviews, minVersion);
+    const negativeReviews = filteredReviews.filter(review => review.rating <= 2);
 
-    setIsGenerating(true);
-    setGenerationProgress(0);
-
-    try {
-      // Filter reviews by version first, then get negative reviews (rating 1-2)
-      const filteredReviews = filterReviewsByVersion(reviews, minVersion);
-      const negativeReviews = filteredReviews.filter(review => review.rating <= 2);
-
-      if (negativeReviews.length === 0) {
-        setIssueCategories([]);
-        setIsGenerating(false);
-        setGenerationProgress(0);
-        return;
-      }
-
-      // Simulate analysis progress
-      const progressInterval = setInterval(() => {
-        setGenerationProgress(prev => {
-          if (prev >= 90) {
-            clearInterval(progressInterval);
-            return 90;
-          }
-          return prev + 10;
-        });
-      }, 200);
-
-      // Define category definitions with priority order (higher priority = appears first)
-      const categoryDefinitions = [
-        {
-          id: "bugs",
-          name: "Bugs & Crashes",
-          description: "App crashes, freezes, and technical issues",
-          icon: Bug,
-          color: "text-red-400",
-          keywords: ["crash", "bug", "freeze", "error", "broken", "stuck", "not working"],
-          severity: "critical" as const,
-          priority: 1,
-        },
-        {
-          id: "performance",
-          name: "Performance Issues",
-          description: "Slow loading, lag, and performance problems",
-          icon: Zap,
-          color: "text-orange-400",
-          keywords: ["slow", "lag", "loading", "performance", "speed", "overheat", "stammering"],
-          severity: "high" as const,
-          priority: 2,
-        },
-        {
-          id: "ux",
-          name: "User Experience",
-          description: "UI/UX problems and usability issues",
-          icon: Users,
-          color: "text-yellow-400",
-          keywords: ["interface", "design", "layout", "confusing", "difficult", "hard to use", "unintuitive"],
-          severity: "medium" as const,
-          priority: 3,
-        },
-        {
-          id: "features",
-          name: "Missing Features",
-          description: "Requested features and functionality gaps",
-          icon: Settings,
-          color: "text-blue-400",
-          keywords: ["feature", "missing", "need", "want", "should have", "export", "pdf", "word"],
-          severity: "medium" as const,
-          priority: 4,
-        },
-        {
-          id: "content",
-          name: "Content Issues",
-          description: "Content quality, accuracy, and relevance problems",
-          icon: AlertCircle,
-          color: "text-purple-400",
-          keywords: ["content", "information", "data", "wrong", "inaccurate", "better", "chatgpt"],
-          severity: "low" as const,
-          priority: 5,
-        },
-      ];
-
-      // Categorize reviews with priority-based assignment (no duplicates)
-      const categorizedReviews = new Set<string>();
-      const categories: IssueCategory[] = categoryDefinitions.map(def => ({
-        id: def.id,
-        name: def.name,
-        description: def.description,
-        icon: def.icon,
-        color: def.color,
-        reviews: [],
-        count: 0,
-        severity: def.severity,
-      }));
-
-      // Sort reviews by priority (highest priority category gets first pick)
-      for (const category of categories) {
-        const def = categoryDefinitions.find(d => d.id === category.id);
-        if (!def) continue;
-
-        const matchingReviews = negativeReviews.filter(review => {
-          // Skip if already categorized
-          if (categorizedReviews.has(review.id)) return false;
-
-          // Check if review matches this category's keywords
-          const reviewText = review.content.toLowerCase() + " " + review.title.toLowerCase();
-          return def.keywords.some(keyword => reviewText.includes(keyword));
-        });
-
-        // Add matching reviews to this category
-        category.reviews = matchingReviews;
-        category.count = matchingReviews.length;
-
-        // Mark these reviews as categorized
-        matchingReviews.forEach(review => categorizedReviews.add(review.id));
-      }
-
-      // Add uncategorized reviews to "other" category
-      const uncategorizedReviews = negativeReviews.filter(review => !categorizedReviews.has(review.id));
-      if (uncategorizedReviews.length > 0) {
-        categories.push({
-          id: "other",
-          name: "Other Issues",
-          description: "Miscellaneous complaints and feedback",
-          icon: AlertTriangle,
-          color: "text-gray-400",
-          reviews: uncategorizedReviews,
-          count: uncategorizedReviews.length,
-          severity: "low",
-        });
-      }
-
-      // Filter out empty categories
-      const nonEmptyCategories = categories.filter(category => category.count > 0);
-
-      // Log deduplication results for debugging
-      const totalCategorized = nonEmptyCategories.reduce((sum, cat) => sum + cat.count, 0);
-      console.log(
-        `🔍 Issue Analysis: ${negativeReviews.length} negative reviews → ${totalCategorized} categorized (${
-          negativeReviews.length - totalCategorized
-        } in "other")`
-      );
-      console.log(
-        `📋 Categories:`,
-        nonEmptyCategories.map(cat => `${cat.name}: ${cat.count}`)
-      );
-
-      clearInterval(progressInterval);
-      setGenerationProgress(100);
-
-      setTimeout(() => {
-        setIssueCategories(nonEmptyCategories);
-        setIsGenerating(false);
-        setGenerationProgress(0);
-      }, 500);
-    } catch (error) {
-      console.error("Error generating issue analysis:", error);
-      setIsGenerating(false);
-      setGenerationProgress(0);
+    if (negativeReviews.length === 0) {
+      setIssueCategories([]);
+      return;
     }
+
+    // Define category definitions with priority order (higher priority = appears first)
+    const categoryDefinitions = [
+      {
+        id: "bugs",
+        name: "Bugs & Crashes",
+        description: "App crashes, freezes, and technical issues",
+        icon: Bug,
+        color: "text-red-400",
+        keywords: ["crash", "bug", "freeze", "error", "broken", "stuck", "not working"],
+        severity: "critical" as const,
+        priority: 1,
+      },
+      {
+        id: "performance",
+        name: "Performance Issues",
+        description: "Slow loading, lag, and performance problems",
+        icon: Zap,
+        color: "text-orange-400",
+        keywords: ["slow", "lag", "loading", "performance", "speed", "overheat", "stammering"],
+        severity: "high" as const,
+        priority: 2,
+      },
+      {
+        id: "ux",
+        name: "User Experience",
+        description: "UI/UX problems and usability issues",
+        icon: Users,
+        color: "text-yellow-400",
+        keywords: ["interface", "design", "layout", "confusing", "difficult", "hard to use", "unintuitive"],
+        severity: "medium" as const,
+        priority: 3,
+      },
+      {
+        id: "features",
+        name: "Missing Features",
+        description: "Requested features and functionality gaps",
+        icon: Settings,
+        color: "text-blue-400",
+        keywords: ["feature", "missing", "need", "want", "should have", "export", "pdf", "word"],
+        severity: "medium" as const,
+        priority: 4,
+      },
+      {
+        id: "content",
+        name: "Content Issues",
+        description: "Content quality, accuracy, and relevance problems",
+        icon: AlertCircle,
+        color: "text-purple-400",
+        keywords: ["content", "information", "data", "wrong", "inaccurate", "better", "chatgpt"],
+        severity: "low" as const,
+        priority: 5,
+      },
+    ];
+
+    // Categorize reviews with priority-based assignment (no duplicates)
+    const categorizedReviews = new Set<string>();
+    const categories: IssueCategory[] = categoryDefinitions.map(def => ({
+      id: def.id,
+      name: def.name,
+      description: def.description,
+      icon: def.icon,
+      color: def.color,
+      reviews: [],
+      count: 0,
+      severity: def.severity,
+    }));
+
+    // Sort reviews by priority (highest priority category gets first pick)
+    for (const category of categories) {
+      const def = categoryDefinitions.find(d => d.id === category.id);
+      if (!def) continue;
+
+      const matchingReviews = negativeReviews.filter(review => {
+        // Skip if already categorized
+        if (categorizedReviews.has(review.id)) return false;
+
+        // Check if review matches this category's keywords
+        const reviewText = review.content.toLowerCase() + " " + review.title.toLowerCase();
+        return def.keywords.some(keyword => reviewText.includes(keyword));
+      });
+
+      // Add matching reviews to this category
+      category.reviews = matchingReviews;
+      category.count = matchingReviews.length;
+
+      // Mark these reviews as categorized
+      matchingReviews.forEach(review => categorizedReviews.add(review.id));
+    }
+
+    // Add uncategorized reviews to "other" category
+    const uncategorizedReviews = negativeReviews.filter(review => !categorizedReviews.has(review.id));
+    if (uncategorizedReviews.length > 0) {
+      categories.push({
+        id: "other",
+        name: "Other Issues",
+        description: "Miscellaneous complaints and feedback",
+        icon: AlertTriangle,
+        color: "text-gray-400",
+        reviews: uncategorizedReviews,
+        count: uncategorizedReviews.length,
+        severity: "low",
+      });
+    }
+
+    // Filter out empty categories
+    const nonEmptyCategories = categories.filter(category => category.count > 0);
+
+    // Log deduplication results for debugging
+    const totalCategorized = nonEmptyCategories.reduce((sum, cat) => sum + cat.count, 0);
+    console.log(
+      `🔍 Issue Analysis: ${negativeReviews.length} negative reviews → ${totalCategorized} categorized (${
+        negativeReviews.length - totalCategorized
+      } in "other")`
+    );
+    console.log(
+      `📋 Categories:`,
+      nonEmptyCategories.map(cat => `${cat.name}: ${cat.count}`)
+    );
+
+    setIssueCategories(nonEmptyCategories);
   };
 
   const getSeverityColor = (severity: string) => {
@@ -305,7 +271,7 @@ export function IssuesView({ analysisResult, reviews, appMetadata }: IssuesViewP
       {/* Version Filter */}
       <VersionSlider reviews={reviews} appMetadata={appMetadata} onVersionChange={setMinVersion} />
 
-      {issueCategories.length === 0 && !isGenerating && !analysisResult && (
+      {issueCategories.length === 0 && !analysisResult && (
         <Card className="bg-black/30 border-zinc-800/50 backdrop-blur-sm">
           <CardContent className="p-8 text-center">
             <div className="w-16 h-16 bg-gradient-to-br from-red-500 to-orange-600 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -319,7 +285,7 @@ export function IssuesView({ analysisResult, reviews, appMetadata }: IssuesViewP
         </Card>
       )}
 
-      {issueCategories.length === 0 && !isGenerating && analysisResult && (
+      {issueCategories.length === 0 && analysisResult && (
         <Card className="bg-black/30 border-zinc-800/50 backdrop-blur-sm">
           <CardContent className="p-8 text-center">
             <AlertCircle className="h-12 w-12 text-zinc-500 mx-auto mb-4" />
@@ -332,26 +298,7 @@ export function IssuesView({ analysisResult, reviews, appMetadata }: IssuesViewP
         </Card>
       )}
 
-      {isGenerating && (
-        <Card className="bg-black/30 border-zinc-800/50 backdrop-blur-sm">
-          <CardContent className="p-8 text-center">
-            <div className="w-16 h-16 bg-gradient-to-br from-red-500 to-orange-600 rounded-full flex items-center justify-center mx-auto mb-4">
-              <Clock className="h-8 w-8 text-white animate-spin" />
-            </div>
-            <h3 className="text-lg font-semibold text-white mb-2">Analyzing Issues</h3>
-            <p className="text-zinc-400 mb-4">Categorizing negative reviews and identifying common problems...</p>
-            <div className="w-full bg-zinc-800 rounded-full h-2 mb-2">
-              <div
-                className="bg-gradient-to-r from-red-500 to-orange-600 h-2 rounded-full transition-all duration-300"
-                style={{ width: `${generationProgress}%` }}
-              />
-            </div>
-            <p className="text-sm text-zinc-500">{generationProgress}% complete</p>
-          </CardContent>
-        </Card>
-      )}
-
-      {issueCategories.length > 0 && !isGenerating && (
+      {issueCategories.length > 0 && (
         <>
           <div className="flex items-center justify-between">
             <div>

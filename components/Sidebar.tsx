@@ -206,7 +206,7 @@ export function Sidebar({
             className="flex-1 bg-transparent border-zinc-700 text-zinc-300 h-8 text-xs"
           >
             <Download className="h-3 w-3 mr-1" />
-            Export
+            Export JSON
           </Button>
         </div>
       </div>

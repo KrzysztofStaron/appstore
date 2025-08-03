@@ -1,9 +1,9 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState, useTransition, useEffect, useMemo } from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
-import { Search, Menu, X, BarChart3 } from "lucide-react";
+import { Search, Menu, X, BarChart3, Download, Clock } from "lucide-react";
 import { APP_STORE_REGIONS } from "@/lib/app-store-api";
 import { Sidebar } from "@/components/Sidebar";
 import { AppConfigModal } from "@/components/AppConfigModal";
@@ -35,6 +35,52 @@ export default function AppStoreAnalyzer() {
   const [progressDetails, setProgressDetails] = useState<string>("");
   const [isConfigModalOpen, setIsConfigModalOpen] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [showCachedDataModal, setShowCachedDataModal] = useState(false);
+  const [cachedData, setCachedData] = useState<any>(null);
+
+  // Create a stable dependency for regions
+  const regionsKey = useMemo(() => selectedRegions.join(","), [selectedRegions]);
+
+  // Check for cached data when appId changes
+  useEffect(() => {
+    const shouldCheckForCachedData = appId === "6670324846" && selectedRegions.includes("all");
+
+    if (shouldCheckForCachedData) {
+      checkForCachedData();
+    } else {
+      setShowCachedDataModal(false);
+      setCachedData(null);
+    }
+  }, [appId, regionsKey]);
+
+  const checkForCachedData = async () => {
+    try {
+      const response = await fetch("/6670324846.json");
+      if (response.ok) {
+        const data = await response.json();
+        setCachedData(data);
+        setShowCachedDataModal(true);
+      }
+    } catch (error) {
+      console.log("No cached data found for this app");
+    }
+  };
+
+  const loadCachedData = () => {
+    if (!cachedData) return;
+
+    setReviews(cachedData.reviews);
+    setAppMetadata(cachedData.metadata.appMetadata);
+    setAnalysisResult(cachedData.analysis);
+    setSelectedRegions(cachedData.metadata.selectedRegions);
+    setShowCachedDataModal(false);
+
+    console.log("📂 Loaded cached data:", {
+      reviewsCount: cachedData.reviews.length,
+      exportDate: cachedData.metadata.exportDate,
+      hasAnalysis: !!cachedData.analysis,
+    });
+  };
 
   const handleAnalyze = () => {
     if (!appId.trim()) return;
@@ -214,22 +260,36 @@ export default function AppStoreAnalyzer() {
   const exportData = () => {
     if (!reviews.length) return;
 
-    const csvContent = [
-      "ID,Region,Title,Content,Rating,Version,Date,Author",
-      ...reviews.map(
-        review =>
-          `"${review.id}","${review.region}","${review.title.replace(/"/g, '""')}","${review.content.replace(
-            /"/g,
-            '""'
-          )}",${review.rating},"${review.version}","${review.date}","${review.author}"`
-      ),
-    ].join("\n");
+    // Create comprehensive export data
+    const exportData = {
+      metadata: {
+        exportDate: new Date().toISOString(),
+        appId: appId,
+        totalReviews: reviews.length,
+        selectedRegions: selectedRegions,
+        appMetadata: appMetadata,
+      },
+      reviews: reviews,
+      analysis: analysisResult,
+    };
 
-    const blob = new Blob([csvContent], { type: "text/csv" });
+    // Log export data for debugging
+    console.log("📤 Exporting data:", {
+      reviewsCount: reviews.length,
+      hasAnalysis: !!analysisResult,
+      analysisKeys: analysisResult ? Object.keys(analysisResult) : [],
+      appMetadata: !!appMetadata,
+    });
+
+    // Convert to JSON string with proper formatting
+    const jsonContent = JSON.stringify(exportData, null, 2);
+
+    // Create and download the file
+    const blob = new Blob([jsonContent], { type: "application/json" });
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `app-store-reviews-${appId}.csv`;
+    a.download = `reviewai-export-${appId}-${new Date().toISOString().split("T")[0]}.json`;
     a.click();
     window.URL.revokeObjectURL(url);
   };
@@ -449,6 +509,74 @@ export default function AppStoreAnalyzer() {
         progressDetails={progressDetails}
         error={error}
       />
+
+      {/* Cached Data Modal */}
+      {showCachedDataModal && cachedData && (
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-gradient-to-br from-zinc-900/95 to-black/95 border border-zinc-800/50 rounded-2xl p-6 w-full max-w-md">
+            <div className="flex items-center gap-3 mb-6">
+              <div className="w-12 h-12 bg-gradient-to-br from-blue-500/20 to-cyan-500/20 border border-blue-500/30 rounded-xl flex items-center justify-center">
+                <Clock className="h-6 w-6 text-blue-400" />
+              </div>
+              <div>
+                <h2 className="text-xl font-bold text-white">Cached Data Available</h2>
+                <p className="text-sm text-zinc-400">Load previously analyzed data for Grok (X AI)</p>
+              </div>
+            </div>
+
+            <div className="space-y-4 mb-6">
+              <div className="bg-zinc-800/30 border border-zinc-700/30 rounded-lg p-4">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-sm text-zinc-300">Export Date:</span>
+                  <span className="text-sm text-zinc-400">
+                    {new Date(cachedData.metadata.exportDate).toLocaleDateString()}
+                  </span>
+                </div>
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-sm text-zinc-300">Reviews:</span>
+                  <span className="text-sm text-zinc-400">{cachedData.metadata.totalReviews.toLocaleString()}</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-zinc-300">Regions:</span>
+                  <span className="text-sm text-zinc-400">
+                    {cachedData.metadata.selectedRegions.includes("all")
+                      ? "All (175)"
+                      : cachedData.metadata.selectedRegions.length}
+                  </span>
+                </div>
+              </div>
+
+              <div className="bg-yellow-900/20 border border-yellow-600/30 rounded-lg p-4">
+                <div className="flex items-center gap-2 mb-2">
+                  <Clock className="h-4 w-4 text-yellow-400" />
+                  <span className="text-sm font-medium text-yellow-400">Note</span>
+                </div>
+                <p className="text-xs text-white">
+                  This data was exported on {new Date(cachedData.metadata.exportDate).toLocaleDateString()}. It may be
+                  outdated. For fresh data, run a new analysis.
+                </p>
+              </div>
+            </div>
+
+            <div className="flex gap-3">
+              <Button
+                onClick={loadCachedData}
+                className="flex-1 bg-gradient-to-r from-blue-800/70 to-sky-900/50 border border-slate-600/50 text-slate-200 hover:from-blue-700 hover:via-sky-700 hover:to-sky-800 hover:text-white transition-all duration-200 shadow-lg"
+              >
+                <Download className="h-4 w-4 mr-2" />
+                Load Cached Data
+              </Button>
+              <Button
+                onClick={() => setShowCachedDataModal(false)}
+                variant="outline"
+                className="bg-gradient-to-r from-slate-800 via-gray-800 to-zinc-900 border border-slate-600/50 text-slate-200 hover:from-slate-700 hover:via-gray-700 hover:to-zinc-800 hover:text-white transition-all duration-200 shadow-lg"
+              >
+                Cancel
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
