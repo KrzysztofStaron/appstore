@@ -364,7 +364,7 @@ export function IssuesView({ analysisResult, reviews, appMetadata }: IssuesViewP
               onClick={generateIssueAnalysis}
               variant="outline"
               size="sm"
-              className="border-zinc-700 text-zinc-300"
+              className="bg-gradient-to-r from-slate-800 via-gray-800 to-zinc-900 border border-slate-600/50 text-slate-200 hover:from-slate-700 hover:via-gray-700 hover:to-zinc-800 hover:text-white transition-all duration-200 shadow-lg"
             >
               <AlertCircle className="h-4 w-4 mr-2" />
               Regenerate

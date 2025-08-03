@@ -232,10 +232,10 @@ export default function AppStoreAnalyzer() {
   const renderMainContent = () => {
     if (!analysisResult) {
       return (
-        <div className="flex items-center justify-center h-full">
+        <div className="flex items-center justify-center min-h-[calc(100vh-2rem)]">
           <div className="text-center max-w-md">
-            <div className="w-24 h-24 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-6">
-              <Search className="h-12 w-12 text-white" />
+            <div className="w-24 h-24 bg-gradient-to-br from-zinc-800/50 to-zinc-900/30 border border-zinc-700/50 rounded-full flex items-center justify-center mx-auto mb-6">
+              <Search className="h-12 w-12 text-zinc-300" />
             </div>
             <h3 className="text-2xl font-bold text-white mb-3">Ready to Analyze</h3>
             <p className="text-zinc-400 mb-6">
@@ -249,21 +249,76 @@ export default function AppStoreAnalyzer() {
     // Show loading state for all views when analyzing
     if (isAnalyzing) {
       return (
-        <div className="flex items-center justify-center min-h-[calc(100vh-2rem)]">
-          <div className="text-center max-w-md">
-            <div className="w-24 h-24 bg-gradient-to-br from-zinc-800/50 to-zinc-900/30 rounded-full flex items-center justify-center mx-auto mb-6 border border-zinc-700/50">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-zinc-400"></div>
+        <div className="space-y-8">
+          {/* Header Skeleton */}
+          <div className="space-y-4">
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 bg-gradient-to-br from-zinc-800/50 to-zinc-900/30 border border-zinc-700/50 rounded-xl animate-pulse"></div>
+              <div className="space-y-2">
+                <div className="h-8 w-48 bg-gradient-to-br from-zinc-800/50 to-zinc-900/30 border border-zinc-700/50 rounded animate-pulse"></div>
+                <div className="h-4 w-64 bg-gradient-to-br from-zinc-800/50 to-zinc-900/30 border border-zinc-700/50 rounded animate-pulse"></div>
+              </div>
             </div>
-            <h3 className="text-2xl font-bold text-white mb-3">Analyzing Data</h3>
-            <p className="text-zinc-300 mb-4">{currentStage || "Processing reviews..."}</p>
-            <div className="w-64 bg-zinc-800/50 rounded-full h-2 mb-2 mx-auto border border-zinc-700/50">
-              <div
-                className="bg-gradient-to-r from-zinc-600 to-zinc-500 h-2 rounded-full transition-all duration-300"
-                style={{ width: `${progress}%` }}
-              />
+          </div>
+
+          {/* Progress Section */}
+          <div className="flex items-center justify-center py-12">
+            <div className="text-center max-w-md">
+              <div className="w-24 h-24 bg-gradient-to-br from-zinc-800/50 to-zinc-900/30 border border-zinc-700/50 rounded-full flex items-center justify-center mx-auto mb-6">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-zinc-400"></div>
+              </div>
+              <h3 className="text-2xl font-bold text-white mb-3">Analyzing Data</h3>
+              <p className="text-zinc-300 mb-4">{currentStage || "Processing reviews..."}</p>
+              <div className="w-64 bg-zinc-800/50 border border-zinc-700/50 rounded-full h-2 mb-2 mx-auto">
+                <div
+                  className="bg-gradient-to-r from-zinc-600 to-zinc-500 h-2 rounded-full transition-all duration-300"
+                  style={{ width: `${progress}%` }}
+                />
+              </div>
+              <p className="text-xs text-zinc-500">{progress}% complete</p>
+              {progressDetails && (
+                <div className="mt-4 p-3 bg-zinc-800/30 border border-zinc-700/30 rounded-lg">
+                  <p className="text-xs text-zinc-400">{progressDetails}</p>
+                </div>
+              )}
             </div>
-            <p className="text-sm text-zinc-400">{Math.round(progress)}% complete</p>
-            {progressDetails && <p className="text-xs text-zinc-500 mt-2">{progressDetails}</p>}
+          </div>
+
+          {/* Content Skeleton */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            {/* Left Column */}
+            <div className="space-y-6">
+              <div className="bg-gradient-to-br from-zinc-800/50 to-zinc-900/30 border border-zinc-700/50 rounded-lg p-6">
+                <div className="h-6 w-32 bg-gradient-to-br from-zinc-700/50 to-zinc-800/30 rounded mb-4 animate-pulse"></div>
+                <div className="space-y-3">
+                  <div className="h-4 w-full bg-gradient-to-br from-zinc-700/50 to-zinc-800/30 rounded animate-pulse"></div>
+                  <div className="h-4 w-3/4 bg-gradient-to-br from-zinc-700/50 to-zinc-800/30 rounded animate-pulse"></div>
+                  <div className="h-4 w-5/6 bg-gradient-to-br from-zinc-700/50 to-zinc-800/30 rounded animate-pulse"></div>
+                </div>
+              </div>
+
+              <div className="bg-gradient-to-br from-zinc-800/50 to-zinc-900/30 border border-zinc-700/50 rounded-lg p-6">
+                <div className="h-6 w-40 bg-gradient-to-br from-zinc-700/50 to-zinc-800/30 rounded mb-4 animate-pulse"></div>
+                <div className="h-32 w-full bg-gradient-to-br from-zinc-700/50 to-zinc-800/30 rounded animate-pulse"></div>
+              </div>
+            </div>
+
+            {/* Right Column */}
+            <div className="space-y-6">
+              <div className="bg-gradient-to-br from-zinc-800/50 to-zinc-900/30 border border-zinc-700/50 rounded-lg p-6">
+                <div className="h-6 w-28 bg-gradient-to-br from-zinc-700/50 to-zinc-800/30 rounded mb-4 animate-pulse"></div>
+                <div className="space-y-3">
+                  <div className="h-4 w-full bg-gradient-to-br from-zinc-700/50 to-zinc-800/30 rounded animate-pulse"></div>
+                  <div className="h-4 w-2/3 bg-gradient-to-br from-zinc-700/50 to-zinc-800/30 rounded animate-pulse"></div>
+                  <div className="h-4 w-4/5 bg-gradient-to-br from-zinc-700/50 to-zinc-800/30 rounded animate-pulse"></div>
+                </div>
+              </div>
+
+              <div className="bg-gradient-to-br from-zinc-800/50 to-zinc-900/30 border border-zinc-700/50 rounded-lg p-6">
+                <div className="h-6 w-36 bg-gradient-to-br from-zinc-700/50 to-zinc-800/30 rounded mb-4 animate-pulse"></div>
+                <div className="h-24 w-full bg-gradient-to-br from-zinc-700/50 to-zinc-800/30 rounded animate-pulse"></div>
+              </div>
+            </div>
           </div>
         </div>
       );

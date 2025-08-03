@@ -84,7 +84,7 @@ export function VersionSlider({
               onClick={onRegenerate}
               disabled={isRegenerating}
               size="sm"
-              className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white border-0"
+              className="bg-gradient-to-r from-zinc-800/50 to-zinc-900/30 border border-zinc-700/50 text-white hover:from-zinc-700/50 hover:to-zinc-800/30 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <RefreshCw className={`h-4 w-4 mr-2 ${isRegenerating ? "animate-spin" : ""}`} />
               {isRegenerating ? "Regenerating..." : "Apply Filter"}
