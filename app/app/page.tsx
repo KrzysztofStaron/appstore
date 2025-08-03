@@ -19,7 +19,7 @@ import { AppStoreReview, AppMetadata, AnalysisResult, ViewType } from "@/app/typ
 import Link from "next/link";
 
 export default function AppStoreAnalyzer() {
-  const [appId, setAppId] = useState("6670324846");
+  const [appId, setAppId] = useState("");
   const [selectedRegions, setSelectedRegions] = useState<string[]>(["us", "gb", "ca"]);
   const [reviews, setReviews] = useState<AppStoreReview[]>([]);
   const [appMetadata, setAppMetadata] = useState<AppMetadata | null>(null);
