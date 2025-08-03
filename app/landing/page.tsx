@@ -53,7 +53,7 @@ export default function LandingPage() {
             </Button>
           </a>
           <Link href="/">
-            <Button className="bg-gradient-to-r from-slate-800/50 to-zinc-900/30 border border-slate-600/50 text-slate-200 hover:from-slate-700 hover:via-gray-700 hover:to-zinc-800 hover:text-white transition-all duration-200 shadow-lg">
+            <Button className="bg-gradient-to-r from-blue-800/70 to-sky-900/50 border border-slate-600/50 text-slate-200 hover:from-blue-700 hover:via-sky-700 hover:to-sky-800 hover:text-white transition-all duration-200 shadow-lg">
               Try App
             </Button>
           </Link>
@@ -66,14 +66,10 @@ export default function LandingPage() {
           <h1 className="text-5xl md:text-7xl font-bold mb-8">
             <span className="text-white">Transform</span>
             <br />
-            <span className="bg-gradient-to-r from-pink-500 to-purple-500 bg-clip-text text-transparent">
-              App Reviews
-            </span>
+            <span className="bg-gradient-to-r from-blue-500 to-sky-500 bg-clip-text text-transparent">App Reviews</span>
             <br />
             <span className="text-white">Into </span>
-            <span className="bg-gradient-to-r from-orange-500 via-pink-500 to-purple-500 bg-clip-text text-transparent">
-              Actionable
-            </span>
+            <span className="text-white">Actionable</span>
             <span className="text-white"> Insights</span>
           </h1>
 
@@ -86,7 +82,7 @@ export default function LandingPage() {
             <Link href="/">
               <Button
                 size="lg"
-                className="bg-gradient-to-r from-slate-800/50 to-zinc-900/30 border border-slate-600/50 text-slate-200 hover:from-slate-700 hover:via-gray-700 hover:to-zinc-800 hover:text-white transition-all duration-200 shadow-lg px-8 py-4 text-lg"
+                className="bg-gradient-to-r from-blue-800/70 to-sky-900/50 border border-slate-600/50 text-slate-200 hover:from-blue-700 hover:via-sky-700 hover:to-sky-800 hover:text-white transition-all duration-200 shadow-lg px-8 py-4 text-lg"
               >
                 <Play className="w-5 h-5 mr-2" />
                 Try App
@@ -192,7 +188,7 @@ export default function LandingPage() {
               <Link href="/">
                 <Button
                   size="lg"
-                  className="bg-gradient-to-r from-slate-800/50 to-zinc-900/30 border border-slate-600/50 text-slate-200 hover:from-slate-700 hover:via-gray-700 hover:to-zinc-800 hover:text-white transition-all duration-200 shadow-lg"
+                  className="bg-gradient-to-r from-blue-800/70 to-sky-900/50 border border-slate-600/50 text-slate-200 hover:from-blue-700 hover:via-sky-700 hover:to-sky-800 hover:text-white transition-all duration-200 shadow-lg"
                 >
                   Try App
                 </Button>
@@ -237,7 +233,7 @@ export default function LandingPage() {
           <Link href="/">
             <Button
               size="lg"
-              className="bg-gradient-to-r from-slate-800/50 to-zinc-900/30 border border-slate-600/50 text-slate-200 hover:from-slate-700 hover:via-gray-700 hover:to-zinc-800 hover:text-white transition-all duration-200 shadow-lg px-8 py-4 text-lg"
+              className="bg-gradient-to-r from-blue-800/70 to-sky-900/50 border border-slate-600/50 text-slate-200 hover:from-blue-700 hover:via-sky-700 hover:to-sky-800 hover:text-white transition-all duration-200 shadow-lg px-8 py-4 text-lg"
             >
               Try App Now
             </Button>

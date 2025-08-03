@@ -247,7 +247,7 @@ export default function AppStoreAnalyzer() {
             </p>
             <Button
               onClick={() => setIsConfigModalOpen(true)}
-              className="w-full bg-gradient-to-r from-slate-800/50 to-zinc-900/30 border border-slate-600/50 text-slate-200 hover:from-slate-700 hover:via-gray-700 hover:to-zinc-800 hover:text-white transition-all duration-200 shadow-lg"
+              className="w-full bg-gradient-to-r from-blue-800/70 to-sky-900/50 border border-slate-600/50 text-slate-200 hover:from-blue-700 hover:via-sky-700 hover:to-sky-800 hover:text-white transition-all duration-200 shadow-lg"
             >
               Generate
             </Button>
