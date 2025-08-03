@@ -115,6 +115,25 @@ export async function POST(request: NextRequest) {
           }
         }
 
+        // Deduplicate reviews by ID to prevent duplicates across regions
+        const uniqueReviews = allReviews.filter(
+          (review, index, self) => index === self.findIndex(r => r.id === review.id)
+        );
+
+        console.log(
+          `📊 Deduplication: ${allReviews.length} total reviews → ${uniqueReviews.length} unique reviews (removed ${
+            allReviews.length - uniqueReviews.length
+          } duplicates)`
+        );
+
+        sendProgress({
+          current: regions.length,
+          total: regions.length,
+          stage: `Deduplicating reviews...`,
+          percentage: 92,
+          details: `Removed ${allReviews.length - uniqueReviews.length} duplicate reviews`,
+        });
+
         sendProgress({
           current: regions.length,
           total: regions.length,
@@ -123,7 +142,7 @@ export async function POST(request: NextRequest) {
         });
 
         // Cache reviews
-        setCachedReviews(appId, regions, allReviews);
+        setCachedReviews(appId, regions, uniqueReviews);
 
         sendProgress({
           current: regions.length,
@@ -135,7 +154,7 @@ export async function POST(request: NextRequest) {
         // Send final result
         sendProgress({
           type: "complete",
-          reviews: allReviews,
+          reviews: uniqueReviews,
           metadata,
         });
 

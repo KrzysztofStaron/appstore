@@ -60,24 +60,17 @@ export function IssuesView({ analysisResult, reviews, appMetadata }: IssuesViewP
         });
       }, 200);
 
-      // Analyze reviews and categorize them
-      const categories: IssueCategory[] = [
+      // Define category definitions with priority order (higher priority = appears first)
+      const categoryDefinitions = [
         {
           id: "bugs",
           name: "Bugs & Crashes",
           description: "App crashes, freezes, and technical issues",
           icon: Bug,
           color: "text-red-400",
-          reviews: negativeReviews.filter(
-            review =>
-              review.content.toLowerCase().includes("crash") ||
-              review.content.toLowerCase().includes("bug") ||
-              review.content.toLowerCase().includes("freeze") ||
-              review.content.toLowerCase().includes("error") ||
-              review.content.toLowerCase().includes("broken")
-          ),
-          count: 0,
-          severity: "critical",
+          keywords: ["crash", "bug", "freeze", "error", "broken", "stuck", "not working"],
+          severity: "critical" as const,
+          priority: 1,
         },
         {
           id: "performance",
@@ -85,16 +78,9 @@ export function IssuesView({ analysisResult, reviews, appMetadata }: IssuesViewP
           description: "Slow loading, lag, and performance problems",
           icon: Zap,
           color: "text-orange-400",
-          reviews: negativeReviews.filter(
-            review =>
-              review.content.toLowerCase().includes("slow") ||
-              review.content.toLowerCase().includes("lag") ||
-              review.content.toLowerCase().includes("loading") ||
-              review.content.toLowerCase().includes("performance") ||
-              review.content.toLowerCase().includes("speed")
-          ),
-          count: 0,
-          severity: "high",
+          keywords: ["slow", "lag", "loading", "performance", "speed", "overheat", "stammering"],
+          severity: "high" as const,
+          priority: 2,
         },
         {
           id: "ux",
@@ -102,17 +88,9 @@ export function IssuesView({ analysisResult, reviews, appMetadata }: IssuesViewP
           description: "UI/UX problems and usability issues",
           icon: Users,
           color: "text-yellow-400",
-          reviews: negativeReviews.filter(
-            review =>
-              review.content.toLowerCase().includes("interface") ||
-              review.content.toLowerCase().includes("design") ||
-              review.content.toLowerCase().includes("layout") ||
-              review.content.toLowerCase().includes("confusing") ||
-              review.content.toLowerCase().includes("difficult") ||
-              review.content.toLowerCase().includes("hard to use")
-          ),
-          count: 0,
-          severity: "medium",
+          keywords: ["interface", "design", "layout", "confusing", "difficult", "hard to use", "unintuitive"],
+          severity: "medium" as const,
+          priority: 3,
         },
         {
           id: "features",
@@ -120,16 +98,9 @@ export function IssuesView({ analysisResult, reviews, appMetadata }: IssuesViewP
           description: "Requested features and functionality gaps",
           icon: Settings,
           color: "text-blue-400",
-          reviews: negativeReviews.filter(
-            review =>
-              review.content.toLowerCase().includes("feature") ||
-              review.content.toLowerCase().includes("missing") ||
-              review.content.toLowerCase().includes("need") ||
-              review.content.toLowerCase().includes("want") ||
-              review.content.toLowerCase().includes("should have")
-          ),
-          count: 0,
-          severity: "medium",
+          keywords: ["feature", "missing", "need", "want", "should have", "export", "pdf", "word"],
+          severity: "medium" as const,
+          priority: 4,
         },
         {
           id: "content",
@@ -137,43 +108,76 @@ export function IssuesView({ analysisResult, reviews, appMetadata }: IssuesViewP
           description: "Content quality, accuracy, and relevance problems",
           icon: AlertCircle,
           color: "text-purple-400",
-          reviews: negativeReviews.filter(
-            review =>
-              review.content.toLowerCase().includes("content") ||
-              review.content.toLowerCase().includes("information") ||
-              review.content.toLowerCase().includes("data") ||
-              review.content.toLowerCase().includes("wrong") ||
-              review.content.toLowerCase().includes("inaccurate")
-          ),
-          count: 0,
-          severity: "low",
+          keywords: ["content", "information", "data", "wrong", "inaccurate", "better", "chatgpt"],
+          severity: "low" as const,
+          priority: 5,
         },
-        {
+      ];
+
+      // Categorize reviews with priority-based assignment (no duplicates)
+      const categorizedReviews = new Set<string>();
+      const categories: IssueCategory[] = categoryDefinitions.map(def => ({
+        id: def.id,
+        name: def.name,
+        description: def.description,
+        icon: def.icon,
+        color: def.color,
+        reviews: [],
+        count: 0,
+        severity: def.severity,
+      }));
+
+      // Sort reviews by priority (highest priority category gets first pick)
+      for (const category of categories) {
+        const def = categoryDefinitions.find(d => d.id === category.id);
+        if (!def) continue;
+
+        const matchingReviews = negativeReviews.filter(review => {
+          // Skip if already categorized
+          if (categorizedReviews.has(review.id)) return false;
+
+          // Check if review matches this category's keywords
+          const reviewText = review.content.toLowerCase() + " " + review.title.toLowerCase();
+          return def.keywords.some(keyword => reviewText.includes(keyword));
+        });
+
+        // Add matching reviews to this category
+        category.reviews = matchingReviews;
+        category.count = matchingReviews.length;
+
+        // Mark these reviews as categorized
+        matchingReviews.forEach(review => categorizedReviews.add(review.id));
+      }
+
+      // Add uncategorized reviews to "other" category
+      const uncategorizedReviews = negativeReviews.filter(review => !categorizedReviews.has(review.id));
+      if (uncategorizedReviews.length > 0) {
+        categories.push({
           id: "other",
           name: "Other Issues",
           description: "Miscellaneous complaints and feedback",
           icon: AlertTriangle,
           color: "text-gray-400",
-          reviews: [],
-          count: 0,
+          reviews: uncategorizedReviews,
+          count: uncategorizedReviews.length,
           severity: "low",
-        },
-      ];
-
-      // Calculate counts and assign uncategorized reviews to "other"
-      const categorizedReviewIds = new Set();
-      categories.forEach(category => {
-        category.count = category.reviews.length;
-        category.reviews.forEach(review => categorizedReviewIds.add(review.id));
-      });
-
-      // Add uncategorized reviews to "other"
-      const uncategorizedReviews = negativeReviews.filter(review => !categorizedReviewIds.has(review.id));
-      categories[5].reviews = uncategorizedReviews;
-      categories[5].count = uncategorizedReviews.length;
+        });
+      }
 
       // Filter out empty categories
       const nonEmptyCategories = categories.filter(category => category.count > 0);
+
+      // Log deduplication results for debugging
+      const totalCategorized = nonEmptyCategories.reduce((sum, cat) => sum + cat.count, 0);
+      console.log(
+        `🔍 Issue Analysis: ${negativeReviews.length} negative reviews → ${totalCategorized} categorized (${
+          negativeReviews.length - totalCategorized
+        } in "other")`
+      );
+      console.log(
+        `📋 Categories:`,
+        nonEmptyCategories.map(cat => `${cat.name}: ${cat.count}`)
+      );
 
       clearInterval(progressInterval);
       setGenerationProgress(100);
@@ -242,7 +246,7 @@ export function IssuesView({ analysisResult, reviews, appMetadata }: IssuesViewP
         </div>
 
         <div className="grid gap-4">
-          {selectedCategory.reviews.map((review, index) => (
+          {selectedCategory.reviews.map(review => (
             <Card key={review.id} className="bg-black/30 border-zinc-800/50 backdrop-blur-sm">
               <CardContent className="p-6">
                 <div className="flex items-start justify-between mb-3">

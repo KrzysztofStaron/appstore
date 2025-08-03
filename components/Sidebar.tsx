@@ -130,7 +130,7 @@ export function Sidebar({
           <Button
             onClick={handleAnalyze}
             disabled={isPending || !appId.trim()}
-            className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white h-9 text-sm"
+            className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white h-9 text-sm"
           >
             {isAnalyzing ? (
               <>
@@ -224,10 +224,8 @@ export function Sidebar({
               <button
                 key={item.id}
                 onClick={() => setCurrentView(item.id as ViewType)}
-                className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all ${
-                  isActive
-                    ? "bg-zinc-800/50 text-white border border-zinc-700/50"
-                    : "text-zinc-400 hover:text-white hover:bg-zinc-900/30"
+                className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium ${
+                  isActive ? "bg-zinc-800/50 text-white border border-zinc-700/50" : "text-zinc-400"
                 }`}
               >
                 <Icon className={`h-4 w-4 ${isActive ? item.color : ""}`} />
@@ -247,7 +245,7 @@ export function Sidebar({
             size="sm"
             onClick={exportData}
             disabled={!reviews.length}
-            className="flex-1 bg-transparent border-zinc-700 text-zinc-300 hover:bg-zinc-800 h-8 text-xs"
+            className="flex-1 bg-transparent border-zinc-700 text-zinc-300 h-8 text-xs"
           >
             <Download className="h-3 w-3 mr-1" />
             Export
@@ -255,7 +253,7 @@ export function Sidebar({
           <Button
             variant="outline"
             size="sm"
-            className="flex-1 bg-transparent border-zinc-700 text-zinc-300 hover:bg-zinc-800 h-8 text-xs"
+            className="flex-1 bg-transparent border-zinc-700 text-zinc-300 h-8 text-xs"
           >
             <Settings className="h-3 w-3 mr-1" />
             Settings
