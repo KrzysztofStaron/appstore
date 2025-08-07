@@ -73,7 +73,6 @@ Available categories:
 For each review, determine:
 1. The most appropriate category based on the main complaint
 2. Confidence level (0.0 to 1.0) in your categorization
-3. Brief reasoning for the categorization
 
 Respond ONLY with a JSON array in this exact format:
 [
@@ -81,13 +80,11 @@ Respond ONLY with a JSON array in this exact format:
     "reviewId": "review_id_here",
     "category": "crashes_errors",
     "confidence": 0.95,
-    "reasoning": "User reports app crashing repeatedly"
   },
   {
     "reviewId": "review_id_here", 
     "category": "performance",
     "confidence": 0.80,
-    "reasoning": "Complaints about slow loading times"
   }
 ]
 
@@ -165,9 +162,7 @@ Do not include any other text or explanation. The array must contain exactly ${r
               content: prompt,
             },
           ],
-          max_tokens: this.config.api.maxTokens * 2 * Math.max(1, Math.ceil(reviews.length / 10)), // scale tokens with batch size
           temperature: this.config.api.temperature,
-          response_format: { type: "json_object" },
         });
       });
 
