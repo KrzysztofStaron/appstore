@@ -234,30 +234,95 @@ export function IssuesView({ analysisResult, reviews, appMetadata }: IssuesViewP
           </div>
         </div>
 
-        <div className="grid gap-4">
+        <div className="grid gap-6">
+          {/* Review display cards with improved structure */}
           {selectedCategory.reviews.map(review => (
-            <Card key={review.id} className="bg-black/30 border-zinc-800/50 backdrop-blur-sm">
-              <CardContent className="p-6">
-                <div className="flex items-start justify-between mb-3">
+            <Card
+              key={review.id}
+              className="bg-black/40 border-zinc-800/60 backdrop-blur-sm hover:bg-black/50 transition-all duration-200 group"
+            >
+              <CardContent className="p-0">
+                {/* Header section with rating and metadata */}
+                <div className="flex items-center justify-between p-4 border-b border-zinc-800/30">
                   <div className="flex items-center gap-3">
-                    <Badge variant="outline" className="text-xs">
-                      {review.rating}★
-                    </Badge>
-                    <Badge variant="outline" className="text-xs">
-                      {review.region.toUpperCase()}
-                    </Badge>
-                    <Badge variant="outline" className="text-xs">
-                      v{review.version}
-                    </Badge>
+                    {/* Rating with visual emphasis */}
+                    <div
+                      className={`flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${
+                        review.rating >= 4
+                          ? "bg-green-500/20 text-green-400"
+                          : review.rating >= 3
+                          ? "bg-yellow-500/20 text-yellow-400"
+                          : "bg-red-500/20 text-red-400"
+                      }`}
+                    >
+                      <span>{"★".repeat(review.rating)}</span>
+                      <span className="ml-1">{review.rating}</span>
+                    </div>
+
+                    {/* Metadata badges */}
+                    <div className="flex items-center gap-2">
+                      <Badge
+                        variant="outline"
+                        className="text-xs border-zinc-700 bg-zinc-800/30 text-zinc-300 hover:bg-zinc-700/30"
+                      >
+                        {review.region.toUpperCase()}
+                      </Badge>
+                      <Badge
+                        variant="outline"
+                        className="text-xs border-zinc-700 bg-zinc-800/30 text-zinc-300 hover:bg-zinc-700/30"
+                      >
+                        v{review.version}
+                      </Badge>
+                    </div>
                   </div>
-                  <div className="text-xs text-zinc-500">{new Date(review.date).toLocaleDateString()}</div>
+
+                  {/* Date and time info */}
+                  <div className="flex items-center gap-2 text-xs text-zinc-500">
+                    <Clock className="h-3 w-3" />
+                    <span>
+                      {new Date(review.date).toLocaleDateString("en-US", {
+                        month: "short",
+                        day: "numeric",
+                        year: "numeric",
+                      })}
+                    </span>
+                  </div>
                 </div>
 
-                <h4 className="font-semibold text-white mb-2">{review.title}</h4>
-                <p className="text-zinc-300 text-sm leading-relaxed">{review.content}</p>
+                {/* Content section */}
+                <div className="p-4 space-y-3">
+                  {/* Review title */}
+                  {review.title && (
+                    <h4 className="font-semibold text-white text-base leading-tight group-hover:text-zinc-100 transition-colors">
+                      {review.title}
+                    </h4>
+                  )}
 
-                <div className="flex items-center gap-2 mt-3 text-xs text-zinc-500">
-                  <span>by {review.author}</span>
+                  {/* Review content */}
+                  <div className="space-y-2">
+                    <p className="text-zinc-300 text-sm leading-relaxed group-hover:text-zinc-200 transition-colors">
+                      {review.content}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Footer with author info */}
+                <div className="flex items-center justify-between px-4 py-3 bg-zinc-900/30 border-t border-zinc-800/30">
+                  <div className="flex items-center gap-2">
+                    <div className="w-6 h-6 bg-gradient-to-br from-zinc-600 to-zinc-700 rounded-full flex items-center justify-center">
+                      <span className="text-xs font-medium text-white">{review.author.charAt(0).toUpperCase()}</span>
+                    </div>
+                    <span className="text-xs text-zinc-400">{review.author}</span>
+                  </div>
+
+                  {/* Severity indicator based on rating */}
+                  <div className="flex items-center gap-2">
+                    <div
+                      className={`w-2 h-2 rounded-full ${
+                        review.rating <= 2 ? "bg-red-500" : review.rating <= 3 ? "bg-yellow-500" : "bg-green-500"
+                      }`}
+                    />
+                  </div>
                 </div>
               </CardContent>
             </Card>
