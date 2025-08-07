@@ -667,31 +667,6 @@ export function IssuesView({ analysisResult, reviews, appMetadata }: IssuesViewP
                 {issueCategories.reduce((sum, cat) => sum + cat.count, 0)} negative reviews categorized
               </p>
             </div>
-            <div className="flex items-center gap-2">
-              <Button
-                onClick={generateIssueAnalysis}
-                variant="outline"
-                size="sm"
-                className="bg-gradient-to-r from-slate-800 via-gray-800 to-zinc-900 border border-slate-600/50 text-slate-200 hover:from-slate-700 hover:via-gray-700 hover:to-zinc-800 hover:text-white transition-all duration-200 shadow-lg"
-              >
-                <RotateCcw className="h-4 w-4 mr-2" />
-                Regenerate (Keywords)
-              </Button>
-              <Button
-                onClick={generateLLMBasedCategories}
-                variant="outline"
-                size="sm"
-                disabled={isCategorizingWithLLM}
-                className="bg-gradient-to-r from-emerald-800 via-green-800 to-teal-900 border border-emerald-600/50 text-emerald-200 hover:from-emerald-700 hover:via-green-700 hover:to-teal-800 hover:text-white transition-all duration-200 shadow-lg disabled:opacity-50"
-              >
-                {isCategorizingWithLLM ? (
-                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                ) : (
-                  <Brain className="h-4 w-4 mr-2" />
-                )}
-                Use AI
-              </Button>
-            </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
