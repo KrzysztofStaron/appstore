@@ -37,6 +37,7 @@ export default function AppStoreAnalyzer() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [showCachedDataModal, setShowCachedDataModal] = useState(false);
   const [cachedData, setCachedData] = useState<any>(null);
+  const [analysisCompleted, setAnalysisCompleted] = useState(false);
 
   // Create a stable dependency for regions
   const regionsKey = useMemo(() => selectedRegions.join(","), [selectedRegions]);
@@ -74,6 +75,7 @@ export default function AppStoreAnalyzer() {
     setAnalysisResult(cachedData.analysis);
     setSelectedRegions(cachedData.metadata.selectedRegions);
     setShowCachedDataModal(false);
+    setIsConfigModalOpen(false); // Also close the generation modal
 
     console.log("📂 Loaded cached data:", {
       reviewsCount: cachedData.reviews.length,
@@ -89,6 +91,7 @@ export default function AppStoreAnalyzer() {
     setProgress(0);
     setRegionProgress(null);
     setIsAnalyzing(true);
+    setAnalysisCompleted(false);
 
     startTransition(async () => {
       try {
@@ -253,6 +256,7 @@ export default function AppStoreAnalyzer() {
         setCurrentStage("");
         setProgressDetails("");
         setIsAnalyzing(false);
+        setAnalysisCompleted(true);
       }
     });
   };
@@ -488,7 +492,7 @@ export default function AppStoreAnalyzer() {
       {/* Main Content */}
       <div className="flex-1 flex flex-col overflow-hidden">
         <ScrollArea className="flex-1">
-          <div className="p-4 md:p-8 pt-20 md:pt-8">{renderMainContent()}</div>
+          <div className="p-4 md:p-8 pt-20 md:pt-8 max-w-7xl mx-auto w-full">{renderMainContent()}</div>
         </ScrollArea>
       </div>
 
@@ -508,6 +512,7 @@ export default function AppStoreAnalyzer() {
         currentStage={currentStage}
         progressDetails={progressDetails}
         error={error}
+        analysisCompleted={analysisCompleted}
       />
 
       {/* Cached Data Modal */}

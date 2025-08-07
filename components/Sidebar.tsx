@@ -170,7 +170,7 @@ export function Sidebar({
 
       {/* Navigation */}
       <div className="flex-1 p-3 md:p-4">
-        <div className="space-y-1">
+        <div className="space-y-2">
           {sidebarItems.map(item => {
             const Icon = item.icon;
             const isActive = currentView === item.id;
@@ -179,13 +179,19 @@ export function Sidebar({
                 key={item.id}
                 onClick={() => handleViewChange(item.id as ViewType)}
                 disabled={isAnalyzing}
-                className={`w-full flex items-center gap-3 px-3 py-2 md:py-2.5 rounded-lg text-sm font-medium transition-colors ${
-                  isActive ? "bg-zinc-800/50 text-white border border-zinc-700/50" : "text-zinc-400"
-                } ${isAnalyzing ? "opacity-50 cursor-not-allowed" : "hover:text-white"}`}
+                className={`w-full flex items-center gap-3 px-3 py-3 md:py-3.5 rounded-lg text-sm md:text-base font-medium transition-all duration-200 ${
+                  isActive
+                    ? "bg-zinc-800/80 text-white border border-zinc-700/50 shadow-lg"
+                    : "text-zinc-300 hover:text-white hover:bg-zinc-800/30"
+                } ${isAnalyzing ? "opacity-50 cursor-not-allowed" : ""}`}
               >
-                <Icon className={`h-4 w-4 ${isActive ? item.color : ""}`} />
-                <span className="flex-1 text-left">{item.label}</span>
-                {isActive && <ChevronRight className="h-4 w-4" />}
+                <Icon
+                  className={`h-4 w-4 md:h-5 md:w-5 ${
+                    isActive ? item.color : "text-zinc-400"
+                  } transition-colors duration-200`}
+                />
+                <span className="flex-1 text-left font-medium">{item.label}</span>
+                {isActive && <ChevronRight className="h-4 w-4 text-zinc-400" />}
                 {isAnalyzing && isActive && (
                   <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-white" />
                 )}

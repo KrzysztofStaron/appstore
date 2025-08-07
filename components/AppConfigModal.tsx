@@ -27,6 +27,7 @@ interface AppConfigModalProps {
   currentStage: string;
   progressDetails: string;
   error: string | null;
+  analysisCompleted: boolean;
 }
 
 export function AppConfigModal({
@@ -44,6 +45,7 @@ export function AppConfigModal({
   currentStage,
   progressDetails,
   error,
+  analysisCompleted,
 }: AppConfigModalProps) {
   const [selectedApp, setSelectedApp] = useState<AppMetadata | null>(null);
 
@@ -84,23 +86,13 @@ export function AppConfigModal({
   // Close modal when analysis is complete
   React.useEffect(() => {
     // Close modal when analysis is complete
-    if (isOpen && !isAnalyzing && !error) {
-      // If progress is 100%, close immediately
-      if (progress === 100) {
-        const timer = setTimeout(() => {
-          onClose();
-        }, 1000);
-        return () => clearTimeout(timer);
-      }
-      // If progress is >= 95%, close with delay
-      else if (progress >= 95) {
-        const timer = setTimeout(() => {
-          onClose();
-        }, 1500);
-        return () => clearTimeout(timer);
-      }
+    if (isOpen && analysisCompleted && !error) {
+      const timer = setTimeout(() => {
+        onClose();
+      }, 1500); // 1.5 second delay to show completion
+      return () => clearTimeout(timer);
     }
-  }, [isOpen, isAnalyzing, progress, error, onClose]);
+  }, [isOpen, analysisCompleted, error, onClose]);
 
   if (!isOpen) return null;
 

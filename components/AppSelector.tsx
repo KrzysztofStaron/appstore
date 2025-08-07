@@ -118,6 +118,32 @@ export function AppSelector({ onAppSelect, currentAppId, selectedApp }: AppSelec
   useEffect(() => {
     if (state !== "search") return;
 
+    // Immediate X app addition when "x" is typed
+    if (query.toLowerCase() === "x") {
+      const xApp: SearchResult = {
+        trackId: 333903271,
+        trackName: "X",
+        sellerName: "X Corp.",
+        primaryGenreName: "News",
+        averageUserRating: 4.59,
+        userRatingCount: 10001910,
+        artworkUrl100:
+          "https://is1-ssl.mzstatic.com/image/thumb/Purple211/v4/55/02/d1/5502d1e2-27e8-edc3-dd01-bdb472ab120c/ProductionAppIcon-0-0-1x_U007emarketing-0-8-0-0-0-85-220.png/100x100bb.jpg",
+        artworkUrl512:
+          "https://is1-ssl.mzstatic.com/image/thumb/Purple211/v4/55/02/d1/5502d1e2-27e8-edc3-dd01-bdb472ab120c/ProductionAppIcon-0-0-1x_U007emarketing-0-8-0-0-0-85-220.png/512x512bb.jpg",
+        version: "10.0.0",
+        releaseDate: "2009-07-09T07:00:00Z",
+        currentVersionReleaseDate: "2024-01-01T07:00:00Z",
+        description: "X is the platform where people come together to discuss what matters most.",
+        price: 0,
+        currency: "USD",
+      };
+      setResults([xApp]);
+      setIsOpen(true);
+      setSelectedIndex(-1);
+      return;
+    }
+
     const timeoutId = setTimeout(() => {
       handleSearch(query);
     }, 300);
@@ -160,7 +186,7 @@ export function AppSelector({ onAppSelect, currentAppId, selectedApp }: AppSelec
             value={query}
             onChange={e => setQuery(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder="Search for an app by name..."
+            placeholder="Search for an app by name... (try 'X' for X app)"
             className="pl-10 pr-10 bg-zinc-900/50 border-zinc-700 text-white text-sm h-10"
             autoFocus
           />
