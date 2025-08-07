@@ -54,6 +54,8 @@ export function IssuesView({ analysisResult, reviews, appMetadata }: IssuesViewP
     totalReviews?: number;
     categorizedReviews?: number;
     errors?: number;
+    currentBatch?: number;
+    totalBatches?: number;
   }>({ stage: "", percentage: 0 });
   const [categorizationMethod, setCategorizationMethod] = useState<"keyword" | "llm" | "keyword_fallback">("keyword");
 
@@ -293,6 +295,16 @@ export function IssuesView({ analysisResult, reviews, appMetadata }: IssuesViewP
             try {
               const data = JSON.parse(line.slice(6));
 
+              if (data.type === "error") {
+                setCategorizationProgress({
+                  stage: data.error || "An error occurred",
+                  percentage: 100,
+                  errors: 1,
+                });
+                setIsCategorizingWithLLM(false);
+                return;
+              }
+
               if (data.type === "complete") {
                 // Process the final categorization result
                 const categoryDefinitions = getCategoryDefinitions();
@@ -354,13 +366,15 @@ export function IssuesView({ analysisResult, reviews, appMetadata }: IssuesViewP
               } else if (data.type === "error") {
                 throw new Error(data.error);
               } else {
-                // Progress update
+                // Progress update with detailed batch information
                 setCategorizationProgress({
                   stage: data.stage || "Processing...",
                   percentage: data.percentage || 0,
                   totalReviews: data.totalReviews,
                   categorizedReviews: data.categorizedReviews,
                   errors: data.errors,
+                  currentBatch: data.currentBatch,
+                  totalBatches: data.totalBatches,
                 });
               }
             } catch (parseError) {
@@ -618,10 +632,25 @@ export function IssuesView({ analysisResult, reviews, appMetadata }: IssuesViewP
                 </div>
 
                 {categorizationProgress.totalReviews && (
-                  <div className="flex justify-between text-xs text-zinc-500">
-                    <span>Total Reviews: {categorizationProgress.totalReviews}</span>
-                    {categorizationProgress.categorizedReviews !== undefined && (
-                      <span>Categorized: {categorizationProgress.categorizedReviews}</span>
+                  <div className="space-y-1">
+                    <div className="flex justify-between text-xs text-zinc-500">
+                      <span>Total Reviews: {categorizationProgress.totalReviews}</span>
+                      {categorizationProgress.categorizedReviews !== undefined && (
+                        <span>Categorized: {categorizationProgress.categorizedReviews}</span>
+                      )}
+                    </div>
+                    {categorizationProgress.currentBatch && categorizationProgress.totalBatches && (
+                      <div className="flex justify-between text-xs text-zinc-400">
+                        <span>
+                          Batch Progress: {categorizationProgress.currentBatch} / {categorizationProgress.totalBatches}
+                        </span>
+                        <span>
+                          {Math.round(
+                            ((categorizationProgress.currentBatch - 1) / categorizationProgress.totalBatches) * 100
+                          )}
+                          % of batches complete
+                        </span>
+                      </div>
                     )}
                   </div>
                 )}

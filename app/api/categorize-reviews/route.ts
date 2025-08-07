@@ -101,13 +101,25 @@ export async function POST(request: NextRequest) {
             totalBatches,
           });
 
-          // Try LLM categorization first
+          // Try LLM categorization first with streaming progress
           try {
-            const result = await reviewCategorizer.categorizeReviews(reviewForAI);
+            const result = await reviewCategorizer.categorizeReviews(reviewForAI, progressData => {
+              // Forward progress from the categorizer to the client
+              sendProgress({
+                stage: progressData.stage,
+                percentage: progressData.percentage,
+                currentBatch: progressData.currentBatch,
+                totalBatches: progressData.totalBatches,
+                categorizedReviews: progressData.categorizedSoFar,
+                totalReviews: progressData.totalReviews,
+              });
+            });
 
             sendProgress({
               stage: "Categorization complete!",
               percentage: 100,
+              categorizedReviews: result.categories.length,
+              totalReviews: validReviews.length,
             });
 
             // Send final result

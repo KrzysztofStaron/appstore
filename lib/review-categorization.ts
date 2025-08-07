@@ -181,7 +181,17 @@ Do not include any other text or explanation. The array must contain exactly ${r
     }
   }
 
-  async categorizeReviews(reviews: AppStoreReview[]): Promise<BatchCategorizationResult> {
+  async categorizeReviews(
+    reviews: AppStoreReview[],
+    progressCallback?: (data: {
+      stage: string;
+      percentage: number;
+      currentBatch?: number;
+      totalBatches?: number;
+      categorizedSoFar?: number;
+      totalReviews?: number;
+    }) => void
+  ): Promise<BatchCategorizationResult> {
     const startTime = Date.now();
     const errors: string[] = [];
     const allCategories: CategoryResult[] = [];
@@ -205,6 +215,15 @@ Do not include any other text or explanation. The array must contain exactly ${r
 
     console.log(`📦 Processing ${batches.length} batches...`);
 
+    // Send initial progress
+    progressCallback?.({
+      stage: `Processing ${batches.length} batches of reviews...`,
+      percentage: 20,
+      totalBatches: batches.length,
+      totalReviews: reviews.length,
+      categorizedSoFar: 0,
+    });
+
     // Process batches with rate limiting
     for (let i = 0; i < batches.length; i++) {
       const batch = batches[i];
@@ -212,17 +231,56 @@ Do not include any other text or explanation. The array must contain exactly ${r
       try {
         console.log(`📊 Processing batch ${i + 1}/${batches.length} (${batch.length} reviews)...`);
 
+        // Send progress for current batch
+        progressCallback?.({
+          stage: `Processing batch ${i + 1} of ${batches.length}...`,
+          percentage: 20 + (i / batches.length) * 70, // Progress from 20% to 90%
+          currentBatch: i + 1,
+          totalBatches: batches.length,
+          categorizedSoFar: allCategories.length,
+          totalReviews: reviews.length,
+        });
+
         const batchCategories = await this.categorizeBatch(batch);
         allCategories.push(...batchCategories);
+
+        // Send progress after batch completion
+        progressCallback?.({
+          stage: `Completed batch ${i + 1} of ${batches.length}`,
+          percentage: 20 + ((i + 1) / batches.length) * 70, // Progress from 20% to 90%
+          currentBatch: i + 1,
+          totalBatches: batches.length,
+          categorizedSoFar: allCategories.length,
+          totalReviews: reviews.length,
+        });
       } catch (error) {
         const errorMsg = `Batch ${i + 1} failed: ${error instanceof Error ? error.message : String(error)}`;
         console.error(`❌ ${errorMsg}`);
         errors.push(errorMsg);
 
+        // Send error progress
+        progressCallback?.({
+          stage: `Batch ${i + 1} failed, continuing with next batch...`,
+          percentage: 20 + ((i + 1) / batches.length) * 70,
+          currentBatch: i + 1,
+          totalBatches: batches.length,
+          categorizedSoFar: allCategories.length,
+          totalReviews: reviews.length,
+        });
+
         // Continue with other batches even if one fails
         continue;
       }
     }
+
+    // Send final progress
+    progressCallback?.({
+      stage: "Finalizing categorization results...",
+      percentage: 95,
+      totalBatches: batches.length,
+      categorizedSoFar: allCategories.length,
+      totalReviews: reviews.length,
+    });
 
     const processingTime = Date.now() - startTime;
 
