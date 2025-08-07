@@ -255,6 +255,7 @@ export default function AppStoreAnalyzer() {
         setRegionProgress(null);
         setCurrentStage("");
         setProgressDetails("");
+        setIsConfigModalOpen(false);
         setIsAnalyzing(false);
         setAnalysisCompleted(true);
       }

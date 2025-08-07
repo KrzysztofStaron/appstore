@@ -83,17 +83,6 @@ export function AppConfigModal({
     }
   };
 
-  // Close modal when analysis is complete
-  React.useEffect(() => {
-    // Close modal when analysis is complete
-    if (isOpen && analysisCompleted && !error) {
-      const timer = setTimeout(() => {
-        onClose();
-      }, 1500); // 1.5 second delay to show completion
-      return () => clearTimeout(timer);
-    }
-  }, [isOpen, analysisCompleted, error, onClose]);
-
   if (!isOpen) return null;
 
   return (
