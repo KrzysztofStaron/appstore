@@ -17,9 +17,9 @@ export function SentimentView({ analysisResult }: SentimentViewProps) {
   const { positive, negative, neutral, total } = analysisResult.sentimentAnalysis;
 
   // Calculate percentages
-  const positivePercent = total > 0 ? Math.round((positive / total) * 100) : 0;
-  const negativePercent = total > 0 ? Math.round((negative / total) * 100) : 0;
-  const neutralPercent = total > 0 ? Math.round((neutral / total) * 100) : 0;
+  const positivePercent = total > 0 ? Number(((positive / total) * 100).toFixed(2)) : 0;
+  const negativePercent = total > 0 ? Number(((negative / total) * 100).toFixed(2)) : 0;
+  const neutralPercent = total > 0 ? Number(((neutral / total) * 100).toFixed(2)) : 0;
 
   const sentimentData = [
     {

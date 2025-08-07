@@ -40,6 +40,7 @@ export function VersionsView({ analysisResult }: VersionsViewProps) {
                     borderRadius: "8px",
                     color: "#F9FAFB",
                   }}
+                  formatter={(value: any) => [typeof value === "number" ? value.toFixed(2) : value, "Average Rating"]}
                 />
                 <Bar dataKey="averageRating" fill="#F97316" radius={[4, 4, 0, 0]} />
               </BarChart>
@@ -49,4 +50,4 @@ export function VersionsView({ analysisResult }: VersionsViewProps) {
       </Card>
     </div>
   );
-} 
+}

@@ -40,6 +40,7 @@ export function RegionsView({ analysisResult }: RegionsViewProps) {
                     borderRadius: "8px",
                     color: "#F9FAFB",
                   }}
+                  formatter={(value: any) => [typeof value === "number" ? value.toFixed(2) : value, "Average Rating"]}
                 />
                 <Bar dataKey="averageRating" fill="#06B6D4" radius={[4, 4, 0, 0]} />
               </BarChart>

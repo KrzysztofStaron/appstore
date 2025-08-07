@@ -80,7 +80,9 @@ export function DashboardView({ analysisResult, appMetadata, onNavigateToView }:
             </div>
             <div className="space-y-1 mb-3 md:mb-4">
               <div className="text-2xl md:text-3xl font-bold text-white">
-                {Math.round((analysisResult.sentimentAnalysis.positive / analysisResult.sentimentAnalysis.total) * 100)}
+                {((analysisResult.sentimentAnalysis.positive / analysisResult.sentimentAnalysis.total) * 100).toFixed(
+                  2
+                )}
                 %
               </div>
               <div className="text-xs md:text-sm text-zinc-400">Positive Sentiment</div>
@@ -359,6 +361,10 @@ export function DashboardView({ analysisResult, appMetadata, onNavigateToView }:
                         borderRadius: "8px",
                         color: "#F9FAFB",
                       }}
+                      formatter={(value: any) => [
+                        typeof value === "number" ? value.toFixed(2) : value,
+                        "Average Rating",
+                      ]}
                     />
                     <Area
                       type="monotone"
