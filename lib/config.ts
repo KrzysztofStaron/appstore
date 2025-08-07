@@ -47,7 +47,7 @@ export const defaultConfig: AppStoreAnalyzerConfig = {
 
   api: {
     baseURL: "https://openrouter.ai/api/v1",
-    model: "mistralai/ministral-3b",
+    model: "mistralai/mistral-saba",
     maxTokens: 200,
     temperature: 0.1,
   },

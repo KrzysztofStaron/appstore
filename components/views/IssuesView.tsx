@@ -15,6 +15,8 @@ import {
   Clock,
   AlertTriangle,
   RotateCcw,
+  Loader2,
+  Brain,
 } from "lucide-react";
 import { AnalysisResult, AppStoreReview, AppMetadata } from "@/app/types";
 import { filterReviewsByVersion } from "@/lib/utils";
@@ -44,6 +46,17 @@ export function IssuesView({ analysisResult, reviews, appMetadata }: IssuesViewP
   // Version filter state
   const [minVersion, setMinVersion] = useState<string>("0.0");
 
+  // LLM categorization state
+  const [isCategorizingWithLLM, setIsCategorizingWithLLM] = useState<boolean>(false);
+  const [categorizationProgress, setCategorizationProgress] = useState<{
+    stage: string;
+    percentage: number;
+    totalReviews?: number;
+    categorizedReviews?: number;
+    errors?: number;
+  }>({ stage: "", percentage: 0 });
+  const [categorizationMethod, setCategorizationMethod] = useState<"keyword" | "llm" | "keyword_fallback">("keyword");
+
   // Generate issues from stored analysis results
   useEffect(() => {
     if (analysisResult && reviews.length > 0) {
@@ -51,69 +64,117 @@ export function IssuesView({ analysisResult, reviews, appMetadata }: IssuesViewP
     }
   }, [analysisResult, reviews, minVersion]);
 
-  const generateIssueAnalysis = () => {
-    // Filter reviews by version first, then get negative reviews (rating 1-2)
-    const filteredReviews = filterReviewsByVersion(reviews, minVersion);
-    const negativeReviews = filteredReviews.filter(review => review.rating <= 2);
+  // Define category definitions
+  const getCategoryDefinitions = () => [
+    {
+      id: "crashes_errors",
+      name: "Crashes and Errors",
+      description: "App crashes, freezes, fatal errors, and application not responding",
+      icon: AlertTriangle,
+      color: "text-red-400",
+      severity: "critical" as const,
+    },
+    {
+      id: "feature_requests",
+      name: "Feature Requests",
+      description: "Missing functionality, new feature requests, and enhancement suggestions",
+      icon: Settings,
+      color: "text-blue-400",
+      severity: "medium" as const,
+    },
+    {
+      id: "performance",
+      name: "Performance Issues",
+      description: "Slow loading, lag, speed issues, memory problems, and battery drain",
+      icon: Zap,
+      color: "text-orange-400",
+      severity: "high" as const,
+    },
+    {
+      id: "ui_ux",
+      name: "UI/UX Issues",
+      description: "User interface problems, design issues, confusing navigation, and usability problems",
+      icon: Users,
+      color: "text-yellow-400",
+      severity: "medium" as const,
+    },
+    {
+      id: "bugs_issues",
+      name: "Bugs and Issues",
+      description: "Non-fatal bugs, glitches, minor technical issues, and broken features",
+      icon: Bug,
+      color: "text-purple-400",
+      severity: "medium" as const,
+    },
+  ];
 
-    if (negativeReviews.length === 0) {
+  const generateIssueAnalysis = () => {
+    // Filter reviews by version first, then apply Issues view specific filtering
+    const versionFilteredReviews = filterReviewsByVersion(reviews, minVersion);
+
+    // Apply Issues view specific filtering: rating ≤3, ≥60 characters, ≥4 words
+    const issuesFilteredReviews = versionFilteredReviews.filter(review => {
+      if (review.rating > 3) return false;
+
+      const combinedText = `${review.title} ${review.content}`.trim();
+
+      // Check minimum length (60 characters)
+      if (combinedText.length < 60) return false;
+
+      // Check minimum word count (4 words)
+      const wordCount = combinedText.split(/\s+/).length;
+      if (wordCount < 4) return false;
+
+      return true;
+    });
+
+    if (issuesFilteredReviews.length === 0) {
       setIssueCategories([]);
       return;
     }
 
-    // Define category definitions with priority order (higher priority = appears first)
-    const categoryDefinitions = [
-      {
-        id: "bugs",
-        name: "Bugs & Crashes",
-        description: "App crashes, freezes, and technical issues",
-        icon: Bug,
-        color: "text-red-400",
-        keywords: ["crash", "bug", "freeze", "error", "broken", "stuck", "not working"],
-        severity: "critical" as const,
-        priority: 1,
-      },
-      {
-        id: "performance",
-        name: "Performance Issues",
-        description: "Slow loading, lag, and performance problems",
-        icon: Zap,
-        color: "text-orange-400",
-        keywords: ["slow", "lag", "loading", "performance", "speed", "overheat", "stammering"],
-        severity: "high" as const,
-        priority: 2,
-      },
-      {
-        id: "ux",
-        name: "User Experience",
-        description: "UI/UX problems and usability issues",
-        icon: Users,
-        color: "text-yellow-400",
-        keywords: ["interface", "design", "layout", "confusing", "difficult", "hard to use", "unintuitive"],
-        severity: "medium" as const,
-        priority: 3,
-      },
-      {
-        id: "features",
-        name: "Missing Features",
-        description: "Requested features and functionality gaps",
-        icon: Settings,
-        color: "text-blue-400",
-        keywords: ["feature", "missing", "need", "want", "should have", "export", "pdf", "word"],
-        severity: "medium" as const,
-        priority: 4,
-      },
-      {
-        id: "content",
-        name: "Content Issues",
-        description: "Content quality, accuracy, and relevance problems",
-        icon: AlertCircle,
-        color: "text-purple-400",
-        keywords: ["content", "information", "data", "wrong", "inaccurate", "better", "chatgpt"],
-        severity: "low" as const,
-        priority: 5,
-      },
-    ];
+    // Use keyword-based categorization as fallback
+    generateKeywordBasedCategories(issuesFilteredReviews);
+  };
+
+  const generateKeywordBasedCategories = (filteredReviews: AppStoreReview[]) => {
+    const categoryDefinitions = getCategoryDefinitions();
+    const keywordMap = {
+      crashes_errors: [
+        "crash",
+        "crashes",
+        "crashed",
+        "freeze",
+        "freezes",
+        "fatal error",
+        "not responding",
+        "force close",
+      ],
+      feature_requests: [
+        "feature",
+        "missing",
+        "need",
+        "want",
+        "should have",
+        "request",
+        "add",
+        "enhancement",
+        "suggestion",
+      ],
+      performance: ["slow", "lag", "loading", "performance", "speed", "battery", "memory", "hang", "stutter"],
+      ui_ux: [
+        "interface",
+        "design",
+        "layout",
+        "confusing",
+        "difficult",
+        "hard to use",
+        "unintuitive",
+        "ugly",
+        "navigation",
+      ],
+      bugs_issues: ["bug", "glitch", "error", "broken", "stuck", "not working", "fails", "issue", "problem"],
+    };
 
     // Categorize reviews with priority-based assignment (no duplicates)
     const categorizedReviews = new Set<string>();
@@ -130,16 +191,15 @@ export function IssuesView({ analysisResult, reviews, appMetadata }: IssuesViewP
 
     // Sort reviews by priority (highest priority category gets first pick)
     for (const category of categories) {
-      const def = categoryDefinitions.find(d => d.id === category.id);
-      if (!def) continue;
+      const keywords = keywordMap[category.id as keyof typeof keywordMap] || [];
 
-      const matchingReviews = negativeReviews.filter(review => {
+      const matchingReviews = filteredReviews.filter(review => {
         // Skip if already categorized
         if (categorizedReviews.has(review.id)) return false;
 
         // Check if review matches this category's keywords
         const reviewText = review.content.toLowerCase() + " " + review.title.toLowerCase();
-        return def.keywords.some(keyword => reviewText.includes(keyword));
+        return keywords.some(keyword => reviewText.includes(keyword));
       });
 
       // Add matching reviews to this category
@@ -151,7 +211,7 @@ export function IssuesView({ analysisResult, reviews, appMetadata }: IssuesViewP
     }
 
     // Add uncategorized reviews to "other" category
-    const uncategorizedReviews = negativeReviews.filter(review => !categorizedReviews.has(review.id));
+    const uncategorizedReviews = filteredReviews.filter(review => !categorizedReviews.has(review.id));
     if (uncategorizedReviews.length > 0) {
       categories.push({
         id: "other",
@@ -167,20 +227,159 @@ export function IssuesView({ analysisResult, reviews, appMetadata }: IssuesViewP
 
     // Filter out empty categories
     const nonEmptyCategories = categories.filter(category => category.count > 0);
-
-    // Log deduplication results for debugging
-    const totalCategorized = nonEmptyCategories.reduce((sum, cat) => sum + cat.count, 0);
-    console.log(
-      `🔍 Issue Analysis: ${negativeReviews.length} negative reviews → ${totalCategorized} categorized (${
-        negativeReviews.length - totalCategorized
-      } in "other")`
-    );
-    console.log(
-      `📋 Categories:`,
-      nonEmptyCategories.map(cat => `${cat.name}: ${cat.count}`)
-    );
-
     setIssueCategories(nonEmptyCategories);
+    setCategorizationMethod("keyword");
+  };
+
+  const generateLLMBasedCategories = async () => {
+    // Filter reviews by version first, then apply Issues view specific filtering
+    const versionFilteredReviews = filterReviewsByVersion(reviews, minVersion);
+
+    // Apply Issues view specific filtering: rating ≤3, ≥60 characters, ≥4 words
+    const issuesFilteredReviews = versionFilteredReviews.filter(review => {
+      if (review.rating > 3) return false;
+
+      const combinedText = `${review.title} ${review.content}`.trim();
+
+      // Check minimum length (60 characters)
+      if (combinedText.length < 60) return false;
+
+      // Check minimum word count (4 words)
+      const wordCount = combinedText.split(/\s+/).length;
+      if (wordCount < 4) return false;
+
+      return true;
+    });
+
+    if (issuesFilteredReviews.length === 0) {
+      setIssueCategories([]);
+      return;
+    }
+
+    setIsCategorizingWithLLM(true);
+    setCategorizationProgress({ stage: "Initializing...", percentage: 0 });
+
+    try {
+      const response = await fetch("/api/categorize-reviews", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          reviews: issuesFilteredReviews, // Send filtered reviews for Issues view
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const reader = response.body?.getReader();
+      if (!reader) {
+        throw new Error("No response body");
+      }
+
+      const decoder = new TextDecoder();
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        const chunk = decoder.decode(value);
+        const lines = chunk.split("\n");
+
+        for (const line of lines) {
+          if (line.startsWith("data: ")) {
+            try {
+              const data = JSON.parse(line.slice(6));
+
+              if (data.type === "complete") {
+                // Process the final categorization result
+                const categoryDefinitions = getCategoryDefinitions();
+                const categories: IssueCategory[] = categoryDefinitions.map(def => ({
+                  id: def.id,
+                  name: def.name,
+                  description: def.description,
+                  icon: def.icon,
+                  color: def.color,
+                  reviews: [],
+                  count: 0,
+                  severity: def.severity,
+                }));
+
+                // Group reviews by category
+                const reviewsByCategory: Record<string, AppStoreReview[]> = {};
+
+                for (const categoryResult of data.result.categories) {
+                  const review = issuesFilteredReviews.find(r => r.id === categoryResult.reviewId);
+                  if (review) {
+                    if (!reviewsByCategory[categoryResult.category]) {
+                      reviewsByCategory[categoryResult.category] = [];
+                    }
+                    reviewsByCategory[categoryResult.category].push(review);
+                  }
+                }
+
+                // Update categories with reviews
+                for (const category of categories) {
+                  category.reviews = reviewsByCategory[category.id] || [];
+                  category.count = category.reviews.length;
+                }
+
+                // Add "other" category if there are uncategorized reviews
+                const categorizedReviewIds = new Set(data.result.categories.map((c: any) => c.reviewId));
+                const uncategorizedReviews = issuesFilteredReviews.filter(
+                  review => !categorizedReviewIds.has(review.id)
+                );
+
+                if (uncategorizedReviews.length > 0) {
+                  categories.push({
+                    id: "other",
+                    name: "Other Issues",
+                    description: "Miscellaneous complaints and feedback",
+                    icon: AlertTriangle,
+                    color: "text-gray-400",
+                    reviews: uncategorizedReviews,
+                    count: uncategorizedReviews.length,
+                    severity: "low",
+                  });
+                }
+
+                const nonEmptyCategories = categories.filter(category => category.count > 0);
+                setIssueCategories(nonEmptyCategories);
+                setCategorizationMethod(data.result.method || "llm");
+
+                console.log(`✅ LLM categorization complete: ${data.result.categorizedReviews} reviews categorized`);
+                break;
+              } else if (data.type === "error") {
+                throw new Error(data.error);
+              } else {
+                // Progress update
+                setCategorizationProgress({
+                  stage: data.stage || "Processing...",
+                  percentage: data.percentage || 0,
+                  totalReviews: data.totalReviews,
+                  categorizedReviews: data.categorizedReviews,
+                  errors: data.errors,
+                });
+              }
+            } catch (parseError) {
+              console.warn("Failed to parse SSE data:", parseError);
+            }
+          }
+        }
+      }
+    } catch (error) {
+      console.error("❌ LLM categorization failed:", error);
+
+      // Fallback to keyword-based categorization
+      setCategorizationProgress({ stage: "Falling back to keyword categorization...", percentage: 50 });
+      generateKeywordBasedCategories(issuesFilteredReviews);
+      setCategorizationMethod("keyword_fallback");
+    } finally {
+      setIsCategorizingWithLLM(false);
+      setCategorizationProgress({ stage: "", percentage: 0 });
+    }
   };
 
   const getSeverityColor = (severity: string) => {
@@ -347,6 +546,91 @@ export function IssuesView({ analysisResult, reviews, appMetadata }: IssuesViewP
       {/* Version Filter */}
       <VersionSlider reviews={reviews} appMetadata={appMetadata} onVersionChange={setMinVersion} />
 
+      {/* LLM Categorization Controls */}
+      {!isCategorizingWithLLM && analysisResult && (
+        <Card className="bg-black/30 border-zinc-800/50 backdrop-blur-sm">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-emerald-500/20 rounded-lg">
+                  <Brain className="h-5 w-5 text-emerald-400" />
+                </div>
+                <div>
+                  <h3 className="font-semibold text-white">AI-Powered Categorization</h3>
+                  <p className="text-sm text-zinc-400">
+                    Use LLM to intelligently categorize reviews instead of keyword matching
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-center gap-3">
+                {categorizationMethod !== "keyword" && (
+                  <Badge
+                    variant="outline"
+                    className={`text-xs ${
+                      categorizationMethod === "llm"
+                        ? "border-emerald-500 bg-emerald-500/10 text-emerald-400"
+                        : "border-yellow-500 bg-yellow-500/10 text-yellow-400"
+                    }`}
+                  >
+                    {categorizationMethod === "llm" ? "LLM Categorized" : "Keyword Fallback"}
+                  </Badge>
+                )}
+                <Button
+                  onClick={generateLLMBasedCategories}
+                  variant="outline"
+                  size="sm"
+                  className="bg-gradient-to-r from-emerald-800 via-green-800 to-teal-900 border border-emerald-600/50 text-emerald-200 hover:from-emerald-700 hover:via-green-700 hover:to-teal-800 hover:text-white transition-all duration-200 shadow-lg"
+                >
+                  <Brain className="h-4 w-4 mr-2" />
+                  Use AI Categorization
+                </Button>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* LLM Categorization Progress */}
+      {isCategorizingWithLLM && (
+        <Card className="bg-black/30 border-zinc-800/50 backdrop-blur-sm">
+          <CardContent className="p-6">
+            <div className="space-y-4">
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-emerald-500/20 rounded-lg">
+                  <Loader2 className="h-5 w-5 text-emerald-400 animate-spin" />
+                </div>
+                <div>
+                  <h3 className="font-semibold text-white">AI Categorization in Progress</h3>
+                  <p className="text-sm text-zinc-400">{categorizationProgress.stage}</p>
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <div className="flex justify-between text-sm">
+                  <span className="text-zinc-400">Progress</span>
+                  <span className="text-zinc-300">{Math.round(categorizationProgress.percentage)}%</span>
+                </div>
+                <div className="w-full bg-zinc-800 rounded-full h-2">
+                  <div
+                    className="bg-gradient-to-r from-emerald-500 to-teal-500 h-2 rounded-full transition-all duration-300"
+                    style={{ width: `${categorizationProgress.percentage}%` }}
+                  />
+                </div>
+
+                {categorizationProgress.totalReviews && (
+                  <div className="flex justify-between text-xs text-zinc-500">
+                    <span>Total Reviews: {categorizationProgress.totalReviews}</span>
+                    {categorizationProgress.categorizedReviews !== undefined && (
+                      <span>Categorized: {categorizationProgress.categorizedReviews}</span>
+                    )}
+                  </div>
+                )}
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       {issueCategories.length === 0 && !analysisResult && (
         <Card className="bg-black/30 border-zinc-800/50 backdrop-blur-sm">
           <CardContent className="p-8 text-center">
@@ -383,15 +667,31 @@ export function IssuesView({ analysisResult, reviews, appMetadata }: IssuesViewP
                 {issueCategories.reduce((sum, cat) => sum + cat.count, 0)} negative reviews categorized
               </p>
             </div>
-            <Button
-              onClick={generateIssueAnalysis}
-              variant="outline"
-              size="sm"
-              className="bg-gradient-to-r from-slate-800 via-gray-800 to-zinc-900 border border-slate-600/50 text-slate-200 hover:from-slate-700 hover:via-gray-700 hover:to-zinc-800 hover:text-white transition-all duration-200 shadow-lg"
-            >
-              <RotateCcw className="h-4 w-4 mr-2" />
-              Regenerate
-            </Button>
+            <div className="flex items-center gap-2">
+              <Button
+                onClick={generateIssueAnalysis}
+                variant="outline"
+                size="sm"
+                className="bg-gradient-to-r from-slate-800 via-gray-800 to-zinc-900 border border-slate-600/50 text-slate-200 hover:from-slate-700 hover:via-gray-700 hover:to-zinc-800 hover:text-white transition-all duration-200 shadow-lg"
+              >
+                <RotateCcw className="h-4 w-4 mr-2" />
+                Regenerate (Keywords)
+              </Button>
+              <Button
+                onClick={generateLLMBasedCategories}
+                variant="outline"
+                size="sm"
+                disabled={isCategorizingWithLLM}
+                className="bg-gradient-to-r from-emerald-800 via-green-800 to-teal-900 border border-emerald-600/50 text-emerald-200 hover:from-emerald-700 hover:via-green-700 hover:to-teal-800 hover:text-white transition-all duration-200 shadow-lg disabled:opacity-50"
+              >
+                {isCategorizingWithLLM ? (
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                ) : (
+                  <Brain className="h-4 w-4 mr-2" />
+                )}
+                Use AI
+              </Button>
+            </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
