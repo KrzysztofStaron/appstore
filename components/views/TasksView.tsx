@@ -172,7 +172,10 @@ export function TasksView({ analysisResult, reviews, appMetadata, onAnalysisUpda
                     <span className="text-2xl">{getCategoryIcon(step.category)}</span>
                     <h3 className="text-xl font-semibold text-white">{step.title}</h3>
                     <Badge variant="outline" className={getPriorityColor(step.priority)}>
-                      {step.priority} priority
+                      <span className="md:hidden">
+                        {step.priority === "critical" ? "critical" : `${step.priority} priority`}
+                      </span>
+                      <span className="hidden md:inline">{step.priority} priority</span>
                     </Badge>
                   </div>
                   <p className="text-zinc-300 mb-4 leading-relaxed">{step.description}</p>

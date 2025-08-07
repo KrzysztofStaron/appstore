@@ -237,7 +237,10 @@ export function DashboardView({ analysisResult, appMetadata, onNavigateToView }:
                         <span className="text-xl md:text-2xl">{getCategoryIcon(topStep.category)}</span>
                         <h3 className="text-lg md:text-xl font-semibold text-white">{topStep.title}</h3>
                         <Badge variant="outline" className={`${getPriorityColor(topStep.priority)} text-xs`}>
-                          {topStep.priority} priority
+                          <span className="md:hidden">
+                            {topStep.priority === "critical" ? "critical" : `${topStep.priority} priority`}
+                          </span>
+                          <span className="hidden md:inline">{topStep.priority} priority</span>
                         </Badge>
                       </div>
                       <p className="text-sm md:text-base text-zinc-300 mb-3 md:mb-4 leading-relaxed">

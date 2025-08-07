@@ -94,7 +94,7 @@ export function Sidebar({
               <BarChart3 className="h-4 w-4 md:h-6 md:w-6 text-zinc-300" />
             </div>
             <div>
-              <h1 className="text-lg md:text-xl font-bold text-white">Analytics Hub</h1>
+              <h1 className="text-lg md:text-xl font-bold text-white">ReviewAI</h1>
               <p className="text-xs text-zinc-400">App Store Intelligence</p>
             </div>
           </div>

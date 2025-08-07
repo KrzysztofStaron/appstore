@@ -34,7 +34,7 @@ export function KeywordsView({ analysisResult }: KeywordsViewProps) {
                 : "from-gray-500/10 to-gray-600/5 border-gray-500/20"
             } backdrop-blur-sm hover:scale-105 transition-transform`}
           >
-            <CardContent className="p-6">
+            <CardContent className="px-6 ">
               <div className="flex items-center justify-between mb-4">
                 <div className="text-2xl font-bold text-white">{keyword.keyword}</div>
                 <Badge
