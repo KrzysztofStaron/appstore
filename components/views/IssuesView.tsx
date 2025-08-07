@@ -17,9 +17,10 @@ import {
   RotateCcw,
   Loader2,
   Brain,
+  RefreshCw,
 } from "lucide-react";
 import { AnalysisResult, AppStoreReview, AppMetadata } from "@/app/types";
-import { filterReviewsByVersion } from "@/lib/utils";
+import { filterReviewsByVersion, getSortedVersions } from "@/lib/utils";
 import { VersionSlider } from "@/components/ui/version-slider";
 
 interface IssueCategory {
@@ -45,6 +46,8 @@ export function IssuesView({ analysisResult, reviews, appMetadata }: IssuesViewP
 
   // Version filter state
   const [minVersion, setMinVersion] = useState<string>("0.0");
+  const [pendingMinVersion, setPendingMinVersion] = useState<string>("0.0");
+  const [isApplyingFilter, setIsApplyingFilter] = useState<boolean>(false);
 
   // LLM categorization state
   const [isCategorizingWithLLM, setIsCategorizingWithLLM] = useState<boolean>(false);
@@ -65,6 +68,30 @@ export function IssuesView({ analysisResult, reviews, appMetadata }: IssuesViewP
       generateIssueAnalysis();
     }
   }, [analysisResult, reviews, minVersion]);
+
+  // Handle version change from slider
+  const handleVersionSliderChange = (version: string) => {
+    setPendingMinVersion(version);
+
+    // If this is the initial version setup (both are at default), sync them
+    if (minVersion === "0.0" && pendingMinVersion === "0.0") {
+      setMinVersion(version);
+    }
+    // Otherwise, don't update minVersion immediately - wait for apply button
+  };
+
+  // Handle applying version filter
+  const handleApplyVersionFilter = async () => {
+    if (pendingMinVersion === minVersion) return; // No change needed
+
+    setIsApplyingFilter(true);
+    try {
+      setMinVersion(pendingMinVersion);
+      // The useEffect above will automatically regenerate the analysis
+    } finally {
+      setIsApplyingFilter(false);
+    }
+  };
 
   // Define category definitions
   const getCategoryDefinitions = () => [
@@ -556,9 +583,6 @@ export function IssuesView({ analysisResult, reviews, appMetadata }: IssuesViewP
           <p className="text-zinc-400">Categorized negative reviews and user complaints</p>
         </div>
       </div>
-
-      {/* Version Filter */}
-      <VersionSlider reviews={reviews} appMetadata={appMetadata} onVersionChange={setMinVersion} />
 
       {/* LLM Categorization Controls */}
       {!isCategorizingWithLLM && analysisResult && (
